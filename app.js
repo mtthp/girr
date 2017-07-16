@@ -4,16 +4,25 @@ var server = require('http').Server(app);
 var io = require('socket.io')(server);
 
 app.use(express.static('./public')) // Indique que le dossier /public contient des fichiers statiques (middleware chargé de base)
- .use(function(req, res){ // Répond enfin
-     res.send('Hello');
-});
-
-io.on('connection', function (socket) {
-  socket.emit('newTitle', { text: 'Title ready !', timeout: 5 });
-  socket.on('setNewTitle', function (data) {
-    console.log(data);
-    io.sockets.emit('newTitle', data);
+  .use(function (req, res) { // Répond enfin
+    res.send('Hello');
   });
+
+io.on('connection', socket => {
+  socket.emit('setTitle', { text: 'Title ready !', timeout: 5 });
+  socket.on('setTitle', data => {
+    console.log(data);
+    io.sockets.emit('setTitle', data);
+  });
+
+  socket.on('setIncrust', data => {
+    //todo check the file exists in the directory
+    io.sockets.emit('setIncrust', data);
+  });
+  socket.on('clearIncrust', data => {
+    io.sockets.emit('clearIncrust', data);
+  });
+
 });
 
 io.listen(app.listen(8081));

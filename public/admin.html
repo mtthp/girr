@@ -1,18 +1,37 @@
 <!doctype html>
 <html>
-    <head>
-        <script type="text/javascript" src="/socket.io/socket.io.js"></script>
-    </head>
-    <body>
+
+<head>
+    <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+</head>
+
+<body>
+    <div>
         <input type="text" id="title" />
         <input type="text" id="duration" />
         <button onclick="updateTitle()">update title</button>
-    </body>
-    <script type="text/javascript">
-        var socket = io.connect();
-        function updateTitle() {
-            var duration = parseInt(document.getElementById("duration").value, 10) || undefined;
-            socket.emit('setNewTitle', { text : document.getElementById("title").value, timeout: duration});
-        }
-    </script>
+    </div>
+    <div>
+        <input type="text" id="incrust" />
+        <input type="text" id="duration" />
+        <button onclick="updateIncrust()">incrust</button>
+        <button onclick="clearIncrust()">clear incrust</button>
+    </div>
+</body>
+<script type="text/javascript">
+    var socket = io.connect();
+    function updateTitle() {
+        var duration = parseInt(document.getElementById("duration").value, 10) || undefined;
+        socket.emit('setTitle', { text: document.getElementById("title").value, timeout: duration });
+    }
+    function updateIncrust() {
+        var duration = parseInt(document.getElementById("duration").value, 10) || undefined;
+        socket.emit('setIncrust', { src: document.getElementById("incrust").value, timeout: duration });
+    }
+    function clearIncrust() {
+        socket.emit('clearIncrust');
+    }
+
+</script>
+
 </html>
