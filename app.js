@@ -1,12 +1,14 @@
-var express = require('express');
-var app = express();
-var server = require('http').Server(app);
-var io = require('socket.io')(server);
+const express = require('express');
+const app = express();
+const server = require('http').Server(app);
+const io = require('socket.io')(server);
 
-app.use(express.static('./public')) // Indique que le dossier /public contient des fichiers statiques (middleware chargé de base)
-  .use(function (req, res) { // Répond enfin
-    res.send('Hello');
-  });
+
+// monter les routes
+const emission = require('./routes/emission.js');
+
+app.use(express.static('./public')); // Indique que le dossier /public contient des fichiers statiques (middleware chargé de base)
+app.use('/api/emissions', emission);
 
 io.on('connection', socket => {
 
@@ -27,6 +29,7 @@ io.on('connection', socket => {
   });
 
 });
+
 
 let port = 8081;
 io.listen(app.listen(port, () => {

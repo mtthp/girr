@@ -3,6 +3,16 @@
 
 <head>
     <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+    <style>
+        #incrusts-container  {
+            display: flex;
+            flex-direction: row;
+        }
+        #incrusts-container > img {
+            max-height: 10em;
+            width:auto;
+        }
+    </style>
 </head>
 
 <body>
@@ -13,9 +23,11 @@
     </div>
     <div>
         <input type="text" id="incrust" value="assets/episode1/0.jpg" />
-        <input type="text" id="duration" />
         <button onclick="updateIncrust()">incrust</button>
         <button onclick="clearIncrust()">clear incrust</button>
+    </div>
+    <div id="incrusts-container">
+
     </div>
 </body>
 <script type="text/javascript">
@@ -25,13 +37,50 @@
         socket.emit('setTitle', { text: document.getElementById("title").value, timeout: duration });
     }
     function updateIncrust() {
-        var duration = parseInt(document.getElementById("duration").value, 10) || undefined;
-        socket.emit('setIncrust', { src: document.getElementById("incrust").value, timeout: duration });
+        sendSetIncrust(document.getElementById("incrust").value);
     }
     function clearIncrust() {
         socket.emit('clearIncrust');
     }
 
+    function sendSetIncrust(src) {
+        socket.emit('setIncrust', { src: src });
+    }
+
+    function loadIncrust() {
+        var request = new XMLHttpRequest();
+        request.open('GET', '/api/emissions/bits/59/incrusts', true);
+
+        request.onload = function() {
+        if (request.status >= 200 && request.status < 400) {
+            // Success!
+            var data = JSON.parse(request.responseText);
+            var container = document.getElementById("incrusts-container");
+            container.innerHTML = "";
+            data.forEach(element => {
+                var img = document.createElement("img");
+                img.src = element;
+                img.addEventListener("click", event => {
+                    sendSetIncrust(event.srcElement.src);
+                });
+                container.appendChild(img);
+            });
+        } else {
+            // We reached our target server, but it returned an error
+
+        }
+        };
+
+        request.onerror = function() {
+        // There was a connection error of some sort
+        };
+
+        request.send();
+    }
+
+    document.addEventListener("DOMContentLoaded", event => {
+        loadIncrust();
+    });
 </script>
 
 </html>
