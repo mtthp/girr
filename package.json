@@ -4,7 +4,6 @@
   "description": "Widget pour les titres de GeekInc",
   "main": "index.html",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node app.js",
     "dev": "nodemon --inspect=5858 app.js"
   },
