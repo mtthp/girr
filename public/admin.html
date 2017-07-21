@@ -4,26 +4,41 @@
 <head>
     <script type="text/javascript" src="/socket.io/socket.io.js"></script>
     <style>
-        #incrusts-container  {
+        #incrusts-container {
             display: flex;
             flex-direction: row;
         }
-        #incrusts-container > img {
+
+        #incrusts-container>img {
             max-height: 10em;
-            width:auto;
+            width: auto;
+            border: 2px solid transparent;
         }
+
+        #incrusts-container>img:hover {
+            border: 2px solid #4286f4;
+            cursor: pointer;
+        }
+
     </style>
 </head>
 
 <body>
+    <div>
+        <label>Emission / Episode #</label>
+        <input type="text" id="emission" onchange="loadIncrust()" value="bits" />
+        <input type="text" id="episode" onchange="loadIncrust()" value="59" />
+    </div>
     <div>
         <input type="text" id="title" value="test title" />
         <input type="text" id="duration" value="2" />
         <button onclick="updateTitle()">update title</button>
     </div>
     <div>
-        <input type="text" id="incrust" value="assets/episode1/0.jpg" />
-        <button onclick="updateIncrust()">incrust</button>
+        <form ref='uploadForm' id='uploadForm' action='' method='post' encType="multipart/form-data">
+            <input type="file" name="incrust" />
+            <input type='submit' value='Upload!' />
+        </form>
         <button onclick="clearIncrust()">clear incrust</button>
     </div>
     <div id="incrusts-container">
@@ -46,33 +61,40 @@
     function sendSetIncrust(src) {
         socket.emit('setIncrust', { src: src });
     }
-
+    function getEpisodeUrl() {
+        return '/api/emissions/' + emission.value + '/' + episode.value;
+    }
     function loadIncrust() {
-        var request = new XMLHttpRequest();
-        request.open('GET', '/api/emissions/bits/59/incrusts', true);
 
-        request.onload = function() {
-        if (request.status >= 200 && request.status < 400) {
-            // Success!
-            var data = JSON.parse(request.responseText);
+        var request = new XMLHttpRequest();
+        var url = getEpisodeUrl() + '/incrusts';
+
+        uploadForm.action = url;
+
+        request.open('GET', url, true);
+
+        request.onload = function () {
             var container = document.getElementById("incrusts-container");
             container.innerHTML = "";
-            data.forEach(element => {
-                var img = document.createElement("img");
-                img.src = element;
-                img.addEventListener("click", event => {
-                    sendSetIncrust(event.srcElement.src);
+            if (request.status >= 200 && request.status < 400) {
+                // Success!
+                var data = JSON.parse(request.responseText);
+                data.forEach(element => {
+                    var img = document.createElement("img");
+                    img.src = element;
+                    img.addEventListener("click", event => {
+                        sendSetIncrust(event.srcElement.src);
+                    });
+                    container.appendChild(img);
                 });
-                container.appendChild(img);
-            });
-        } else {
-            // We reached our target server, but it returned an error
+            } else {
+                // We reached our target server, but it returned an error
 
-        }
+            }
         };
 
-        request.onerror = function() {
-        // There was a connection error of some sort
+        request.onerror = function () {
+            // There was a connection error of some sort
         };
 
         request.send();
@@ -81,6 +103,7 @@
     document.addEventListener("DOMContentLoaded", event => {
         loadIncrust();
     });
+
 </script>
 
 </html>
