@@ -1,8 +1,8 @@
 {
-  "name": "geekincwidget",
+  "name": "girr",
   "version": "1.0.0",
-  "description": "Widget pour les titres de GeekInc",
-  "main": "index.html",
+  "description": "GeekInc Remote Regie",
+  "main": "app.js",
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon --inspect=5858 app.js"
