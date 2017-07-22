@@ -1,0 +1,197 @@
+<!doctype html>
+<html>
+
+<head>
+    <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript" src="https://unpkg.com/vue"></script>
+    <script type="text/javascript" src="https://unpkg.com/vue-resource@1.3.4"></script>
+    <style>
+        ol {
+            list-style-type: none;
+            -webkit-padding-start: 0;
+        }
+
+        #app>ol>li {
+            border: 2px solid transparent;
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+            padding: 0.5em 0.5em;
+            margin: 1em 0;
+            background-color: #e3e3e3;
+        }
+        /* #app>ol>li:hover {
+            border: 2px solid #FF6600;
+        } */
+
+        #app>ol>li>.title {
+            display: inline-block;
+        }
+
+        #app>ol>li>.incrusts-container {
+            display: flex;
+            flex-direction: row;
+            overflow-x: auto;
+            margin: 0.5em 0;
+        }
+
+        #app>ol>li>div>.x {
+            font-size: 8em;
+            background-color: lightgrey;
+            padding: 0 0.5em;
+            /* font-family: Arial, Helvetica, sans-serif; */
+        }
+
+        #app>ol>li>div>* {
+            margin: 0 1rem;
+            max-height: 10em;
+            width: auto;
+            border: 4px solid transparent;
+        }
+        /* #4286f4 */
+
+        #app>ol>li>div>*:hover {
+            border: 4px solid #FF6600;
+            cursor: pointer;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <ol>
+            <li v-for="(n, index) in news">
+                <div class="title" v-on:click="sendSetTitle(n.title)">{{ n.title }}</div>
+                <div class="incrusts-container">
+                    <span class="x" v-on:click="sendSetTitle(n.title)">{{index+1}}</span>
+                    <img v-for="incrust in n.incrusts" v-bind:src="incrust" v-on:click="sendSetIncrust(incrust)">
+                </div>
+            </li>
+        </ol>
+
+    </div>
+</body>
+<script type="text/javascript">
+    var socket = io.connect();
+
+    var app = new Vue({
+        el: '#app',
+        data: {
+            news: [
+                {
+                    title: 'Hyperloop One le test fonctionnel',
+                    incrusts: [
+                        '/assets/emissions/bits/59/0.jpg',
+                        '/assets/emissions/bits/59/1.jpg'
+                    ]
+                },
+                {
+                    title: 'DeepMind sait marcher',
+                    incrusts: [
+                        '/assets/emissions/bits/59/2.png',
+                        '/assets/emissions/bits/59/3.gif'
+                    ]
+                },
+                {
+                    title: 'Hyperloop One le test fonctionnel',
+                    incrusts: [
+                        '/assets/emissions/bits/59/0.jpg',
+                        '/assets/emissions/bits/59/1.jpg'
+                    ]
+                },
+                {
+                    title: 'DeepMind sait marcher',
+                    incrusts: [
+                        '/assets/emissions/bits/59/2.png',
+                        '/assets/emissions/bits/59/3.gif'
+                    ]
+                },
+                {
+                    title: 'Hyperloop One le test fonctionnel',
+                    incrusts: [
+                        '/assets/emissions/bits/59/0.jpg',
+                        '/assets/emissions/bits/59/1.jpg'
+                    ]
+                },
+                {
+                    title: 'DeepMind sait marcher',
+                    incrusts: [
+                        '/assets/emissions/bits/59/2.png',
+                        '/assets/emissions/bits/59/3.gif'
+                    ]
+                }
+            ]
+        },
+        methods: {
+            sendSetTitle: function (title) {
+                socket.emit('clearIncrust');
+                socket.emit('setTitle', { text: title });
+            },
+            sendSetIncrust: function(src) {
+                socket.emit('setIncrust', { src: src });
+            }
+        }
+    })
+
+    function updateTitle() {
+        var duration = parseInt(document.getElementById("duration").value, 10) || undefined;
+        socket.emit('setTitle', { text: document.getElementById("title").value, timeout: duration });
+    }
+    function updateIncrust() {
+        sendSetIncrust(document.getElementById("incrust").value);
+    }
+    function clearIncrust() {
+        socket.emit('clearIncrust');
+    }
+
+    function sendSetTitle(title) {
+        socket.emit('setTitle', { text: title });
+    }
+    function sendSetIncrust(src) {
+        socket.emit('setIncrust', { src: src });
+    }
+    function getEpisodeUrl() {
+        return '/api/emissions/' + emission.value + '/' + episode.value;
+    }
+    function loadIncrust() {
+
+        var request = new XMLHttpRequest();
+        var url = getEpisodeUrl() + '/incrusts';
+
+        uploadForm.action = url;
+
+        request.open('GET', url, true);
+
+        request.onload = function () {
+            var container = document.getElementById("incrusts-container");
+            container.innerHTML = "";
+            if (request.status >= 200 && request.status < 400) {
+                // Success!
+                var data = JSON.parse(request.responseText);
+                data.forEach(element => {
+                    var img = document.createElement("img");
+                    img.src = element;
+                    img.addEventListener("click", event => {
+                        sendSetIncrust(event.srcElement.src);
+                    });
+                    container.appendChild(img);
+                });
+            } else {
+                // We reached our target server, but it returned an error
+
+            }
+        };
+
+        request.onerror = function () {
+            // There was a connection error of some sort
+        };
+
+        request.send();
+    }
+
+    document.addEventListener("DOMContentLoaded", event => {
+        //        loadIncrust();
+    });
+
+</script>
+
+</html>

@@ -5,10 +5,24 @@ const router = express.Router();
 const fileUpload = require('express-fileupload');
 
 router.use('/:emission/:episode', (req, res, next) => {
-    req.publicPathToIncrusts = `assets/${req.params.emission}/${req.params.episode}`;
+    req.publicPathToIncrusts = `assets/emissions/${req.params.emission}/${req.params.episode}`;
     req.localPathToIncrusts = path.join('public', req.publicPathToIncrusts);
     next();
 });
+
+// router.get('/:emission/:episode', (req, res) => {
+//     let incrusts = [];
+
+//     fs.readdir(req.localPathToIncrusts, (err, files) => {
+//         if(err) {
+//             return res.status(404).send(err);
+//         }
+//         if(files) {
+//             incrusts = files.map(f => path.join(req.publicPathToIncrusts, f));
+//         }
+//         return res.send(incrusts);
+//     });
+// });
 
 router.get('/:emission/:episode/incrusts', (req, res) => {
     let incrusts = [];
