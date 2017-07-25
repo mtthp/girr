@@ -6,6 +6,10 @@
     <script type="text/javascript" src="https://unpkg.com/vue"></script>
     <script type="text/javascript" src="https://unpkg.com/vue-resource@1.3.4"></script>
     <style>
+        body {
+            background-color: rgb(238, 238, 238)
+        }
+
         ol {
             list-style-type: none;
             -webkit-padding-start: 0;
@@ -14,16 +18,17 @@
         #app>ol>li {
             border: 2px solid transparent;
             font-family: Verdana, Geneva, Tahoma, sans-serif;
-            padding: 0.5em 0.5em;
             margin: 1em 0;
-            background-color: #e3e3e3;
+            background-color: #fafafa;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
         }
-        /* #app>ol>li:hover {
-            border: 2px solid #FF6600;
-        } */
 
         #app>ol>li>.title {
-            display: inline-block;
+            display: flex;
+            background-color: #ff4200;
+            color: #fafafa;
+            font-weight: bold;
+            padding: 0.5em 0.5em;
         }
 
         #app>ol>li>.incrusts-container {
@@ -33,24 +38,39 @@
             margin: 0.5em 0;
         }
 
-        #app>ol>li>div>.x {
-            font-size: 8em;
-            background-color: lightgrey;
+        #app>ol>li>div .x {
+            /* margin: 0 0.01em; */
+            font-size: 4em;
+            background-color: #005976;
+            color: #fafafa;
             padding: 0 0.5em;
-            /* font-family: Arial, Helvetica, sans-serif; */
+            border: 4px solid #fafafa;
+            display: flex;
         }
 
-        #app>ol>li>div>* {
-            margin: 0 1rem;
-            max-height: 10em;
+        #app>ol>li>div img {
+            /* margin: 0 0.05em; */
+            /* margin: 0 1em; */
+            max-height: 5em;
             width: auto;
             border: 4px solid transparent;
+            /* border: 4px solid #005976; */
+            /* box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); */
         }
-        /* #4286f4 */
 
-        #app>ol>li>div>*:hover {
+        #app>ol>li>div input[type=radio] {
+            display: none;
+        }
+
+        #app>ol>li>div img:hover,
+        #app>ol>li>div .x:hover {
             border: 4px solid #FF6600;
+            /* box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22); */
             cursor: pointer;
+        }
+
+        #app>ol>li>div input[type="radio"]:checked+* {
+            border: 4px solid #3BF21C;
         }
 
     </style>
@@ -58,16 +78,21 @@
 
 <body>
     <div id="app">
-        <ol>
-            <li v-for="(n, index) in news">
+        <ol v-if="episode.news">
+            <li v-for="(n, index) in episode.news">
                 <div class="title" v-on:click="sendSetTitle(n.title)">{{ n.title }}</div>
                 <div class="incrusts-container">
-                    <span class="x" v-on:click="sendSetTitle(n.title)">{{index+1}}</span>
-                    <img v-for="incrust in n.incrusts" v-bind:src="incrust" v-on:click="sendSetIncrust(incrust)">
+                    <label>
+                        <input type="radio" name="incrustgroup" v-model="displayed" v-bind:value="{news: index, incrust: null}">
+                        <span class="x">{{index+1}}</span>
+                    </label>
+                    <label v-for="(incrust, indexIncrust) in n.incrusts">
+                        <input type="radio" name="incrustgroup" v-model="displayed" v-bind:value="{news: index, incrust: indexIncrust}">
+                        <img v-bind:src="incrust">
+                    </label>
                 </div>
             </li>
         </ol>
-
     </div>
 </body>
 <script type="text/javascript">
@@ -76,121 +101,234 @@
     var app = new Vue({
         el: '#app',
         data: {
-            news: [
-                {
-                    title: 'Hyperloop One le test fonctionnel',
-                    incrusts: [
-                        '/assets/emissions/bits/59/0.jpg',
-                        '/assets/emissions/bits/59/1.jpg'
-                    ]
-                },
-                {
-                    title: 'DeepMind sait marcher',
-                    incrusts: [
-                        '/assets/emissions/bits/59/2.png',
-                        '/assets/emissions/bits/59/3.gif'
-                    ]
-                },
-                {
-                    title: 'Hyperloop One le test fonctionnel',
-                    incrusts: [
-                        '/assets/emissions/bits/59/0.jpg',
-                        '/assets/emissions/bits/59/1.jpg'
-                    ]
-                },
-                {
-                    title: 'DeepMind sait marcher',
-                    incrusts: [
-                        '/assets/emissions/bits/59/2.png',
-                        '/assets/emissions/bits/59/3.gif'
-                    ]
-                },
-                {
-                    title: 'Hyperloop One le test fonctionnel',
-                    incrusts: [
-                        '/assets/emissions/bits/59/0.jpg',
-                        '/assets/emissions/bits/59/1.jpg'
-                    ]
-                },
-                {
-                    title: 'DeepMind sait marcher',
-                    incrusts: [
-                        '/assets/emissions/bits/59/2.png',
-                        '/assets/emissions/bits/59/3.gif'
-                    ]
-                }
-            ]
+            episode: { news: [] },
+            displayed: null
         },
         methods: {
             sendSetTitle: function (title) {
-                socket.emit('clearIncrust');
                 socket.emit('setTitle', { text: title });
             },
-            sendSetIncrust: function(src) {
+            clearIncrust: function () {
+                socket.emit('clearIncrust');
+
+            },
+            sendSetIncrust: function (src) {
                 socket.emit('setIncrust', { src: src });
+            },
+            scrollIntoView: function (alignToTop) {
+                this.$nextTick(() => {
+                    var inputSelected = this.$el.querySelector('input[type=radio]:checked');
+                    if (inputSelected)
+                        inputSelected.parentElement.parentElement.parentElement.scrollIntoView(alignToTop);
+                });
+            },
+            getEpisode: function () {
+                // /api/emissions/' + emission.value + '/' + episode.value;
+                return this.$http.get('/api/emissions/bits/59').then(response => {
+                    this.episode = response.body;
+                });
+                /*
+                    this.episode = {
+                        title: 'Bits 59',
+                        displayed: null,
+                        news: [
+                            {
+                                title: 'Hyperloop One le test fonctionnel',
+                                incrusts: [
+                                    '/assets/emissions/bits/59/0.jpg',
+                                    '/assets/emissions/bits/59/1.jpg'
+                                ]
+                            },
+                            {
+                                title: 'DeepMind sait marcher',
+                                incrusts: [
+                                    '/assets/emissions/bits/59/2.png',
+                                    '/assets/emissions/bits/59/3.gif'
+                                ]
+                            },
+                            {
+                                title: 'Hyperloop One le test fonctionnel',
+                                incrusts: [
+                                    '/assets/emissions/bits/59/0.jpg',
+                                    '/assets/emissions/bits/59/1.jpg'
+                                ]
+                            },
+                            {
+                                title: 'DeepMind sait marcher',
+                                incrusts: [
+                                    '/assets/emissions/bits/59/2.png',
+                                    '/assets/emissions/bits/59/3.gif'
+                                ]
+                            },
+                            {
+                                title: 'Hyperloop One le test fonctionnel',
+                                incrusts: [
+                                    '/assets/emissions/bits/59/0.jpg',
+                                    '/assets/emissions/bits/59/1.jpg'
+                                ]
+                            },
+                            {
+                                title: 'DeepMind sait marcher',
+                                incrusts: [
+                                    '/assets/emissions/bits/59/2.png',
+                                    '/assets/emissions/bits/59/3.gif'
+                                ]
+                            }
+                        ]
+                    };
+                */
             }
+        },
+        watch: {
+            displayed: function (val, oldVal) {
+                if (val === null || val.news === null) {
+                    this.sendSetTitle(this.episode.title);
+                    return;
+                }
+                if (!oldVal || val.news !== oldVal.news) {
+                    this.sendSetTitle(this.episode.news[val.news].title);
+                }
+                if (!oldVal || val.incrust !== oldVal.incrust) {
+                    if (val.incrust !== null) {
+                        this.sendSetIncrust(this.episode.news[val.news].incrusts[val.incrust]);
+                    }
+                    else {
+                        this.clearIncrust();
+                    }
+                }
+            },
+            'displayed.news': function (val, oldVal) {
+                if (val !== oldVal) {
+                    if (val === null) {
+                        this.sendSetTitle(this.episode.title);
+                    } else {
+                        this.sendSetTitle(this.episode.news[val].title);
+                    }
+                }
+            },
+            'displayed.incrust': function (val, oldVal) {
+                if (val !== oldVal) {
+                    if (val !== null) {
+                        this.sendSetIncrust(this.episode.news[this.displayed.news].incrusts[val]);
+                    } else {
+                        this.clearIncrust();
+                    }
+                }
+            }
+        },
+        mounted: function () {
+            this.clearIncrust();
+            this.getEpisode().then(() => {
+                this.displayed = {
+                    news: null,
+                    incrust: null
+                };
+            });
+
+            document.addEventListener("keydown", event => {
+                /*
+                    left = 37
+                    up = 38
+                    right = 39
+                    down = 40
+                */
+                if (event.keyCode === 39) {
+                    if (this.displayed !== null && this.displayed.news !== null) {
+                        var news = this.episode.news[this.displayed.news];
+                        if (this.displayed.incrust === null) {
+                            if (news.incrusts.length > 0) {
+                                this.displayed.incrust = 0;
+                            }
+                        } else {
+                            if (this.displayed.incrust < news.incrusts.length - 1) {
+                                this.displayed.incrust += 1;
+                            }
+                            else {
+                                this.displayed.incrust = null;
+                            }
+                        }
+                    }
+                }
+                else if (event.keyCode === 37) {
+                    if (this.displayed !== null && this.displayed.news !== null) {
+                        if (this.displayed.incrust !== null) {
+                            if (this.displayed.incrust === 0) {
+                                this.displayed.incrust = null;
+                            } else {
+                                this.displayed.incrust -= 1;
+                            }
+                        }
+                    }
+                }
+                else if (event.keyCode === 40) {
+                    event.preventDefault();
+                    if (this.displayed !== null) {
+                        this.displayed.incrust = null;
+                        if (this.displayed.news !== null) {
+                            if (this.displayed.news < this.episode.news.length - 1)
+                                this.displayed.news = this.displayed.news + 1;
+                        }
+                        else {
+                            this.displayed.news = 0;
+                        }
+                    }
+                    else {
+                        this.displayed = { news: 0, incrust: null };
+                    }
+                    this.scrollIntoView(false);
+                }
+                else if (event.keyCode === 38) {
+                    event.preventDefault();
+                    if (this.displayed !== null) {
+                        if (this.displayed.incrust !== null) {
+                            this.displayed.incrust = null;
+                            return;
+                        }
+                        if (this.displayed.news !== null && this.displayed.news !== 0) {
+                            this.displayed.news = this.displayed.news - 1;
+                        }
+                        else {
+                            this.displayed.news = null;
+                        }
+                    }
+                    // else {
+                    //     this.displayed = { news: 0, incrust: null };
+                    // }
+                    this.scrollIntoView(true);
+                }
+            });
         }
     })
 
-    function updateTitle() {
-        var duration = parseInt(document.getElementById("duration").value, 10) || undefined;
-        socket.emit('setTitle', { text: document.getElementById("title").value, timeout: duration });
-    }
-    function updateIncrust() {
-        sendSetIncrust(document.getElementById("incrust").value);
-    }
-    function clearIncrust() {
-        socket.emit('clearIncrust');
-    }
+    // function getEpisodeUrl() {
+    //     return '/api/emissions/' + emission.value + '/' + episode.value;
+    // }
 
-    function sendSetTitle(title) {
-        socket.emit('setTitle', { text: title });
-    }
-    function sendSetIncrust(src) {
-        socket.emit('setIncrust', { src: src });
-    }
-    function getEpisodeUrl() {
-        return '/api/emissions/' + emission.value + '/' + episode.value;
-    }
-    function loadIncrust() {
+    // function loadIncrust() {
 
-        var request = new XMLHttpRequest();
-        var url = getEpisodeUrl() + '/incrusts';
+    //     var request = new XMLHttpRequest();
+    //     var url = getEpisodeUrl() + '/incrusts';
 
-        uploadForm.action = url;
+    //     uploadForm.action = url;
 
-        request.open('GET', url, true);
+    //     request.open('GET', url, true);
 
-        request.onload = function () {
-            var container = document.getElementById("incrusts-container");
-            container.innerHTML = "";
-            if (request.status >= 200 && request.status < 400) {
-                // Success!
-                var data = JSON.parse(request.responseText);
-                data.forEach(element => {
-                    var img = document.createElement("img");
-                    img.src = element;
-                    img.addEventListener("click", event => {
-                        sendSetIncrust(event.srcElement.src);
-                    });
-                    container.appendChild(img);
-                });
-            } else {
-                // We reached our target server, but it returned an error
+    //     request.onload = function () {
+    //         if (request.status >= 200 && request.status < 400) {
+    //             // Success!
+    //             var data = JSON.parse(request.responseText);
+    //             episode = data;
+    //         } else {
+    //             // We reached our target server, but it returned an error
+    //         }
+    //     };
 
-            }
-        };
+    //     request.onerror = function () {
+    //         // There was a connection error of some sort
+    //     };
 
-        request.onerror = function () {
-            // There was a connection error of some sort
-        };
-
-        request.send();
-    }
-
-    document.addEventListener("DOMContentLoaded", event => {
-        //        loadIncrust();
-    });
+    //     request.send();
+    // }
 
 </script>
 

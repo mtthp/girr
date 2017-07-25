@@ -12,7 +12,7 @@ app.use('/api/emissions', emission);
 
 io.on('connection', socket => {
 
-  socket.emit('setTitle', { text: 'Title ready !', timeout: 5 });
+  socket.emit('setTitle', { text: 'GeekInc Remote Regie ready !' });
 
   socket.on('setTitle', data => {
     console.log(data);
