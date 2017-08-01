@@ -13,7 +13,8 @@ router.get('/', (req, res) => {
 router.post('/:news', (req, res) => {
     let news = new News({
         numero: req.params.news,
-        episode: req.episode._id
+        episode: req.episode._id,
+        titre: ''
     });
     news.save(err => {
         if (err) {
@@ -31,7 +32,7 @@ router.use('/:news', (req, res, next) => {
     }, (err, n) => {
         if (err)
             return res.status(500).send(err);
-        if(n === null)
+        if (n === null)
             return res.sendStatus(404);
         req.news = n;
         next();
@@ -64,7 +65,17 @@ router.delete('/:news', (req, res) => {
         if (err) {
             return res.status(500).send(err);
         }
-        return res.sendStatus(204);
+        // il faut renuméroter les autres
+        News.find({
+            episode: req.episode._id
+        }, (err, news) => {
+            news.forEach((n, index) => {
+                n.numero = index + 1;
+                n.save(); //TODO attendre que tous les save soient OK
+            })
+            return res.sendStatus(204);
+        });
+
     });
 });
 
