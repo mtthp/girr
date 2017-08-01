@@ -3,7 +3,8 @@ const bodyParser = require('body-parser');
 const app = express();
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
+mongoose.Promise = Promise;
 
 // monter les routes
 const emission = require('./routes/emission.js');
