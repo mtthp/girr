@@ -5,8 +5,8 @@ const News = require('../models/news');
 router.get('/', (req, res) => {
     News.find({
         episode: req.episode._id
-    }, (err, episodes) => {
-        res.send(episodes);
+    }, (err, news) => {
+        res.send(news);
     });
 });
 

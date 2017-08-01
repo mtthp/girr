@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Episode = require('../models/episode')
+const News = require('../models/news')
 const news = require('./news')
 
 router.get('/', (req, res) => {
@@ -15,7 +16,8 @@ router.post('/:episode', (req, res) => {
     let episode = new Episode({
         numero: req.params.episode,
         nom: req.body.nom,
-        emission: req.emission });
+        emission: req.emission
+    });
     episode.save(err => {
         if (err) {
             return res.status(500).send(err);
@@ -32,7 +34,7 @@ router.use('/:episode', (req, res, next) => {
     }).populate({ path: 'emission', select: 'nom' }).exec((err, ep) => {
         if (err)
             return res.status(500).send(err);
-        if(ep === null)
+        if (ep === null)
             return res.sendStatus(404);
         req.episode = ep;
         next();
@@ -69,6 +71,31 @@ router.delete('/:episode', (req, res) => {
     });
 });
 
+router.get('/:episode/full', (req, res) => {
+    // this.episode = {
+    //     title: 'Bits 59',
+    //     displayed: null,
+    //     news: [
+    //         {
+    //             title: 'Hyperloop One le test fonctionnel',
+    //             incrusts: [
+    //                 '/assets/emissions/bits/59/0.jpg',
+    //                 '/assets/emissions/bits/59/1.jpg'
+    //             ]
+    //         },
+
+    News.find({
+        episode: req.episode._id
+    }, {'_id': 0, 'numero': 1, 'titre': 1, 'incrusts': 1}, (err, news) => {
+        let nomCapitalFirst = req.emission.nom.charAt(0).toUpperCase() + req.emission.nom.slice(1);
+        let episodeFull = {
+            titre: `${nomCapitalFirst} ${req.episode.numero}`,
+            news: news
+        };
+        res.send(episodeFull);
+    });
+
+});
 router.use('/:episode/news', news);
 
 // router.use('/:emission/:episode', (req, res, next) => {

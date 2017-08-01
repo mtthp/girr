@@ -80,7 +80,7 @@
     <div id="app">
         <ol v-if="episode.news">
             <li v-for="(n, index) in episode.news">
-                <div class="title" v-on:click="sendSetTitle(n.title)">{{ n.title }}</div>
+                <div class="title" v-on:click="sendSetTitle(n.titre)">{{ n.titre }}</div>
                 <div class="incrusts-container">
                     <label>
                         <input type="radio" name="incrustgroup" v-model="displayed" v-bind:value="{news: index, incrust: null}">
@@ -105,8 +105,8 @@
             displayed: null
         },
         methods: {
-            sendSetTitle: function (title) {
-                socket.emit('setTitle', { text: title });
+            sendSetTitle: function (titre) {
+                socket.emit('setTitle', { text: titre });
             },
             clearIncrust: function () {
                 socket.emit('clearIncrust');
@@ -124,51 +124,51 @@
             },
             getEpisode: function () {
                 // /api/emissions/' + emission.value + '/' + episode.value;
-                return this.$http.get('/api/emissions/bits/59').then(response => {
+                return this.$http.get('/api/emissions/bits/episodes/59/full').then(response => {
                     this.episode = response.body;
                 });
                 /*
                     this.episode = {
-                        title: 'Bits 59',
+                        titre: 'Bits 59',
                         displayed: null,
                         news: [
                             {
-                                title: 'Hyperloop One le test fonctionnel',
+                                titre: 'Hyperloop One le test fonctionnel',
                                 incrusts: [
                                     '/assets/emissions/bits/59/0.jpg',
                                     '/assets/emissions/bits/59/1.jpg'
                                 ]
                             },
                             {
-                                title: 'DeepMind sait marcher',
+                                titre: 'DeepMind sait marcher',
                                 incrusts: [
                                     '/assets/emissions/bits/59/2.png',
                                     '/assets/emissions/bits/59/3.gif'
                                 ]
                             },
                             {
-                                title: 'Hyperloop One le test fonctionnel',
+                                titre: 'Hyperloop One le test fonctionnel',
                                 incrusts: [
                                     '/assets/emissions/bits/59/0.jpg',
                                     '/assets/emissions/bits/59/1.jpg'
                                 ]
                             },
                             {
-                                title: 'DeepMind sait marcher',
+                                titre: 'DeepMind sait marcher',
                                 incrusts: [
                                     '/assets/emissions/bits/59/2.png',
                                     '/assets/emissions/bits/59/3.gif'
                                 ]
                             },
                             {
-                                title: 'Hyperloop One le test fonctionnel',
+                                titre: 'Hyperloop One le test fonctionnel',
                                 incrusts: [
                                     '/assets/emissions/bits/59/0.jpg',
                                     '/assets/emissions/bits/59/1.jpg'
                                 ]
                             },
                             {
-                                title: 'DeepMind sait marcher',
+                                titre: 'DeepMind sait marcher',
                                 incrusts: [
                                     '/assets/emissions/bits/59/2.png',
                                     '/assets/emissions/bits/59/3.gif'
@@ -182,11 +182,11 @@
         watch: {
             displayed: function (val, oldVal) {
                 if (val === null || val.news === null) {
-                    this.sendSetTitle(this.episode.title);
+                    this.sendSetTitle(this.episode.titre);
                     return;
                 }
                 if (!oldVal || val.news !== oldVal.news) {
-                    this.sendSetTitle(this.episode.news[val.news].title);
+                    this.sendSetTitle(this.episode.news[val.news].titre);
                 }
                 if (!oldVal || val.incrust !== oldVal.incrust) {
                     if (val.incrust !== null) {
@@ -200,9 +200,9 @@
             'displayed.news': function (val, oldVal) {
                 if (val !== oldVal) {
                     if (val === null) {
-                        this.sendSetTitle(this.episode.title);
+                        this.sendSetTitle(this.episode.titre);
                     } else {
-                        this.sendSetTitle(this.episode.news[val].title);
+                        this.sendSetTitle(this.episode.news[val].titre);
                     }
                 }
             },
