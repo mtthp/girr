@@ -1,103 +1,70 @@
 const express = require('express');
-const fs = require('fs');
-const path = require('path');
 const router = express.Router();
-const fileUpload = require('express-fileupload');
+const Emission = require('../models/emission')
+const episode = require('./episode')
 
-router.use('/:emission/:episode', (req, res, next) => {
-    req.publicPathToIncrusts = `assets/emissions/${req.params.emission}/${req.params.episode}`;
-    req.localPathToIncrusts = path.join('public', req.publicPathToIncrusts);
-    next();
+router.get('/', (req, res) => {
+    Emission.find((err, emissions) => {
+        res.send(emissions);
+    })
 });
 
-router.get('/:emission/:episode', (req, res) => {
-    let episode = {
-        title: 'Bits 59',
-        news: [
-            {
-                title: 'Hyperloop One le test fonctionnel',
-                incrusts: [
-                    '/assets/emissions/bits/59/0.jpg',
-                    '/assets/emissions/bits/59/1.jpg'
-                ]
-            },
-            {
-                title: 'DeepMind sait marcher',
-                incrusts: [
-                    '/assets/emissions/bits/59/2.png',
-                    '/assets/emissions/bits/59/3.gif'
-                ]
-            },
-            {
-                title: 'Hyperloop One le test fonctionnel',
-                incrusts: [
-                    '/assets/emissions/bits/59/0.jpg',
-                    '/assets/emissions/bits/59/1.jpg'
-                ]
-            },
-            {
-                title: 'DeepMind sait marcher',
-                incrusts: [
-                    '/assets/emissions/bits/59/2.png',
-                    '/assets/emissions/bits/59/3.gif'
-                ]
-            },
-            {
-                title: 'Hyperloop One le test fonctionnel',
-                incrusts: [
-                    '/assets/emissions/bits/59/0.jpg',
-                    '/assets/emissions/bits/59/1.jpg'
-                ]
-            },
-            {
-                title: 'DeepMind sait marcher',
-                incrusts: [
-                    '/assets/emissions/bits/59/2.png',
-                    '/assets/emissions/bits/59/3.gif'
-                ]
-            }
-        ]
-    };
-    console.log(`returning episode`);
-    return res.send(episode);
-    // fs.readdir(req.localPathToIncrusts, (err, files) => {
-    //     if(err) {
-    //         return res.status(404).send(err);
-    //     }
-    //     if(files) {
-    //         incrusts = files.map(f => path.join(req.publicPathToIncrusts, f));
-    //     }
-    //     return res.send(incrusts);
-    // });
-});
-
-router.get('/:emission/:episode/incrusts', (req, res) => {
-    let incrusts = [];
-
-    fs.readdir(req.localPathToIncrusts, (err, files) => {
+router.post('/:emission', (req, res) => {
+    let emission = new Emission({ nom: req.params.emission });
+    emission.save(err => {
         if (err) {
-            return res.status(404).send(err);
-        }
-        if (files) {
-            incrusts = files.map(f => path.join(req.publicPathToIncrusts, f));
-        }
-        return res.send(incrusts);
-    });
-});
-
-router.use(fileUpload());
-
-router.post('/:emission/:episode/incrusts', (req, res) => {
-    if (!req.files)
-        return res.status(400).send('No files were uploaded.');
-
-    let incrustFile = req.files.incrust;
-
-    incrustFile.mv(path.join(req.localPathToIncrusts, req.files.incrust.name), err => {
-        if (err)
             return res.status(500).send(err);
-        res.send('File uploaded!');
+        }
+        res.setHeader('location', `api/emissions/${emission.nom}`);
+        return res.sendStatus(201);
     });
 });
+
+router.use('/:emission', (req, res, next) => {
+    Emission.findOne({
+        nom: req.params.emission
+    }, (err, emission) => {
+        if (err) {
+            return res.status(500).send(err);
+        }
+        if (emission === null) {
+            return res.sendStatus(404);
+        }
+        req.emission = emission;
+        next();
+    });
+});
+
+router.get('/:emission', (req, res) => {
+    return res.send(req.emission);
+});
+
+router.put('/:emission', (req, res) => {
+    Emission.findOneAndUpdate({
+        nom: req.params.emission
+    }, req.body, { new: true }, (err, emission) => {
+
+        if (err) {
+            return res.status(500).send(err);
+        }
+        if (emission === null) {
+            return res.sendStatus(404);
+        }
+        return res.send(emission);
+    });
+});
+
+router.delete('/:emission', (req, res) => {
+    Emission.findOneAndRemove({
+        nom: req.params.emission
+    }, err => {
+        if (err) {
+            return res.status(500).send(err);
+        }
+        return res.sendStatus(204);
+    });
+});
+
+router.use('/:emission/episodes', episode);
 
 module.exports = router;

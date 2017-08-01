@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
 module.exports = mongoose.model('Emission', new mongoose.Schema({
-    nom: String,
-    logo: { data: Buffer, contentType: String }
+    nom: { type: String, unique: true, required: true},
+    logo: { data: Buffer, contentType: String },
 }));
