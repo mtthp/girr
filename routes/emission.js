@@ -9,12 +9,10 @@ router.get('/', (req, res) => {
     })
 });
 
-router.post('/:emission', (req, res) => {
+router.post('/:emission', (req, res, next) => {
     let emission = new Emission({ nom: req.params.emission });
     emission.save(err => {
-        if (err) {
-            return res.status(500).send(err);
-        }
+        if(err) return next(err);
         res.setHeader('location', `api/emissions/${emission.nom}`);
         return res.sendStatus(201);
     });
@@ -24,9 +22,7 @@ router.use('/:emission', (req, res, next) => {
     Emission.findOne({
         nom: req.params.emission
     }, (err, emission) => {
-        if (err) {
-            return res.status(500).send(err);
-        }
+        if(err) return next(err);
         if (emission === null) {
             return res.sendStatus(404);
         }
@@ -39,14 +35,12 @@ router.get('/:emission', (req, res) => {
     return res.send(req.emission);
 });
 
-router.put('/:emission', (req, res) => {
+router.put('/:emission', (req, res, next) => {
     Emission.findOneAndUpdate({
         nom: req.params.emission
     }, req.body, { new: true }, (err, emission) => {
 
-        if (err) {
-            return res.status(500).send(err);
-        }
+        if(err) return next(err);
         if (emission === null) {
             return res.sendStatus(404);
         }
@@ -54,13 +48,11 @@ router.put('/:emission', (req, res) => {
     });
 });
 
-router.delete('/:emission', (req, res) => {
+router.delete('/:emission', (req, res, next) => {
     Emission.findOneAndRemove({
         nom: req.params.emission
     }, err => {
-        if (err) {
-            return res.status(500).send(err);
-        }
+        if(err) return next(err);
         return res.sendStatus(204);
     });
 });

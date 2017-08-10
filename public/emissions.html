@@ -53,13 +53,13 @@
             top: .5em;
             z-index: 1;
             margin-left: 1em;
-
         }
 
         nav>a:not(:first-child) {
             padding-left: 2em;
             margin-left: .2em;
         }
+
         nav>a:not(:first-child):before {
             content: '';
             position: absolute;
@@ -130,6 +130,62 @@
             height: 10em;
         }
 
+        img.icon {
+            width: 1em;
+        }
+
+        .upload-incrust {
+            align-items: center;
+            display: flex;
+        }
+
+        .upload-incrust>input {
+            flex: 1;
+        }
+
+        .upload-incrust>img.icon {
+            margin-left: .5em;
+        }
+
+        .incrust-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+
+        .incrust-container img {
+            max-height: 100px;
+            margin: .5em;
+            border-radius: 3px;
+        }
+
+        .incrust-container img+a {
+            display: none;
+        }
+        /* la croix pour supprimer l'image */
+
+        .incrust-container img+a:hover,
+        .incrust-container img:hover+a {
+            display: block;
+            position: absolute;
+            background-color: lightgrey;
+            color: #ff4200;
+            margin-left: -1em;
+            margin-top: 1em;
+            padding: 0.5em;
+            cursor: pointer;
+            text-decoration: none;
+            text-shadow: 0 1px 0 #fff;
+            font: 14px/100% arial, sans-serif;
+            font-weight: 900;
+            border-radius: 3px;
+        }
+
+        .incrust {
+            display: flex;
+            flex-direction: row-reverse;
+        }
+
         .slide-left-enter-active,
         .slide-left-leave-active {
             transition: transform .5s;
@@ -175,7 +231,7 @@
                 <li class="button" v-on:click="addNews()"><i>+</i><span>Ajouter une news</span></li>
             </ul>
             <!-- </transition> -->
-            <form v-if="selectedNews">
+            <form v-if="selectedNews" v-on:submit.prevent>
                 <div>
                     <label>Titre</label>
                     <input v-model="selectedNews.titre" v-on:blur="updateNews(selectedNews)" />
@@ -186,12 +242,34 @@
                 </div>
                 <div>
                     <label>Incrusts</label>
-                    <span>TODO</span>
+                    <div class="upload-incrust"><input v-on:paste="uploadIncrust"><img class="icon" src="assets/clippy.svg"></div>
+                    <div class="incrust-container">
+                        <!-- <label v-for="(incrust, indexIncrust) in selectedNews.incrusts">
+                            <img v-bind:src="incrust">
+                        </label> -->
+                        <div class="incrust" v-for="incrust in selectedNews.incrusts">
+                            <img v-bind:src="incrust">
+                            <a v-on:click="deleteIncrust(incrust)">X</a>
+                        </div>
+                    </div>
                 </div>
                 <div>
+                    <button v-on:click="updateNews(selectedNews)">Mettre à jour</button>
                     <button v-on:click="deleteNews(selectedNews)">Supprimer</button>
                 </div>
             </form>
+            <!-- <form enctype="multipart/form-data" novalidate v-if="isInitial || isSaving">
+                <h1>Upload images</h1>
+                <div class="dropbox">
+                    <input type="file" multiple :name="uploadFieldName" :disabled="isSaving" @change="filesChange($event.target.name, $event.target.files); fileCount = $event.target.files.length" accept="image/*" class="input-file">
+                    <p v-if="isInitial">
+                        Drag your file(s) here to begin<br> or click to browse
+                    </p>
+                    <p v-if="isSaving">
+                        Uploading {{ fileCount }} files...
+                    </p>
+                </div>
+            </form> -->
         </main>
     </div>
 </body>
@@ -260,10 +338,36 @@
                 // console.log(`changed ${JSON.stringify(n)}`);
                 return this.$http.put(`/api/emissions/${this.selectedEmission.nom}/episodes/${this.selectedEpisode.numero}/news/${val.numero}`, val).then(response => {
                 });
+            },
+            uploadIncrust: function (event) {
+                let val = { uri: event.clipboardData.getData('text/plain') };
+                console.log('upload:' + val);
+                return this.$http.post(`/api/emissions/${this.selectedEmission.nom}/episodes/${this.selectedEpisode.numero}/news/${this.selectedNews.numero}/incrusts`, val).then(response => {
+                    let newIncrust = response.headers.get('location');
+                    console.log(newIncrust);
+                    if (newIncrust) {
+                        this.selectedNews.incrusts.push(newIncrust);
+                    }
+                    event.target.value = ''; // on vide le input field
+                });
+            },
+            deleteIncrust: function (incrust) {
+                let incrustId = incrust.split('/').pop(); // en attendant d'avoir un vrai objet incrust avec {id, assetUrl}
+                return this.$http.delete(`/api/emissions/${this.selectedEmission.nom}/episodes/${this.selectedEpisode.numero}/news/${this.selectedNews.numero}/incrusts/${incrustId}`).then(response => {
+                    if (response.ok) {
+                        let indexIncrustToRemove = this.selectedNews.incrusts.indexOf(incrust);
+                        if (indexIncrustToRemove !== -1) {
+                            this.selectedNews.incrusts.splice(indexIncrustToRemove, 1);
+                        }
+                    }
+                });
             }
         },
         mounted: function () {
             this.getEmissions();
+            // document.addEventListener('paste', event => {
+            //     console.log('User performed <b>' + event.type + '</b> operation. Payload is: <b>' + event.clipboardData.getData('text/plain') + '</b>');
+            // });
         }
     });
 

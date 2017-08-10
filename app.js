@@ -16,6 +16,10 @@ app.use(bodyParser.json())
 
 app.use(express.static('./public')); // Indique que le dossier /public contient des fichiers statiques (middleware chargé de base)
 app.use('/api/emissions', emission);
+app.use((err, req, res, next) => {
+  if(err) return res.status(500).send({ error: err });
+  next();
+});
 
 io.on('connection', socket => {
 

@@ -5,10 +5,5 @@ module.exports = mongoose.model('News', new mongoose.Schema({
     titre: { type: String },
     notes: String,
     episode: { type: mongoose.Schema.Types.ObjectId, ref:'Episode' },
-    incrusts: [
-        {
-            type: Buffer,
-            contentType: String
-        }
-    ]
+    incrusts: [{ type: mongoose.Schema.Types.ObjectId, ref:'Incrust' }]
 }));
