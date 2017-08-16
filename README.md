@@ -29,7 +29,6 @@ npm run dev
 
 ## TODOs
 
-- Licences d'utilisation Open Source
 - Diagrammes
   - Architecture
   - Modèles
@@ -41,5 +40,4 @@ npm run dev
 
 
 ## Licence
-
-TODOv3
+This project is licensed under the MIT license.
