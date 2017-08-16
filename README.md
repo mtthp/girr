@@ -25,3 +25,6 @@ ou pour le lancer en mode développement (auto reload du backend)
 ```
 npm run dev
 ```
+
+## Licence
+This project is licensed under the MIT license.
