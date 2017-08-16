@@ -25,3 +25,19 @@ ou pour le lancer en mode développement (auto reload du backend)
 ```
 npm run dev
 ```
+
+
+## TODOs
+
+- Licences d'utilisation Open Source
+- Diagrammes
+  - Architecture
+  - Modèles
+  - Routes
+- PoC
+- voir reprendre les composants mis en place sur https://github.com/codlab/TwitchToast
+
+
+## Licence
+
+TODOv3
