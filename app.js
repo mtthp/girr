@@ -32,7 +32,7 @@ DEFAULT_TITLE = "GeekInc Remote Regie ready !";
 
 io.on(CONNECTION, socket => {
 
-  const config = {
+  var config = {
     text: DEFAULT_TITLE,
     timeout: 2
   };
