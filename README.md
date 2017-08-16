@@ -34,7 +34,9 @@ npm run dev
   - Architecture
   - Modèles
   - Routes
-- PoC
+- Routes
+  - mock
+- extraction des websockets de app.js
 - voir reprendre les composants mis en place sur https://github.com/codlab/TwitchToast
 
 
