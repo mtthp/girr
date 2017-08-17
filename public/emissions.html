@@ -5,6 +5,8 @@
     <script type="text/javascript" src="/socket.io/socket.io.js"></script>
     <script type="text/javascript" src="https://unpkg.com/vue"></script>
     <script type="text/javascript" src="https://unpkg.com/vue-resource@1.3.4"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.6.0/Sortable.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Vue.Draggable/2.14.1/vuedraggable.min.js"></script>
     <style>
         html {
             font-family: "Roboto", "Helvetica", "Arial", sans-serif;
@@ -225,9 +227,11 @@
             <!-- </transition> -->
             <!-- <transition name="slide-left"> -->
             <ul v-if="selectedEpisode">
-                <li v-for="(news, index) in news" v-on:click="selectNews(news)" v-bind:class="[selectedNews === news ? 'active' : '', 'news']">
-                    <a>{{news.numero}} {{news.titre}}</a>
+                <draggable v-model="news" @change="saveNewsOrder">
+                <li v-for="(news, index) in news" v-on:click="selectNews(news)" v-bind:class="[selectedNews === news ? 'active' : '', 'news']" v-sortable>
+                    <a v-sortable>{{news.numero}} {{news.titre}}</a>
                 </li>
+                </draggable>
                 <li class="button" v-on:click="addNews()"><i>+</i><span>Ajouter une news</span></li>
             </ul>
             <!-- </transition> -->
@@ -304,6 +308,23 @@
                 return this.$http.get(`/api/emissions/${this.selectedEmission.nom}/episodes/${this.selectedEpisode.numero}/news`).then(response => {
                     this.news = response.body;
                 });
+            },
+            saveNewsOrder: function (event) {
+                if (event.moved != undefined)
+                {
+                    startIndex = event.moved.newIndex > event.moved.oldIndex ? event.moved.oldIndex : event.moved.newIndex;
+                    endIndex = event.moved.newIndex > event.moved.oldIndex ? event.moved.newIndex : event.moved.oldIndex;
+
+                    for (var i = startIndex; i < endIndex + 1; i++)
+                    {
+                        var oldNewsNumber = this.news[i].numero;
+
+                        this.news[i].numero = i + 1;
+                        this.$http
+                            .put(`/api/emissions/${this.selectedEmission.nom}/episodes/${this.selectedEpisode.numero}/news/${oldNewsNumber}`, this.news[i]);
+                    }
+                }
+                
             },
             selectEmission: function (emission) {
                 this.selectedNews = null;
