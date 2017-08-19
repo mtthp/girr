@@ -32,6 +32,7 @@
         ul {
             list-style-type: none;
             -webkit-padding-start: 0;
+            -moz-padding-start: 0;
         }
 
         main>ul,
@@ -379,8 +380,6 @@
             },
             addEpisode: function () {
                 var prochainNumero = this.episodes.reduce((a, b) => {
-                    console.log(a);
-                    console.log(b.numero);
                     return Math.max(a, b.numero);
                 }, 0) + 1;
                 prochainNumero = prompt(`Numéro de l'épisode`, prochainNumero);
@@ -399,10 +398,8 @@
             },
             uploadIncrust: function (event) {
                 let val = { uri: event.clipboardData.getData('text/plain') };
-                console.log('upload:' + val);
                 return this.$http.post(`/api/emissions/${this.selectedEmission.nom}/episodes/${this.selectedEpisode.numero}/news/${this.selectedNews.numero}/incrusts`, val).then(response => {
                     let newIncrust = response.headers.get('location');
-                    console.log(newIncrust);
                     if (newIncrust) {
                         this.selectedNews.incrusts.push(newIncrust);
                     }
