@@ -81,7 +81,7 @@ router.get('/:episode/full', (req, res) => {
 
     News.find({
         episode: req.episode._id
-    }, { '_id': 0, 'numero': 1, 'titre': 1, 'incrusts': 1 }, { 'sort': { 'numero': 1 } }).lean().exec((err, news) => {
+    }, { '_id': 0, 'numero': 1, 'titre': 1, 'notes': 1,'incrusts': 1 }, { 'sort': { 'numero': 1 } }).lean().exec((err, news) => {
         let nomCapitalFirst = req.emission.nom.charAt(0).toUpperCase() + req.emission.nom.slice(1);
         let episodeFull = {
             titre: `${nomCapitalFirst} ${req.episode.numero}`,

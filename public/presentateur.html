@@ -35,6 +35,12 @@
             box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
         }
 
+        #app>ol>li>.notes {
+            white-space: pre-line;
+            margin-top: .5em;
+            margin-left: .5em;
+        }
+
         #app>ol>li>.title {
             display: flex;
             background-color: #ff4200;
@@ -107,7 +113,8 @@
         }
 
         nav>a:hover,
-        li:not(.nohover):hover {
+        nav li:not(.nohover):hover,
+        header li:not(.nohover):hover {
             background-color: #ff4200;
             color: #fafafa;
             cursor: pointer;
@@ -174,6 +181,7 @@
         <ol v-if="episode && episode.news">
             <li v-for="(n, index) in episode.news">
                 <div class="title" v-on:click="sendSetTitle(n.titre)">{{ n.titre }}</div>
+                <div class="notes">{{ n.notes }}</div>
                 <div class="incrusts-container">
                     <label>
                         <input type="radio" name="incrustgroup" v-model="displayed" v-bind:value="{news: index, incrust: null}">
