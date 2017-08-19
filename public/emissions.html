@@ -227,14 +227,29 @@
             <!-- </transition> -->
             <!-- <transition name="slide-left"> -->
             <ul v-if="selectedEpisode">
+                <li v-on:click="displayEpisodeDetail()" class="button">
+                    <a>{{selectedEpisode.numero}} du {{selectedEpisode.date | formatDate}}</a>
+                </li>
                 <draggable v-model="news" @change="saveNewsOrder">
-                <li v-for="(news, index) in news" v-on:click="selectNews(news)" v-bind:class="[selectedNews === news ? 'active' : '', 'news']" v-sortable>
-                    <a v-sortable>{{news.numero}} {{news.titre}}</a>
+                <li v-for="(news, index) in news" v-on:click="selectNews(news)" v-bind:class="[selectedNews === news ? 'active' : '', 'news']">
+                    <a>{{news.numero}} {{news.titre}}</a>
                 </li>
                 </draggable>
                 <li class="button" v-on:click="addNews()"><i>+</i><span>Ajouter une news</span></li>
             </ul>
             <!-- </transition> -->
+            <!-- Edition d'un épisode -->
+            <form v-if="!selectedNews && selectedEpisode" v-on:submit.prevent>
+                <div>
+                    <label>Titre</label>
+                    <input v-model="selectedEpisode.nom" v-on:blur="updateEpisode(selectedEpisode)" />
+                </div>
+                <div>
+                    <label>Date</label>
+                    <input v-model="selectedEpisode.date" v-on:blur="updateEpisode(selectedEpisode)" />
+                </div>
+            </form>
+            <!-- Edition des news -->
             <form v-if="selectedNews" v-on:submit.prevent>
                 <div>
                     <label>Titre</label>
@@ -324,7 +339,7 @@
                             .put(`/api/emissions/${this.selectedEmission.nom}/episodes/${this.selectedEpisode.numero}/news/${oldNewsNumber}`, this.news[i]);
                     }
                 }
-                
+
             },
             selectEmission: function (emission) {
                 this.selectedNews = null;
@@ -333,13 +348,14 @@
                 this.getEpisodes();
             },
             selectEpisode: function (ep) {
-                console.log('clicked');
                 this.selectedEpisode = ep;
                 this.getNews();
             },
             selectNews: function (n) {
-                console.log('clicked');
                 this.selectedNews = n;
+            },
+            displayEpisodeDetail: function () {
+                this.selectedNews = null;
             },
             addNews: function () {
                 return this.$http.post(`/api/emissions/${this.selectedEmission.nom}/episodes/${this.selectedEpisode.numero}/news/${this.news.length + 1}`).then(response => {
@@ -355,9 +371,11 @@
                 });
             },
             updateNews: function (val) {
-                // TODO gérer le move / réordonnancement...
-                // console.log(`changed ${JSON.stringify(n)}`);
                 return this.$http.put(`/api/emissions/${this.selectedEmission.nom}/episodes/${this.selectedEpisode.numero}/news/${val.numero}`, val).then(response => {
+                });
+            },
+            updateEpisode: function (val) {
+                return this.$http.put(`/api/emissions/${this.selectedEmission.nom}/episodes/${val.numero}`, val).then(response => {
                 });
             },
             uploadIncrust: function (event) {
