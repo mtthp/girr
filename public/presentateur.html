@@ -6,20 +6,26 @@
     <script type="text/javascript" src="https://unpkg.com/vue"></script>
     <script type="text/javascript" src="https://unpkg.com/vue-resource@1.3.4"></script>
     <style>
+        html {
+            font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+        }
+
         body {
             background-color: rgb(238, 238, 238)
         }
 
+        ul,
         ol {
             list-style-type: none;
             -webkit-padding-start: 0;
             -moz-padding-start: 0;
+            margin: 0;
         }
 
         #app>ol>li {
-            border: 2px solid transparent;
+            /* border: 2px solid transparent; */
             font-family: Verdana, Geneva, Tahoma, sans-serif;
-            margin: 1em 0;
+            /* margin: 1em 0; */
             background-color: #fafafa;
             box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
         }
@@ -32,11 +38,15 @@
             padding: 0.5em 0.5em;
         }
 
+        #app>ol>li:not(:first-child) {
+            margin-top: 0.5em;
+        }
+
         #app>ol>li>.incrusts-container {
             display: flex;
             flex-direction: row;
             overflow-x: auto;
-            margin: 0.5em 0;
+            margin-top: 0.5em;
         }
 
         #app>ol>li>div .x {
@@ -75,12 +85,51 @@
             border: 4px solid #3BF21C;
         }
 
+        nav {
+            display: flex;
+            flex-direction: row;
+            margin-bottom: .5em;
+        }
+
+        nav>ul {
+            background-color: #fafafa;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+        }
+
+        nav li {
+            width: 15em;
+            display: flex;
+            padding: 1em;
+        }
+
+        nav>a:hover,
+        li:hover {
+            background-color: #ff4200;
+            color: #fafafa;
+            cursor: pointer;
+        }
+
     </style>
 </head>
 
 <body>
     <div id="app">
-        <ol v-if="episode.news">
+        <nav>
+            <ul v-if="!episode">
+                <li v-for="(emission, index) in emissions" v-on:click="selectEmission(emission)">
+                    <a>{{emission.nom}}</a>
+                </li>
+            </ul>
+            <ul v-if="!episode && selectedEmission">
+                <li v-for="(episode, index) in episodes" v-on:click="selectEpisode(episode)">
+                    <a>{{episode.numero}} du {{episode.date | formatDate}}</a>
+                </li>
+            </ul>
+            <ul v-if="episode">
+                <li v-on:click="selectEpisode(null)"><a>X {{selectedEmission.nom}} {{selectedEpisode.numero}} {{selectedEpisode.date | formatDate}}</a></li>
+            </ul>
+        </nav>
+        <ol v-if="episode && episode.news">
             <li v-for="(n, index) in episode.news">
                 <div class="title" v-on:click="sendSetTitle(n.titre)">{{ n.titre }}</div>
                 <div class="incrusts-container">
@@ -100,13 +149,44 @@
 <script type="text/javascript">
     var socket = io.connect();
 
+    Vue.filter('formatDate', function (value) {
+        if (value) {
+            return new Date(String(value)).toLocaleDateString();
+        }
+    });
+
     var app = new Vue({
         el: '#app',
         data: {
-            episode: { news: [] },
+            selectedEmission: null,
+            selectedEpisode: null,
+            emissions: [],
+            episodes: [],
+            episode: null,
             displayed: null
         },
         methods: {
+            getEmissions: function () {
+                return this.$http.get('/api/emissions').then(response => {
+                    this.emissions = response.body;
+                });
+            },
+            getEpisodes: function () {
+                return this.$http.get(`/api/emissions/${this.selectedEmission.nom}/episodes`).then(response => {
+                    this.episodes = response.body;
+                });
+            },
+            selectEmission: function (emission) {
+                this.selectedEmission = emission;
+                this.getEpisodes();
+            },
+            selectEpisode: function (ep) {
+                this.selectedEpisode = ep;
+                this.episode = null;
+                if(ep) {
+                    this.getEpisode();
+                }
+            },
             sendSetTitle: function (titre) {
                 socket.emit('setTitle', { text: titre });
             },
@@ -126,59 +206,9 @@
             },
             getEpisode: function () {
                 // /api/emissions/' + emission.value + '/' + episode.value;
-                return this.$http.get('/api/emissions/bits/episodes/59/full').then(response => {
+                return this.$http.get(`/api/emissions/${this.selectedEmission.nom}/episodes/${this.selectedEpisode.numero}/full`).then(response => {
                     this.episode = response.body;
                 });
-                /*
-                    this.episode = {
-                        titre: 'Bits 59',
-                        displayed: null,
-                        news: [
-                            {
-                                titre: 'Hyperloop One le test fonctionnel',
-                                incrusts: [
-                                    '/assets/emissions/bits/59/0.jpg',
-                                    '/assets/emissions/bits/59/1.jpg'
-                                ]
-                            },
-                            {
-                                titre: 'DeepMind sait marcher',
-                                incrusts: [
-                                    '/assets/emissions/bits/59/2.png',
-                                    '/assets/emissions/bits/59/3.gif'
-                                ]
-                            },
-                            {
-                                titre: 'Hyperloop One le test fonctionnel',
-                                incrusts: [
-                                    '/assets/emissions/bits/59/0.jpg',
-                                    '/assets/emissions/bits/59/1.jpg'
-                                ]
-                            },
-                            {
-                                titre: 'DeepMind sait marcher',
-                                incrusts: [
-                                    '/assets/emissions/bits/59/2.png',
-                                    '/assets/emissions/bits/59/3.gif'
-                                ]
-                            },
-                            {
-                                titre: 'Hyperloop One le test fonctionnel',
-                                incrusts: [
-                                    '/assets/emissions/bits/59/0.jpg',
-                                    '/assets/emissions/bits/59/1.jpg'
-                                ]
-                            },
-                            {
-                                titre: 'DeepMind sait marcher',
-                                incrusts: [
-                                    '/assets/emissions/bits/59/2.png',
-                                    '/assets/emissions/bits/59/3.gif'
-                                ]
-                            }
-                        ]
-                    };
-                */
             }
         },
         watch: {
@@ -219,13 +249,14 @@
             }
         },
         mounted: function () {
+            this.getEmissions();
             this.clearIncrust();
-            this.getEpisode().then(() => {
-                this.displayed = {
-                    news: null,
-                    incrust: null
-                };
-            });
+            // this.getEpisode().then(() => {
+            //     this.displayed = {
+            //         news: null,
+            //         incrust: null
+            //     };
+            // });
 
             document.addEventListener("keydown", event => {
                 /*
@@ -301,36 +332,6 @@
             });
         }
     })
-
-    // function getEpisodeUrl() {
-    //     return '/api/emissions/' + emission.value + '/' + episode.value;
-    // }
-
-    // function loadIncrust() {
-
-    //     var request = new XMLHttpRequest();
-    //     var url = getEpisodeUrl() + '/incrusts';
-
-    //     uploadForm.action = url;
-
-    //     request.open('GET', url, true);
-
-    //     request.onload = function () {
-    //         if (request.status >= 200 && request.status < 400) {
-    //             // Success!
-    //             var data = JSON.parse(request.responseText);
-    //             episode = data;
-    //         } else {
-    //             // We reached our target server, but it returned an error
-    //         }
-    //     };
-
-    //     request.onerror = function () {
-    //         // There was a connection error of some sort
-    //     };
-
-    //     request.send();
-    // }
 
 </script>
 
