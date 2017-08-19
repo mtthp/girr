@@ -51,6 +51,7 @@ router.get('/:news', (req, res) => {
 })
 
 router.put('/:news', (req, res, next) => {
+    delete req.body['incrusts']; // on ne veut pas mettre à jour les incrusts
     News.findOneAndUpdate({
         _id: req.news._id
     }, req.body, { new: true }, (err, n) => {
