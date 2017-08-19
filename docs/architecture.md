@@ -6,7 +6,7 @@ Il sert à 3 types de cas d'usage :
 2. En live depuis le canapé, les animateurs peuvent piloter les titres et incrusts affichées
 3. le PC de la régie capte une page consituée dynamiquement par les titres + incrusts en cours d'affichage (en overlay)
 
-![architecture](http://chriscamicas.github.io/docs/global_architecture.svg)
+![architecture](http://chriscamicas.github.io/girr/docs/global_architecture.svg)
 
 # Stack technique
 ## Backend
