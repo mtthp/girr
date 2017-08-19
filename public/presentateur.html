@@ -22,6 +22,10 @@
             margin: 0;
         }
 
+        ol {
+            margin-top: 4em;
+        }
+
         #app>ol>li {
             /* border: 2px solid transparent; */
             font-family: Verdana, Geneva, Tahoma, sans-serif;
@@ -88,7 +92,6 @@
         nav {
             display: flex;
             flex-direction: row;
-            margin-bottom: .5em;
         }
 
         nav>ul {
@@ -109,6 +112,32 @@
             cursor: pointer;
         }
 
+        header {
+            /* display: flex;
+            flex-direction: column;
+            margin-bottom: .5em; */
+            position: fixed;
+            background-color: white;
+            width: 100%;
+            top: 0;
+            left: 0;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+        }
+
+        header>ul {
+            margin: .5em;
+            display: flex;
+            color: #fafafa;
+        }
+
+        header li {
+            /* width: 15em; */
+            background-color: #005976;
+            display: flex;
+            padding: 1em;
+            margin: 0 .1em
+        }
+
     </style>
 </head>
 
@@ -125,10 +154,13 @@
                     <a>{{episode.numero}} du {{episode.date | formatDate}}</a>
                 </li>
             </ul>
-            <ul v-if="episode">
-                <li v-on:click="selectEpisode(null)"><a>X {{selectedEmission.nom}} {{selectedEpisode.numero}} {{selectedEpisode.date | formatDate}}</a></li>
-            </ul>
         </nav>
+        <header>
+            <ul v-if="episode">
+                <li v-on:click="selectEpisode(null)"><a>X</a></li>
+                <li v-on:click="displayed={news: null, incrust: null}"><a>{{selectedEmission.nom}} {{selectedEpisode.numero}} {{selectedEpisode.date | formatDate}}</a></li>
+            </ul>
+        </header>
         <ol v-if="episode && episode.news">
             <li v-for="(n, index) in episode.news">
                 <div class="title" v-on:click="sendSetTitle(n.titre)">{{ n.titre }}</div>
@@ -183,7 +215,7 @@
             selectEpisode: function (ep) {
                 this.selectedEpisode = ep;
                 this.episode = null;
-                if(ep) {
+                if (ep) {
                     this.getEpisode();
                 }
             },
