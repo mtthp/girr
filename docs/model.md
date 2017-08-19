@@ -1,3 +1,3 @@
 # Modèle de données
-![model](http://chriscamicas.github.io/docs/model.svg)
+![model](http://chriscamicas.github.io/girr/docs/model.svg)
 
