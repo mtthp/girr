@@ -222,7 +222,7 @@
                 <li v-for="(episode, index) in episodes" v-on:click="selectEpisode(episode)">
                     <a>{{episode.numero}} du {{episode.date | formatDate}}</a>
                 </li>
-                <li class="button"><i>+</i><span>Créer un épisode</span></li>
+                <li class="button" v-on:click="addEpisode"><i>+</i><span>Créer un épisode</span></li>
             </ul>
             <!-- </transition> -->
             <!-- <transition name="slide-left"> -->
@@ -231,9 +231,9 @@
                     <a>{{selectedEpisode.numero}} du {{selectedEpisode.date | formatDate}}</a>
                 </li>
                 <draggable v-model="news" @change="saveNewsOrder">
-                <li v-for="(news, index) in news" v-on:click="selectNews(news)" v-bind:class="[selectedNews === news ? 'active' : '', 'news']">
-                    <a>{{news.numero}} {{news.titre}}</a>
-                </li>
+                    <li v-for="(news, index) in news" v-on:click="selectNews(news)" v-bind:class="[selectedNews === news ? 'active' : '', 'news']">
+                        <a>{{news.numero}} {{news.titre}}</a>
+                    </li>
                 </draggable>
                 <li class="button" v-on:click="addNews()"><i>+</i><span>Ajouter une news</span></li>
             </ul>
@@ -319,19 +319,22 @@
                     this.episodes = response.body;
                 });
             },
+            getEpisode: function (numero) {
+                return this.$http.get(`/api/emissions/${this.selectedEmission.nom}/episodes/${numero}`).then(response => {
+                    return response.body;
+                });
+            },
             getNews: function () {
                 return this.$http.get(`/api/emissions/${this.selectedEmission.nom}/episodes/${this.selectedEpisode.numero}/news`).then(response => {
                     this.news = response.body;
                 });
             },
             saveNewsOrder: function (event) {
-                if (event.moved != undefined)
-                {
+                if (event.moved != undefined) {
                     startIndex = event.moved.newIndex > event.moved.oldIndex ? event.moved.oldIndex : event.moved.newIndex;
                     endIndex = event.moved.newIndex > event.moved.oldIndex ? event.moved.newIndex : event.moved.oldIndex;
 
-                    for (var i = startIndex; i < endIndex + 1; i++)
-                    {
+                    for (var i = startIndex; i < endIndex + 1; i++) {
                         var oldNewsNumber = this.news[i].numero;
 
                         this.news[i].numero = i + 1;
@@ -373,6 +376,22 @@
             updateNews: function (val) {
                 return this.$http.put(`/api/emissions/${this.selectedEmission.nom}/episodes/${this.selectedEpisode.numero}/news/${val.numero}`, val).then(response => {
                 });
+            },
+            addEpisode: function () {
+                var prochainNumero = this.episodes.reduce((a, b) => {
+                    console.log(a);
+                    console.log(b.numero);
+                    return Math.max(a, b.numero);
+                }, 0) + 1;
+                prochainNumero = prompt(`Numéro de l'épisode`, prochainNumero);
+                if (prochainNumero) {
+                    return this.$http.post(`/api/emissions/${this.selectedEmission.nom}/episodes/${prochainNumero}`).then(response => {
+                        this.getEpisode(prochainNumero).then(ep => {
+                            this.episodes.unshift(ep);
+                            this.selectEpisode(ep);
+                        });
+                    });
+                }
             },
             updateEpisode: function (val) {
                 return this.$http.put(`/api/emissions/${this.selectedEmission.nom}/episodes/${val.numero}`, val).then(response => {

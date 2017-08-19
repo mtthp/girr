@@ -8,7 +8,7 @@ const news = require('./news')
 router.get('/', (req, res) => {
     Episode.find({
         emission: req.emission._id
-    }).populate({ path: 'emission', select: 'nom' }).exec((err, episodes) => {
+    }).populate({ path: 'emission', select: 'nom' }).sort({ 'numero': -1 }).exec((err, episodes) => {
         res.send(episodes);
     });
 });
