@@ -60,7 +60,6 @@ router.put('/:news', (req, res, next) => {
     // Map the incrusts back to an array of objectIds
     req.body.incrusts = req.body.incrusts.map(incrust => incrust.id);
 
-    delete req.body['incrusts']; // on ne veut pas mettre à jour les incrusts
     News.findOneAndUpdate({
         _id: req.news._id
     }, req.body, { new: true }, (err, n) => {
