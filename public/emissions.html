@@ -268,7 +268,7 @@
                             <img v-bind:src="incrust">
                         </label> -->
                         <div class="incrust" v-for="incrust in selectedNews.incrusts">
-                            <img v-bind:src="incrust">
+                            <img v-bind:src="incrust.path">
                             <a v-on:click="deleteIncrust(incrust)">X</a>
                         </div>
                     </div>
