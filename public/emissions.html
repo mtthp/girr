@@ -263,7 +263,7 @@
                 <div>
                     <label>Incrusts</label>
                     <div class="upload-incrust"><input v-on:paste="uploadIncrust"><img class="icon" src="assets/clippy.svg"></div>
-                    <draggable v-model="selectedNews.incrusts" class="incrust-container">
+                    <draggable v-model="selectedNews.incrusts" class="incrust-container" @change="updateNews(selectedNews)">
                         <div class="incrust" v-for="incrust in selectedNews.incrusts">
                             <img v-bind:src="incrust.path">
                             <a v-on:click="deleteIncrust(incrust)">X</a>
