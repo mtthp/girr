@@ -9,10 +9,16 @@ router.get('/', (req, res, next) => {
     News.find({
         episode: req.episode._id
     }, null, { sort: { 'numero': 1 } }).lean().exec((err, news) => {
-
         news.forEach(n => {
-            n.incrusts = n.incrusts.map(incrust => path.join(req.originalUrl, n.numero.toString(), 'incrusts', incrust.toString()));
+            // Map the incrusts to build their URI while keeping their ID
+            n.incrusts = n.incrusts.map(incrust => {
+                return { 
+                    "path": path.join(req.originalUrl, n.numero.toString(), 'incrusts', incrust.toString()),
+                    "id": incrust
+                };
+            });
         });
+
         if (err) return next(err);
         res.send(news);
     });
@@ -51,7 +57,9 @@ router.get('/:news', (req, res) => {
 })
 
 router.put('/:news', (req, res, next) => {
-    delete req.body['incrusts']; // on ne veut pas mettre à jour les incrusts
+    // Map the incrusts back to an array of objectIds
+    req.body.incrusts = req.body.incrusts.map(incrust => incrust.id);
+
     News.findOneAndUpdate({
         _id: req.news._id
     }, req.body, { new: true }, (err, n) => {

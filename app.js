@@ -22,7 +22,14 @@ app.use(bodyParser.urlencoded({ extended: false }))
 .use(express.static('./public'))
 .use('/api/emissions', emission)
 .use((err, req, res, next) => {
-  if(err) return res.status(500).send({ error: err });
+  if(err) {
+    console.error(`\n==== ERROR: ${(new Date).toLocaleString()} ====`);
+    console.error(err);
+    console.error("=================\n");
+    
+    return res.status(500).send({ error: err });
+  }
+
   next();
 });
 
