@@ -404,7 +404,7 @@
                 });
             },
             deleteIncrust: function (incrust) {
-                let incrustId = incrust.split('/').pop(); // en attendant d'avoir un vrai objet incrust avec {id, assetUrl}
+                let incrustId = incrust.id; // en attendant d'avoir un vrai objet incrust avec {id, assetUrl}
                 return this.$http.delete(`/api/emissions/${this.selectedEmission.nom}/episodes/${this.selectedEpisode.numero}/news/${this.selectedNews.numero}/incrusts/${incrustId}`).then(response => {
                     if (response.ok) {
                         let indexIncrustToRemove = this.selectedNews.incrusts.indexOf(incrust);
