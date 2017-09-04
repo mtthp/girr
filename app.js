@@ -4,6 +4,7 @@ const app = express();
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
 const mongoose = require('mongoose');
+const basicAuth = require('express-basic-auth');
 const config = require("./config/server");
 const WebSockets = require("./websockets");
 
@@ -13,6 +14,15 @@ const websockets = new WebSockets(io);
 // monter les routes
 const emission = require('./routes/emission.js');
 
+
+let password = process.env.GIRR_PASSWORD || config.password;
+if(password) {
+  app.use(basicAuth({
+    users: { girr: password },
+    challenge: true,
+    realm: 'g1RR'
+  }));
+}
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }))
 // parse application/json
@@ -26,7 +36,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
     console.error(`\n==== ERROR: ${(new Date).toLocaleString()} ====`);
     console.error(err);
     console.error("=================\n");
-    
+
     return res.status(500).send({ error: err });
   }
 
