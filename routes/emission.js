@@ -36,9 +36,11 @@ router.get('/:emission', (req, res) => {
 });
 
 router.put('/:emission', (req, res, next) => {
+    let emission = req.body;
+    delete emission._id;
     Emission.findOneAndUpdate({
         nom: req.params.emission
-    }, req.body, { new: true }, (err, emission) => {
+    }, emission, { new: true }, (err, emission) => {
 
         if(err) return next(err);
         if (emission === null) {

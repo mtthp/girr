@@ -12,7 +12,7 @@ router.get('/', (req, res, next) => {
         news.forEach(n => {
             // Map the incrusts to build their URI while keeping their ID
             n.incrusts = n.incrusts.map(incrust => {
-                return { 
+                return {
                     "path": path.join(req.originalUrl, n.numero.toString(), 'incrusts', incrust.toString()),
                     "id": incrust
                 };
@@ -59,10 +59,11 @@ router.get('/:news', (req, res) => {
 router.put('/:news', (req, res, next) => {
     // Map the incrusts back to an array of objectIds
     req.body.incrusts = req.body.incrusts.map(incrust => incrust.id);
-
+    let news = req.body;
+    delete news._id;
     News.findOneAndUpdate({
         _id: req.news._id
-    }, req.body, { new: true }, (err, n) => {
+    }, news, { new: true }, (err, n) => {
         if (err) return next(err);
         if (n === null) {
             return res.sendStatus(404);

@@ -44,9 +44,11 @@ router.get('/:episode', (req, res) => {
 })
 
 router.put('/:episode', (req, res, next) => {
+    let episode = req.body;
+    delete episode._id;
     Episode.findOneAndUpdate({
         _id: req.episode._id
-    }, req.body, { new: true }, (err, ep) => {
+    }, episode, { new: true }, (err, ep) => {
 
         if (err) return next(err);
         if (ep === null) {
