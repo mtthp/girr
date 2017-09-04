@@ -396,10 +396,12 @@
             uploadIncrust: function (event) {
                 let val = { uri: event.clipboardData.getData('text/plain') };
                 return this.$http.post(`/api/emissions/${this.selectedEmission.nom}/episodes/${this.selectedEpisode.numero}/news/${this.selectedNews.numero}/incrusts`, val).then(response => {
-                    let newIncrust = response.headers.get('location');
-                    if (newIncrust) {
-                        this.selectedNews.incrusts.push(newIncrust);
-                    }
+                    let newIncrustPath = response.headers.get('location');
+                    let newIncrustId = newIncrustPath.split('/').pop();
+                    this.selectedNews.incrusts.push({
+                        id: newIncrustId,
+                        path: newIncrustPath
+                    });
                     event.target.value = ''; // on vide le input field
                 });
             },
