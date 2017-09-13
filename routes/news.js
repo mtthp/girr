@@ -96,6 +96,104 @@ router.delete('/:news', (req, res, next) => {
     });
 });
 
+router.get('/:news/checkintegrity', (req, res, next) => {
+    let recovery = [];
+    let modified = false;
+    Incrust.find({
+        news: req.news._id
+    }, (err, incrusts) => {
+        if (err) return next(err);
+        recovery = req.news.incrusts.slice(0); // on copie les incrusts déjà présentes dans la news
+        incrusts.forEach(incrust => {
+            if (!req.news.incrusts.find(v => {
+                return v.toString() === incrust._id.toString();
+            })) {
+                modified = true;
+                recovery.push(incrust._id); // une incrust perdue, on la rajoute
+            }
+        });
+        let incruststoRemove = [];
+        req.news.incrusts.forEach(r => {
+            if (!incrusts.find(v => {
+                return r.toString() === v._id.toString();
+            })) {
+                incruststoRemove.push(r);
+            }
+        });
+        incruststoRemove.forEach(elToRemove => {
+            let index = recovery.findIndex(v => v.toString() === elToRemove.toString());
+            if (index > 0) {
+                modified = true;
+                recovery.splice(index, 1);
+            }
+        })
+        // if(modified) {
+        //     req.news.incrusts = recovery;
+        //     req.news.save(err => {
+        //         if (err) return next(err);
+        //         return res.sendStatus(200);
+        //     });
+        // } else {
+        //     return res.sendStatus(204);
+        // }
+        res.send({
+            modified: modified,
+            before: req.news.incrusts,
+            after: recovery
+        });
+    });
+});
+
+router.get('/:news/recover', (req, res, next) => {
+    let recovery = [];
+    let modified = false;
+    Incrust.find({
+        news: req.news._id
+    }, (err, incrusts) => {
+        if (err) return next(err);
+        recovery = req.news.incrusts.slice(0); // on copie les incrusts déjà présentes dans la news
+        incrusts.forEach(incrust => {
+            if (!req.news.incrusts.find(v => {
+                return v.toString() === incrust._id.toString();
+            })) {
+                modified = true;
+                recovery.push(incrust._id); // une incrust perdue, on la rajoute
+            }
+
+        });
+        // 59b86d69016d791afbf1ff73
+        let incruststoRemove = [];
+        req.news.incrusts.forEach(r => {
+            if (!incrusts.find(v => {
+                return r.toString() === v._id.toString();
+            })) {
+                incruststoRemove.push(r);
+            }
+        });
+        incruststoRemove.forEach(elToRemove => {
+            let index = recovery.findIndex(v => v.toString() === elToRemove.toString());
+            if (index > 0) {
+                modified = true;
+                recovery.splice(index, 1);
+            }
+        })
+        if(modified) {
+            req.news.incrusts = recovery;
+            req.news.save(err => {
+                if (err) return next(err);
+                return res.sendStatus(200);
+            });
+        } else {
+            return res.sendStatus(204);
+        }
+        // res.send({
+        //     modified: modified,
+        //     before: req.news.incrusts,
+        //     after: recovery
+        // });
+    });
+});
+
 router.use('/:news/incrusts', incrustRoute);
 
 module.exports = router;
