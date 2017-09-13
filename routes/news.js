@@ -122,7 +122,7 @@ router.get('/:news/checkintegrity', (req, res, next) => {
         });
         incruststoRemove.forEach(elToRemove => {
             let index = recovery.findIndex(v => v.toString() === elToRemove.toString());
-            if (index > 0) {
+            if (index >= 0) {
                 modified = true;
                 recovery.splice(index, 1);
             }
@@ -172,7 +172,7 @@ router.get('/:news/recover', (req, res, next) => {
         });
         incruststoRemove.forEach(elToRemove => {
             let index = recovery.findIndex(v => v.toString() === elToRemove.toString());
-            if (index > 0) {
+            if (index >= 0) {
                 modified = true;
                 recovery.splice(index, 1);
             }
