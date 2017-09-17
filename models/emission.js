@@ -9,7 +9,7 @@ let emissionSchema = new mongoose.Schema({
     episodes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Episode' }]
 });
 
-// when an Episode is removed, delete all its News
+// when a Emission is removed, delete all its Episodes
 emissionSchema.post('remove', function(emission) {
   Episode
     .remove({emission: emission._id})
