@@ -78,56 +78,129 @@ router.route('/')
           })
     });
 
-router.post('/:emission', (req, res, next) => {
-    let emission = new Emission({ nom: req.params.emission });
-    emission.save(err => {
-        if(err) return next(err);
-        res.setHeader('location', `api/emissions/${emission.nom}`);
-        return res.sendStatus(201);
-    });
-});
+// Middleware : we check if the emission exists in the DB before going further
+router.param('name', function (req, res, next, value, name) {
+  Emission
+    .findOne({nom: value})
+    .then(function(emission) {
+      if (emission !== null) {
+        logger.debug("Found " + emission.toString())
+        req.emission = emission
+        next()
+      } else {
+        next({message:"Emission " + value + " was not found", status: 404})
+      }
+    })
+    .catch(function(error) {
+      next(error)
+    })
+})
 
-router.use('/:emission', (req, res, next) => {
-    Emission.findOne({
-        nom: req.params.emission
-    }, (err, emission) => {
-        if(err) return next(err);
-        if (emission === null) {
-            return res.sendStatus(404);
+router.route('/:name')
+  /**
+   * @swagger
+   * /emissions/{nom}:
+   *   get:
+   *     tags:
+   *       - Emissions
+   *     description: Returns a single emission
+   *     summary: Get a emission
+   *     produces:
+   *       - application/json
+   *     parameters:
+   *       - name: nom
+   *         description: Emission's name
+   *         in: path
+   *         required: true
+   *         type: string
+   *     responses:
+   *       200:
+   *         description: A single Emission
+   *         schema:
+   *           $ref: '#/definitions/Emission'
+   */
+  .get(function (req, res, next) {
+    res.send(req.emission)
+  })
+  /**
+   * @swagger
+   * /emissions/{nom}:
+   *   put:
+   *     tags:
+   *       - Emissions
+   *     description: Updates a single emission
+   *     summary: Edit a emission
+   *     produces: application/json
+   *     parameters:
+   *       - name: nom
+   *         description: Emission's name
+   *         in: path
+   *         required: true
+   *         type: string
+   *       - name: emission
+   *         in: body
+   *         description: Fields for the Emission resource
+   *         schema:
+   *           type: array
+   *           $ref: '#/definitions/Emission'
+   *     responses:
+   *       200:
+   *         description: Successfully updated
+   *         schema:
+   *           $ref: '#/definitions/Emission'
+   */
+  .put(function (req, res, next) {
+    Emission
+      // use findOneAndUpdate to get the new result (even if we already found the resource in the DB)
+      .findOneAndUpdate({nom: req.emission.nom}, Object.assign(req.body, {modified: Date.now()}), {new : true})
+      .then(function(emission) {
+        if (emission !== null) {
+          logger.debug("Updated " + emission.toString())
+          res.json(emission)
+        } else {
+          next({message:"Emission " + req.emission.nom + " wasn't updated", status: 417})
         }
-        req.emission = emission;
-        next();
-    });
-});
-
-router.get('/:emission', (req, res) => {
-    return res.send(req.emission);
-});
-
-router.put('/:emission', (req, res, next) => {
-    let emission = req.body;
-    delete emission._id;
-    Emission.findOneAndUpdate({
-        nom: req.params.emission
-    }, emission, { new: true }, (err, emission) => {
-
-        if(err) return next(err);
-        if (emission === null) {
-            return res.sendStatus(404);
+      })
+      .catch(function(error) {
+        next(error)
+      })
+  })
+  /**
+   * @swagger
+   * /emissions/{nom}:
+   *   delete:
+   *     tags:
+   *       - Emissions
+   *     description: Deletes a single emission
+   *     summary: Remove a emission
+   *     produces:
+   *       - application/json
+   *     parameters:
+   *       - name: nom
+   *         description: Emission's name
+   *         in: path
+   *         required: true
+   *         type: string
+   *     responses:
+   *       204:
+   *         description: Successfully deleted
+   */
+  .delete(function (req, res, next) {
+    req.emission
+      .remove()
+      .then(function(result) {
+        if (result !== null) {
+          logger.debug("Removed Emission " + req.params.name)
+          res.status(204).json(result.toString())
+        } else {
+          next({message:"Emission " + req.params.name + " wasn't deleted", status: 417})
         }
-        return res.send(emission);
-    });
-});
+      })
+      .catch(function(error) {
+        next({message:error.toString()})
+      })
+  })
 
-router.delete('/:emission', (req, res, next) => {
-    Emission.findOneAndRemove({
-        nom: req.params.emission
-    }, err => {
-        if(err) return next(err);
-        return res.sendStatus(204);
-    });
-});
-
-router.use('/:emission/episodes', episode);
+router.use('/:name/episodes', episode);
 
 module.exports = router;
