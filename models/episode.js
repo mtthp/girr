@@ -1,3 +1,4 @@
+"use strict";
 const mongoose = require('mongoose');
 
 let episodeSchema = new mongoose.Schema({

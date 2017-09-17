@@ -1,3 +1,4 @@
+"use strict"; // https://stackoverflow.com/a/33001437
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
