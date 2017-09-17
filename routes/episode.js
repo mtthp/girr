@@ -1,75 +1,266 @@
-"use strict";
 const express = require('express');
 const path = require('path');
 const router = express.Router();
+const logger = require('../logger');
 const Episode = require('../models/episode')
 const News = require('../models/news')
 const news = require('./news')
 
-router.get('/', (req, res) => {
-    Episode.find({
-        emission: req.emission._id
-    }).populate({ path: 'emission', select: 'nom' }).sort({ 'numero': -1 }).exec((err, episodes) => {
-        res.send(episodes);
-    });
-});
+/**
+ * @swagger
+ * definitions:
+ *   Episode:
+ *     properties:
+ *       numero:
+ *         type: integer
+ *         description: unique identifier
+ *         required: true
+ *       nom:
+ *         type: string
+ *         description: name
+ *       date:
+ *         type: date
+ *         description: when an episode air
+ */
 
-router.post('/:episode', (req, res, next) => {
-    let episode = new Episode({
-        numero: req.params.episode,
-        nom: req.body.nom,
-        emission: req.emission
-    });
-    episode.save(err => {
-        if (err) return next(err);
-        res.setHeader('location', req.path);
-        return res.sendStatus(201);
-    });
-});
+router.route('/')
+  /**
+   * @swagger
+   * /emissions/{emissionName}/episodes:
+   *   get:
+   *     tags:
+   *       - Episodes
+   *     description: Returns all events
+   *     summary: Get all events
+   *     produces:
+   *       - application/json
+   *     parameters:
+   *       - name: emissionName
+   *         description: Episode's name
+   *         in: path
+   *         required: true
+   *         type: string
+   *     responses:
+   *       200:
+   *         description: An array of episodes
+   *         schema:
+   *           type: array
+   *           items:
+   *             $ref: '#/definitions/Episode'
+   */
+  .get(function(req, res, next) {
+    Episode
+        .find({ emission: req.emission._id })
+        .populate({ path: 'emission', select: 'nom' })
+        .sort({ 'numero': -1 })
+        .then(function(episodes) {
+            logger.debug("Found " + (episodes.length ? episodes.toString() : 0 + " episodes"))
+            res.json(episodes)
+        })
+        .catch(function(error) {
+            next(error)
+        });
+  })
+  /**
+   * @swagger
+   * /emissions/{emissionName}/episodes:
+   *   post:
+   *     tags:
+   *       - Episodes
+   *     description: Creates a new episode
+   *     summary: Add a new one
+   *     produces:
+   *       - application/json
+   *     parameters:
+   *       - name: emissionName
+   *         description: Episode's name
+   *         in: path
+   *         required: true
+   *         type: string
+   *       - name: episode
+   *         in: body
+   *         description: Fields for the Episode resource
+   *         schema:
+   *           type: array
+   *           $ref: '#/definitions/Episode'
+   *     responses:
+   *       200:
+   *         description: Successfully created
+   *         schema:
+   *           $ref: '#/definitions/Episode'
+   */
+  .post(function (req, res, next) {
+    "use strict";
+    let episode = new Episode(req.body)
+    episode.emission = req.emission._id
+    
+    // provide a number if the user didn't specified one
+    if (typeof episode.numero === "undefined") {
+        // Max episode number + 1 - inspired by https://stackoverflow.com/a/4020842
+        var maxEpisodeNumber = req.emission.episodes.length > 0 ? Math.max.apply(
+            Math,
+            req.emission.episodes.map(function(episode){
+                return episode.numero;
+            })
+        ) : 0;
+        episode.numero = 1 + maxEpisodeNumber;
+    }
 
-router.use('/:episode', (req, res, next) => {
-    Episode.findOne({
-        emission: req.emission._id,
-        numero: req.params.episode
-    }).populate({ path: 'emission', select: 'nom' }).exec((err, ep) => {
-        if (err) return next(err);
-        if (ep === null)
-            return res.sendStatus(404);
-        req.episode = ep;
-        next();
-    });
+    episode
+        .save()
+        .then(function(episode) {
+            logger.debug("Added a new Episode " + episode.toString())
+            // add episode to emission to retrieve them all by using 'populate'
+            req.emission.episodes.push(episode)
+            req.emission.save()
+
+            res.json(episode)
+        })
+        .catch(function(error) {
+            next(error)
+        })
+  })
+
+// Middleware : we check if the episode exists in the specified emission before going further
+router.param('number', function (req, res, next, value, name) {
+  Episode
+    .findOne({numero: value, emission: req.emission._id})
+    .then(function(episode) {
+      if (episode !== null) {
+        logger.debug("Found " + episode.toString())
+        req.episode = episode
+        next()
+      } else {
+        next({message:"Episode " + value + " was not found", status: 404})
+      }
+    })
+    .catch(function(error) {
+      next(error)
+    })
 })
 
-router.get('/:episode', (req, res) => {
-    return res.send(req.episode);
-})
-
-router.put('/:episode', (req, res, next) => {
-    let episode = req.body;
-    delete episode._id;
-    Episode.findOneAndUpdate({
-        _id: req.episode._id
-    }, episode, { new: true }, (err, ep) => {
-
-        if (err) return next(err);
-        if (ep === null) {
-            return res.sendStatus(404);
+router.route('/:number')
+  /**
+   * @swagger
+   * /emissions/{emissionName}/episodes/{number}:
+   *   get:
+   *     tags:
+   *       - Episodes
+   *     description: Returns a single episode
+   *     summary: Get a episode
+   *     produces:
+   *       - application/json
+   *     parameters:
+   *       - name: emissionName
+   *         description: Emission's name
+   *         in: path
+   *         required: true
+   *         type: string
+   *       - name: number
+   *         description: Episode's number
+   *         in: path
+   *         required: true
+   *         type: integer
+   *     responses:
+   *       200:
+   *         description: A single Episode
+   *         schema:
+   *           $ref: '#/definitions/Episode'
+   */
+  .get(function (req, res, next) {
+    res.send(req.episode)
+  })
+  /**
+   * @swagger
+   * /emissions/{emissionName}/episodes/{number}:
+   *   put:
+   *     tags:
+   *       - Episodes
+   *     description: Updates a single episode
+   *     summary: Edit a episode
+   *     produces: application/json
+   *     parameters:
+   *       - name: emissionName
+   *         description: Emission's name
+   *         in: path
+   *         required: true
+   *         type: string
+   *       - name: number
+   *         description: Episode's number
+   *         in: path
+   *         required: true
+   *         type: integer
+   *       - name: episode
+   *         in: body
+   *         description: Fields for the Episode resource
+   *         schema:
+   *           type: array
+   *           $ref: '#/definitions/Episode'
+   *     responses:
+   *       200:
+   *         description: Successfully updated
+   *         schema:
+   *           $ref: '#/definitions/Episode'
+   */
+  .put(function (req, res, next) {
+    Episode
+      // use findOneAndUpdate to get the new result (even if we already found the resource in the DB)
+      .findOneAndUpdate({numero: req.episode.numero, emission: req.emission._id}, Object.assign(req.body, {modified: Date.now()}), {new : true})
+      .then(function(episode) {
+        if (episode !== null) {
+          logger.debug("Updated " + episode.toString())
+          res.json(episode)
+        } else {
+          next({message:"Episode " + req.episode.numero + " wasn't updated", status: 417})
         }
-        return res.send(ep);
-    });
-});
-
-router.delete('/:episode', (req, res, next) => {
-    Episode.findOneAndRemove({
-        _id: req.episode._id
-    }, err => {
-        if (err) return next(err);
-        // TODO supprimer toutes les news et incrusts !
-        return res.sendStatus(204);
-    });
-});
+      })
+      .catch(function(error) {
+        next(error)
+      })
+  })
+  /**
+   * @swagger
+   * /emissions/{emissionName}/episodes/{number}:
+   *   delete:
+   *     tags:
+   *       - Episodes
+   *     description: Deletes a single episode
+   *     summary: Remove a episode
+   *     produces:
+   *       - application/json
+   *     parameters:
+   *       - name: emissionName
+   *         description: Emission's name
+   *         in: path
+   *         required: true
+   *         type: string
+   *       - name: number
+   *         description: Episode's number
+   *         in: path
+   *         required: true
+   *         type: string
+   *     responses:
+   *       204:
+   *         description: Successfully deleted
+   */
+  .delete(function (req, res, next) {
+    req.episode
+      .remove()
+      .then(function(result) {
+        if (result !== null) {
+          logger.debug("Removed Episode " + req.params.number)
+          res.status(204).json(result.toString())
+        } else {
+          next({message:"Episode " + req.params.number + " wasn't deleted", status: 417})
+        }
+      })
+      .catch(function(error) {
+        next(error)
+      })
+  })
 
 router.get('/:episode/full', (req, res) => {
+    "use strict";
     // this.episode = {
     //     title: 'Bits 59',
     //     displayed: null,
@@ -96,8 +287,8 @@ router.get('/:episode/full', (req, res) => {
         });
         res.send(episodeFull);
     });
-
 });
+
 router.use('/:episode/news', news);
 
 module.exports = router;
