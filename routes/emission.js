@@ -67,7 +67,7 @@ router.route('/')
      *           $ref: '#/definitions/Emission'
      */
     .post((req, res, next) => {
-        let emission = new Emission(req.body);
+        let emission = new Emission(Object.assign({nom: (new Date()).toString()}, req.body));
         emission.save()
           .then(function(emission) {
             logger.debug("Add a new Emission " + emission.toString())
