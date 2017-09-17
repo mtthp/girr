@@ -2,7 +2,6 @@
 const express = require('express');
 const router = express.Router();
 const Emission = require('../models/emission');
-const episode = require('./episode');
 const logger = require('../logger');
 
 /**
@@ -201,6 +200,6 @@ router.route('/:name')
       })
   })
 
-router.use('/:name/episodes', episode);
+router.use('/:name/episodes', require('./episode'));
 
 module.exports = router;
