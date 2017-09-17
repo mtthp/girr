@@ -1,7 +1,7 @@
-var express = require('express')
-var router = express.Router()
-var swaggerJSDoc = require('swagger-jsdoc')
-var path = require('path')
+var express = require('express');
+var router = express.Router();
+var swaggerJSDoc = require('swagger-jsdoc');
+var path = require('path');
 
 // check here for documentation https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md
 
@@ -14,7 +14,7 @@ var swaggerDefinition = {
   },
   // host: 'localhost:' + port, // TO DO - define it dynamically
   basePath: '/api'
-}
+};
 
 // options for the swagger docs
 var options = {
@@ -22,16 +22,16 @@ var options = {
   swaggerDefinition: swaggerDefinition,
   // path to the API docs
   apis: [path.resolve('routes/*.js')]
-}
+};
 
 // initialize swagger-jsdoc
-var swaggerSpec = swaggerJSDoc(options)
+var swaggerSpec = swaggerJSDoc(options);
 
 // serve swagger
 router.get('/swagger.json', function (req, res) {
   res.setHeader('Content-Type', 'application/json')
   res.send(swaggerSpec)
-})
+});
 
-module.exports = router
+module.exports = router;
 

@@ -1,6 +1,6 @@
-var winston = require('winston')
-var path = require('path')
-winston.emitErrs = true
+var winston = require('winston');
+var path = require('path');
+winston.emitErrs = true;
 
 var logger = new winston.Logger({
     transports: [
