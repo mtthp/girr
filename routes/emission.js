@@ -1,14 +1,82 @@
 "use strict";
 const express = require('express');
 const router = express.Router();
-const Emission = require('../models/emission')
-const episode = require('./episode')
+const Emission = require('../models/emission');
+const episode = require('./episode');
+const logger = require('../logger');
 
-router.get('/', (req, res) => {
-    Emission.find((err, emissions) => {
-        res.send(emissions);
+/**
+ * @swagger
+ * definitions:
+ *   Emission:
+ *     properties:
+ *       nom:
+ *         type: string
+ *         description: unique identifier
+ *         required: true
+ *       logo:
+ *         type: string
+ *         description: buffer data
+ */
+
+router.route('/')
+    /**
+     * @swagger
+     * /emissions:
+     *   get:
+     *     tags:
+     *       - Emissions
+     *     description: Returns all emissions
+     *     summary: Get all emissions
+     *     produces:
+     *       - application/json
+     *     responses:
+     *       200:
+     *         description: An array of emissions
+     *         schema:
+     *           type: array
+     *           items:
+     *             $ref: '#/definitions/Emission'
+     */
+    .get((req, res) => {
+        Emission.find((err, emissions) => {
+            res.send(emissions);
+        })
     })
-});
+    /**
+     * @swagger
+     * /emissions:
+     *   post:
+     *     tags:
+     *       - Emissions
+     *     description: Creates a new emission
+     *     summary: Add a new one
+     *     produces:
+     *       - application/json
+     *     parameters:
+     *       - name: emission
+     *         in: body
+     *         description: Fields for the Emission resource
+     *         schema:
+     *           type: array
+     *           $ref: '#/definitions/Emission'
+     *     responses:
+     *       200:
+     *         description: Successfully created
+     *         schema:
+     *           $ref: '#/definitions/Emission'
+     */
+    .post((req, res, next) => {
+        let emission = new Emission(req.body);
+        emission.save()
+          .then(function(emission) {
+            logger.debug("Add a new Emission " + emission.toString())
+            res.json(emission)
+          })
+          .catch(function(error) {
+            next(error)
+          })
+    });
 
 router.post('/:emission', (req, res, next) => {
     let emission = new Emission({ nom: req.params.emission });
