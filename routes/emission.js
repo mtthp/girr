@@ -65,7 +65,7 @@ router.route('/')
      *         schema:
      *           $ref: '#/definitions/Emission'
      */
-    .post((req, res, next) => {
+    .post(function(req, res, next) {
         let emission = new Emission(Object.assign({nom: (new Date()).toString()}, req.body));
         emission.save()
           .then(function(emission) {
@@ -81,6 +81,7 @@ router.route('/')
 router.param('name', function (req, res, next, value, name) {
   Emission
     .findOne({nom: value})
+    .populate('episodes')
     .then(function(emission) {
       if (emission !== null) {
         logger.debug("Found " + emission.toString())
@@ -196,7 +197,7 @@ router.route('/:name')
         }
       })
       .catch(function(error) {
-        next({message:error.toString()})
+        next(error)
       })
   })
 
