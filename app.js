@@ -46,7 +46,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
     console.error(err);
     console.error("=================\n");
 
-    return res.status(500).send({ error: err });
+    return res.status(500).send(err);
   }
 
   next();
