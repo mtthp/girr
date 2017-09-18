@@ -55,15 +55,8 @@ app.use(bodyParser.urlencoded({ extended: false }))
   app.use('/', express.static('public/swagger'))
 })
 .use((err, req, res, next) => {
-  if(err) {
-    console.error(`\n==== ERROR: ${(new Date).toLocaleString()} ====`);
-    console.error(err);
-    console.error("=================\n");
-
-    return res.status(500).send(err);
-  }
-
-  next();
+  logger.error(err);
+  res.status(err.status).send(err);
 });
 
 
