@@ -2,19 +2,18 @@ const express = require('express');
 const router = express.Router();
 const logger = require('../logger');
 const Episode = require('../models/episode')
-const News = require('../models/news')
-const news = require('./news')
+const Topics = require('../models/topic')
 
 /**
  * @swagger
  * definitions:
  *   Episode:
  *     properties:
- *       numero:
+ *       position:
  *         type: integer
  *         description: unique identifier
  *         required: true
- *       nom:
+ *       name:
  *         type: string
  *         description: name
  *       date:
@@ -25,16 +24,16 @@ const news = require('./news')
 router.route('/')
   /**
    * @swagger
-   * /emissions/{emissionName}/episodes:
+   * /programs/{programName}/episodes:
    *   get:
    *     tags:
    *       - Episodes
-   *     description: Returns all episodes from a emission
+   *     description: Returns all episodes from a program
    *     summary: Get all episodes
    *     produces: application/json
    *     parameters:
-   *       - name: emissionName
-   *         description: Emission's name
+   *       - name: programName
+   *         description: programName's name
    *         in: path
    *         required: true
    *         type: string
@@ -48,9 +47,9 @@ router.route('/')
    */
   .get(function(req, res, next) {
     Episode
-        .find({ emission: req.emission._id })
-        .populate({ path: 'emission', select: 'nom' })
-        .sort({ 'numero': -1 })
+        .find({ program: req.program._id })
+        .populate({ path: 'program', select: 'name' })
+        .sort({ 'position': -1 })
         .then(function(episodes) {
             logger.debug("Found " + (episodes.length ? episodes.toString() : 0 + " episodes"))
             res.json(episodes)
@@ -61,7 +60,7 @@ router.route('/')
   })
   /**
    * @swagger
-   * /emissions/{emissionName}/episodes:
+   * /programs/{programName}/episodes:
    *   post:
    *     tags:
    *       - Episodes
@@ -69,8 +68,8 @@ router.route('/')
    *     summary: Add a new one
    *     produces: application/json
    *     parameters:
-   *       - name: emissionName
-   *         description: Emission's name
+   *       - name: programName
+   *         description: Program's name
    *         in: path
    *         required: true
    *         type: string
@@ -89,27 +88,27 @@ router.route('/')
   .post(function (req, res, next) {
     "use strict";
     let episode = new Episode(req.body)
-    episode.emission = req.emission._id
+    episode.program = req.program._id
     
-    // provide a number if the user didn't specified one
-    if (typeof episode.numero === "undefined") {
-        // Max episode number + 1 - inspired by https://stackoverflow.com/a/4020842
-        var maxEpisodeNumber = req.emission.episodes.length > 0 ? Math.max.apply(
+    // provide a position if the user didn't specified one
+    if (typeof episode.position === "undefined") {
+        // Max episode position + 1 - inspired by https://stackoverflow.com/a/4020842
+        var maxEpisodePosition = req.program.episodes.length > 0 ? Math.max.apply(
             Math,
-            req.emission.episodes.map(function(episode){
-                return episode.numero;
+            req.program.episodes.map(function(e){
+                return e.position;
             })
         ) : 0;
-        episode.numero = 1 + maxEpisodeNumber;
+        episode.position = 1 + maxEpisodePosition;
     }
 
     episode
         .save()
         .then(function(episode) {
             logger.debug("Added a new Episode " + episode.toString())
-            // add episode to emission to retrieve them all by using 'populate'
-            req.emission.episodes.push(episode)
-            req.emission.save()
+            // add episode to program to retrieve them all by using 'populate'
+            req.program.episodes.push(episode)
+            req.program.save()
 
             res.json(episode)
         })
@@ -118,11 +117,11 @@ router.route('/')
         })
   })
 
-// Middleware : we check if the episode exists in the specified emission before going further
-router.param('episodeNumber', function (req, res, next, value, name) {
+// Middleware : we check if the episode exists in the specified program before going further
+router.param('episodePosition', function (req, res, next, value, name) {
   Episode
-    .findOne({numero: value, emission: req.emission._id})
-    .populate('news')
+    .findOne({position: value, program: req.program._id})
+    .populate('topics')
     .then(function(episode) {
       if (episode !== null) {
         logger.debug("Found " + episode.toString())
@@ -137,10 +136,10 @@ router.param('episodeNumber', function (req, res, next, value, name) {
     })
 })
 
-router.route('/:episodeNumber')
+router.route('/:episodePosition')
   /**
    * @swagger
-   * /emissions/{emissionName}/episodes/{number}:
+   * /programs/{programName}/episodes/{episodePosition}:
    *   get:
    *     tags:
    *       - Episodes
@@ -148,13 +147,13 @@ router.route('/:episodeNumber')
    *     summary: Get a episode
    *     produces: application/json
    *     parameters:
-   *       - name: emissionName
-   *         description: Emission's name
+   *       - name: programName
+   *         description: Program's name
    *         in: path
    *         required: true
    *         type: string
-   *       - name: episodeNumber
-   *         description: Episode's number
+   *       - name: episodePosition
+   *         description: Episode's position
    *         in: path
    *         required: true
    *         type: integer
@@ -169,7 +168,7 @@ router.route('/:episodeNumber')
   })
   /**
    * @swagger
-   * /emissions/{emissionName}/episodes/{number}:
+   * /programs/{programName}/episodes/{episodePosition}:
    *   put:
    *     tags:
    *       - Episodes
@@ -177,13 +176,13 @@ router.route('/:episodeNumber')
    *     summary: Edit a episode
    *     produces: application/json
    *     parameters:
-   *       - name: emissionName
-   *         description: Emission's name
+   *       - name: programName
+   *         description: Program's name
    *         in: path
    *         required: true
    *         type: string
-   *       - name: episodeNumber
-   *         description: Episode's number
+   *       - name: episodePosition
+   *         description: Episode's position
    *         in: path
    *         required: true
    *         type: integer
@@ -202,13 +201,13 @@ router.route('/:episodeNumber')
   .put(function (req, res, next) {
     Episode
       // use findOneAndUpdate to get the new result (even if we already found the resource in the DB)
-      .findOneAndUpdate({numero: req.episode.numero, emission: req.emission._id}, Object.assign(req.body, {modified: Date.now()}), {new : true})
+      .findOneAndUpdate({position: req.episode.position, program: req.program._id}, Object.assign(req.body, {modified: Date.now()}), {new : true})
       .then(function(episode) {
         if (episode !== null) {
           logger.debug("Updated " + episode.toString())
           res.json(episode)
         } else {
-          next({message:"Episode " + req.episode.numero + " wasn't updated", status: 417})
+          next({message:"Episode " + req.episode.position + " wasn't updated", status: 417})
         }
       })
       .catch(function(error) {
@@ -217,7 +216,7 @@ router.route('/:episodeNumber')
   })
   /**
    * @swagger
-   * /emissions/{emissionName}/episodes/{number}:
+   * /programs/{programName}/episodes/{episodePosition}:
    *   delete:
    *     tags:
    *       - Episodes
@@ -225,13 +224,13 @@ router.route('/:episodeNumber')
    *     summary: Remove a episode
    *     produces: application/json
    *     parameters:
-   *       - name: emissionName
-   *         description: Emission's name
+   *       - name: programName
+   *         description: Program's name
    *         in: path
    *         required: true
    *         type: string
-   *       - name: episodeNumber
-   *         description: Episode's number
+   *       - name: episodePosition
+   *         description: Episode's position
    *         in: path
    *         required: true
    *         type: string
@@ -244,10 +243,10 @@ router.route('/:episodeNumber')
       .remove()
       .then(function(result) {
         if (result !== null) {
-          logger.debug("Removed Episode " + req.params.episodeNumber)
+          logger.debug("Removed Episode " + req.params.episodePosition)
           res.status(204).json(result.toString())
         } else {
-          next({message:"Episode " + req.params.episodeNumber + " wasn't deleted", status: 417})
+          next({message:"Episode " + req.params.episodePosition + " wasn't deleted", status: 417})
         }
       })
       .catch(function(error) {
@@ -264,27 +263,27 @@ router.get('/:episode/full', (req, res) => {
     //         {
     //             title: 'Hyperloop One le test fonctionnel',
     //             incrusts: [
-    //                 '/assets/emissions/bits/59/0.jpg',
-    //                 '/assets/emissions/bits/59/1.jpg'
+    //                 '/assets/programs/bits/59/0.jpg',
+    //                 '/assets/programs/bits/59/1.jpg'
     //             ]
     //         },
 
-    News.find({
+    Topics.find({
         episode: req.episode._id
-    }, { '_id': 0, 'numero': 1, 'titre': 1, 'notes': 1,'incrusts': 1 }, { 'sort': { 'numero': 1 } }).lean().exec((err, news) => {
-        let nomCapitalFirst = req.emission.nom.charAt(0).toUpperCase() + req.emission.nom.slice(1);
+    }, { '_id': 0, 'position': 1, 'title': 1, 'notes': 1, 'medias': 1 }, { 'sort': { 'position': 1 } }).lean().exec((err, news) => {
+        let nameCapitalFirst = req.program.name.charAt(0).toUpperCase() + req.program.name.slice(1);
         let episodeFull = {
-            titre: `${nomCapitalFirst} ${req.episode.numero}`,
+            titre: `${nameCapitalFirst} ${req.episode.position}`,
             news: news
         };
         let baseUrl = req.originalUrl.replace('full', '');
         episodeFull.news.forEach(n => {
-            n.incrusts = n.incrusts.map(incrust => path.join(baseUrl, 'news', n.numero.toString(), 'incrusts', incrust.toString()));
+            n.incrusts = n.incrusts.map(incrust => path.join(baseUrl, 'news', n.position.toString(), 'incrusts', incrust.toString()));
         });
         res.send(episodeFull);
     });
 });
 
-router.use('/:episodeNumber/news', news);
+router.use('/:episodePosition/topics', require('./topic'));
 
 module.exports = router;

@@ -1,23 +1,23 @@
 "use strict";
 const mongoose = require('mongoose');
-const News = require('./news');
+const Topic = require('./topic');
 const logger = require('../logger');
 
 let episodeSchema = new mongoose.Schema({
-    numero: { type: Number, required: true, index: true },
-    nom: { type: String },
+    position: { type: Number, required: true, index: true },
+    name: { type: String },
     date: { type: Date, default: Date.now },
-    emission: { type: mongoose.Schema.Types.ObjectId, ref:'Emission', required: true, index: true },
-    news: [{ type: mongoose.Schema.Types.ObjectId, ref:'News' }]
+    program: { type: mongoose.Schema.Types.ObjectId, ref:'Program', required: true, index: true },
+    topics: [{ type: mongoose.Schema.Types.ObjectId, ref:'Topic' }]
 });
-episodeSchema.index({ numero: 1, emission: 1 }, { unique: true });
+episodeSchema.index({ position: 1, program: 1 }, { unique: true });
 
-// when an Episode is removed, delete all its News
+// when an Episode is removed, delete all its Topics
 episodeSchema.post('remove', function(episode) {
-  News
+  Topic
     .remove({episode: episode._id})
     .then(function(result) {
-      logger.debug("Removed all News from Episode " + episode._id)
+      logger.debug("Removed all Topics from Episode " + episode._id)
     })
     .catch(function(error) {
       logger.error(error)

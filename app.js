@@ -14,9 +14,6 @@ const path = require('path')
 mongoose.Promise = Promise;
 
 const websockets = new WebSockets(io);
-// monter les routes
-const emission = require('./src/routes/emission.js');
-
 
 let password = process.env.GIRR_PASSWORD || config.password;
 if(password) {
@@ -46,7 +43,6 @@ app.use(bodyParser.urlencoded({ extended: false }))
 // Indique que le dossier /public contient des fichiers statiques
 // (middleware chargé de base)
 .use(express.static('./public'))
-.use('/api/emissions', emission)
  // swagger.json
 .use('/', require('./src/swagger'))
  // swagger UI
@@ -54,9 +50,11 @@ app.use(bodyParser.urlencoded({ extended: false }))
   res.sendFile(path.resolve('public/swagger/index.html'))
   app.use('/', express.static('public/swagger'))
 })
+.use('/api/programs', require('./src/routes/program.js'))
+// error middleware
 .use((err, req, res, next) => {
   logger.error(err);
-  res.status(err.status).send(err);
+  res.status(err.status ? err.status : 500).send(err);
 });
 
 

@@ -2,8 +2,8 @@
 const express = require('express');
 const path = require('path');
 const router = express.Router();
-const Incrust = require('../models/incrust');
-const News = require('../models/news');
+const Incrust = require('../models/media');
+const Topic = require('../models/topic');
 const fileUpload = require('express-fileupload');
 const request = require('request');
 
@@ -23,7 +23,7 @@ const request = require('request');
  */
 
 router.get('/', (req, res) => {
-    return res.send(req.news.incrusts);
+    return res.send(req.topic.medias);
 });
 
 router.get('/:incrust', (req, res, next) => {
@@ -94,7 +94,7 @@ router.delete('/:incrust', (req, res, next) => {
     }, (err, incrust) => {
         if (err) return next(err);
 
-        News.findOne({ _id: incrust.news }, (err, news) => {
+        Topic.findOne({ _id: incrust.news }, (err, news) => {
             if (err) return next(err);
             if (news) {
                 let indexIncrustToRemove = news.incrusts.indexOf(incrust._id);

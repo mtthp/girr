@@ -3,22 +3,22 @@ const mongoose = require('mongoose');
 const Episode = require('./episode');
 const logger = require('../logger');
 
-let emissionSchema = new mongoose.Schema({
-    nom: { type: String, unique: true, required: true},
+let programSchema = new mongoose.Schema({
+    name: { type: String, unique: true, required: true},
     logo: { data: Buffer, contentType: String },
     episodes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Episode' }]
 });
 
 // when a Emission is removed, delete all its Episodes
-emissionSchema.post('remove', function(emission) {
+programSchema.post('remove', function(program) {
   Episode
-    .remove({emission: emission._id})
+    .remove({program: program._id})
     .then(function(result) {
-      logger.debug("Removed all Episodes from Emission " + emission._id)
+      logger.debug("Removed all Episodes from Program " + program._id)
     })
     .catch(function(error) {
       logger.error(error)
     })
 })
 
-module.exports = mongoose.model('Emission', emissionSchema);
+module.exports = mongoose.model('Program', programSchema);
