@@ -7,6 +7,21 @@ const News = require('../models/news');
 const fileUpload = require('express-fileupload');
 const request = require('request');
 
+/**
+ * @swagger
+ * definitions:
+ *   Incrust:
+ *     properties:
+ *       data:
+ *         type: string
+ *         description: data value
+ *         format: byte
+ *         required: true
+ *       contentType:
+ *         type: string
+ *         description: Type of the content ? idk
+ */
+
 router.get('/', (req, res) => {
     return res.send(req.news.incrusts);
 });
