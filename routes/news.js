@@ -1,102 +1,285 @@
 "use strict";
 const express = require('express');
-const path = require('path');
 const router = express.Router();
+const logger = require('../logger');
 const News = require('../models/news');
 const Incrust = require('../models/incrust');
-const incrustRoute = require('./incrust');
 
-router.get('/', (req, res, next) => {
-    News.find({
-        episode: req.episode._id
-    }, null, { sort: { 'numero': 1 } }).lean().exec((err, news) => {
-        news.forEach(n => {
-            // Map the incrusts to build their URI while keeping their ID
-            n.incrusts = n.incrusts.map(incrust => {
-                return {
-                    "path": path.join(req.originalUrl, n.numero.toString(), 'incrusts', incrust.toString()),
-                    "id": incrust
-                };
-            });
+/**
+ * @swagger
+ * definitions:
+ *   News:
+ *     properties:
+ *       numero:
+ *         type: integer
+ *         description: unique identifier
+ *         required: true
+ *       titre:
+ *         type: string
+ *         description: News title
+ *       notes:
+ *         type: string
+ *         description: Some notes that should be useful
+ */
+
+router.route('/')
+  /**
+   * @swagger
+   * /emissions/{emissionName}/episodes/{episodeNumber}/news:
+   *   get:
+   *     tags:
+   *       - News
+   *     description: Returns all news from an episode
+   *     summary: Get all news
+   *     produces: application/json
+   *     parameters:
+   *       - name: emissionName
+   *         description: Emission's name
+   *         in: path
+   *         required: true
+   *         type: string
+   *       - name: episodeNumber
+   *         description: Episode's number
+   *         in: path
+   *         required: true
+   *         type: integer
+   *     responses:
+   *       200:
+   *         description: An array of episodes
+   *         schema:
+   *           type: array
+   *           items:
+   *             $ref: '#/definitions/Episode'
+   */
+  .get(function(req, res, next) {
+    logger.debug(req.episode.toString())
+    News
+        .find({ episode: req.episode._id })
+        .sort({ 'numero': 1 })
+        .then(function(news) {
+            logger.debug("Found " + (news.length ? news.toString() : 0 + " news"))
+            res.json(news)
+        })
+        .catch(function(error) {
+            next(error)
         });
+  })
+  /**
+   * @swagger
+   * /emissions/{emissionName}/episodes/{episodeNumber}/news:
+   *   post:
+   *     tags:
+   *       - News
+   *     description: Creates a new news
+   *     summary: Add a news
+   *     produces: application/json
+   *     parameters:
+   *       - name: emissionName
+   *         description: Emission's name
+   *         in: path
+   *         required: true
+   *         type: string
+   *       - name: episodeNumber
+   *         description: Episode's number
+   *         in: path
+   *         required: true
+   *         type: integer
+   *       - name: news
+   *         in: body
+   *         description: Fields for the News resource
+   *         schema:
+   *           type: array
+   *           $ref: '#/definitions/News'
+   *     responses:
+   *       200:
+   *         description: Successfully created
+   *         schema:
+   *           $ref: '#/definitions/News'
+   */
+  .post(function (req, res, next) {
+    "use strict";
+    let news = new News(req.body)
+    news.episode = req.episode._id
+    
+    // provide a number if the user didn't specified one
+    if (typeof news.numero === "undefined") {
+        // Max news number + 1 - inspired by https://stackoverflow.com/a/4020842
+        var maxNewsNumber = req.episode.news.length > 0 ? Math.max.apply(
+            Math,
+            req.episode.news.map(function(episode_news){
+                return episode_news.numero;
+            })
+        ) : 0;
+        news.numero = 1 + maxNewsNumber;
+    }
 
-        if (err) return next(err);
-        res.send(news);
-    });
-});
+    news
+        .save()
+        .then(function(news) {
+            logger.debug("Added a new Episode " + news.toString())
+            // add news to episode to retrieve them all by using 'populate'
+            req.episode.news.push(news)
+            req.episode.save()
 
-router.post('/:news', (req, res, next) => {
-    let news = new News({
-        numero: req.params.news,
-        episode: req.episode._id,
-        titre: ''
-    });
-    news.save(err => {
-        if (err) return next(err);
-        res.setHeader('location', req.path);
-        return res.sendStatus(201);
-    });
-});
+            res.json(news)
+        })
+        .catch(function(error) {
+            next(error)
+        })
+  })
 
-router.use('/:news', (req, res, next) => {
-    News.findOne({
-        episode: req.episode._id,
-        numero: req.params.news
-    }, (err, n) => {
-        if (err) return next(err);
-        if (n === null)
-            return res.sendStatus(404);
-        req.news = n;
-        next();
-    });
+// Middleware : we check if the episode exists in the specified emission before going further
+router.param('newsNumber', function (req, res, next, value, name) {
+  News
+    .findOne({numero: value, episode: req.episode._id})
+    .then(function(news) {
+      if (news !== null) {
+        logger.debug("Found " + news.toString())
+        req.news = news
+        next()
+      } else {
+        next({message:"News " + value + " was not found", status: 404})
+      }
+    })
+    .catch(function(error) {
+      next(error)
+    })
 })
 
-router.get('/:news', (req, res) => {
-    let n = req.news.toObject();
-    n.incrusts = n.incrusts.map(incrust => path.join(req.originalUrl, 'incrusts', incrust.toString()));
-    return res.send(n);
-})
-
-router.put('/:news', (req, res, next) => {
-    // Map the incrusts back to an array of objectIds
-    req.body.incrusts = req.body.incrusts.map(incrust => incrust.id);
-    let news = req.body;
-    delete news._id;
-    News.findOneAndUpdate({
-        _id: req.news._id
-    }, news, { new: true }, (err, n) => {
-        if (err) return next(err);
-        if (n === null) {
-            return res.sendStatus(404);
+router.route('/:newsNumber')
+  /**
+   * @swagger
+   * /emissions/{emissionName}/episodes/{episodeNumber}/news/{newsNumber}:
+   *   get:
+   *     tags:
+   *       - News
+   *     description: Returns a single news
+   *     summary: Get a news
+   *     produces: application/json
+   *     parameters:
+   *       - name: emissionName
+   *         description: Emission's name
+   *         in: path
+   *         required: true
+   *         type: string
+   *       - name: episodeNumber
+   *         description: Episode's number
+   *         in: path
+   *         required: true
+   *         type: integer
+   *       - name: newsNumber
+   *         description: News number
+   *         in: path
+   *         required: true
+   *         type: integer
+   *     responses:
+   *       200:
+   *         description: A single News
+   *         schema:
+   *           $ref: '#/definitions/News'
+   */
+  .get(function (req, res, next) {
+    res.send(req.news)
+  })
+  /**
+   * @swagger
+   * /emissions/{emissionName}/episodes/{episodeNumber}/news/{newsNumber}:
+   *   put:
+   *     tags:
+   *       - News
+   *     description: Updates a single news
+   *     summary: Edit a news
+   *     produces: application/json
+   *     parameters:
+   *       - name: emissionName
+   *         description: Emission's name
+   *         in: path
+   *         required: true
+   *         type: string
+   *       - name: episodeNumber
+   *         description: Episode's number
+   *         in: path
+   *         required: true
+   *         type: integer
+   *       - name: newsNumber
+   *         description: News number
+   *         in: path
+   *         required: true
+   *         type: integer
+   *       - name: news
+   *         in: body
+   *         description: Fields for the News resource
+   *         schema:
+   *           type: array
+   *           $ref: '#/definitions/News'
+   *     responses:
+   *       200:
+   *         description: Successfully updated
+   *         schema:
+   *           $ref: '#/definitions/News'
+   */
+  .put(function (req, res, next) {
+    News
+      // use findOneAndUpdate to get the new result (even if we already found the resource in the DB)
+      .findOneAndUpdate({numero: req.news.numero, episode: req.episode._id}, Object.assign(req.body, {modified: Date.now()}), {new : true})
+      .then(function(news) {
+        if (news !== null) {
+          logger.debug("Updated " + news.toString())
+          res.json(news)
+        } else {
+          next({message:"News " + req.news.numero + " wasn't updated", status: 417})
         }
-        return res.send(n);
-    });
-});
+      })
+      .catch(function(error) {
+        next(error)
+      })
+  })
+  /**
+   * @swagger
+   * /emissions/{emissionName}/episodes/{episodeNumber}/news/{newsNumber}:
+   *   delete:
+   *     tags:
+   *       - News
+   *     description: Deletes a single news
+   *     summary: Remove a news
+   *     produces: application/json
+   *     parameters:
+   *       - name: emissionName
+   *         description: Emission's name
+   *         in: path
+   *         required: true
+   *         type: string
+   *       - name: episodeNumber
+   *         description: Episode's number
+   *         in: path
+   *         required: true
+   *         type: integer
+   *       - name: newsNumber
+   *         description: News number
+   *         in: path
+   *         required: true
+   *         type: integer
+   *     responses:
+   *       204:
+   *         description: Successfully deleted
+   */
+  .delete(function (req, res, next) {
+    req.news
+      .remove()
+      .then(function(result) {
+        if (result !== null) {
+          logger.debug("Removed News " + req.params.newsNumber)
+          res.status(204).json(result.toString())
+        } else {
+          next({message:"News " + req.params.newsNumber + " wasn't deleted", status: 417})
+        }
+      })
+      .catch(function(error) {
+        next(error)
+      })
+  })
 
-router.delete('/:news', (req, res, next) => {
-    News.findOneAndRemove({
-        _id: req.news._id
-    }, err => {
-        if (err) return next(err);
-        // il faut renuméroter les autres
-        Incrust.remove({
-            news: req.news._id
-        }, err => {
-            if (err) return next(err);
-            News.find({
-                episode: req.episode._id
-            }, (err, news) => {
-                if (err) return next(err);
-                news.forEach((n, index) => {
-                    n.numero = index + 1;
-                    n.save(); //TODO attendre que tous les save soient OK
-                });
-                return res.sendStatus(204);
-            });
-        });
-    });
-});
-
+// legacy code, est-il encore nécessaire ? - @Matthieu Petit
 router.get('/:news/checkintegrity', (req, res, next) => {
     let recovery = [];
     let modified = false;
@@ -145,6 +328,7 @@ router.get('/:news/checkintegrity', (req, res, next) => {
     });
 });
 
+// legacy code, est-il encore nécessaire ? - @Matthieu Petit
 router.get('/:news/recover', (req, res, next) => {
     let recovery = [];
     let modified = false;
@@ -195,6 +379,6 @@ router.get('/:news/recover', (req, res, next) => {
     });
 });
 
-router.use('/:news/incrusts', incrustRoute);
+router.use('/:news/incrusts', require('./incrust'));
 
 module.exports = router;

@@ -1,5 +1,4 @@
 const express = require('express');
-const path = require('path');
 const router = express.Router();
 const logger = require('../logger');
 const Episode = require('../models/episode')
@@ -30,13 +29,12 @@ router.route('/')
    *   get:
    *     tags:
    *       - Episodes
-   *     description: Returns all events
-   *     summary: Get all events
-   *     produces:
-   *       - application/json
+   *     description: Returns all episodes from a emission
+   *     summary: Get all episodes
+   *     produces: application/json
    *     parameters:
    *       - name: emissionName
-   *         description: Episode's name
+   *         description: Emission's name
    *         in: path
    *         required: true
    *         type: string
@@ -69,11 +67,10 @@ router.route('/')
    *       - Episodes
    *     description: Creates a new episode
    *     summary: Add a new one
-   *     produces:
-   *       - application/json
+   *     produces: application/json
    *     parameters:
    *       - name: emissionName
-   *         description: Episode's name
+   *         description: Emission's name
    *         in: path
    *         required: true
    *         type: string
@@ -122,9 +119,10 @@ router.route('/')
   })
 
 // Middleware : we check if the episode exists in the specified emission before going further
-router.param('number', function (req, res, next, value, name) {
+router.param('episodeNumber', function (req, res, next, value, name) {
   Episode
     .findOne({numero: value, emission: req.emission._id})
+    .populate('news')
     .then(function(episode) {
       if (episode !== null) {
         logger.debug("Found " + episode.toString())
@@ -139,7 +137,7 @@ router.param('number', function (req, res, next, value, name) {
     })
 })
 
-router.route('/:number')
+router.route('/:episodeNumber')
   /**
    * @swagger
    * /emissions/{emissionName}/episodes/{number}:
@@ -148,15 +146,14 @@ router.route('/:number')
    *       - Episodes
    *     description: Returns a single episode
    *     summary: Get a episode
-   *     produces:
-   *       - application/json
+   *     produces: application/json
    *     parameters:
    *       - name: emissionName
    *         description: Emission's name
    *         in: path
    *         required: true
    *         type: string
-   *       - name: number
+   *       - name: episodeNumber
    *         description: Episode's number
    *         in: path
    *         required: true
@@ -185,7 +182,7 @@ router.route('/:number')
    *         in: path
    *         required: true
    *         type: string
-   *       - name: number
+   *       - name: episodeNumber
    *         description: Episode's number
    *         in: path
    *         required: true
@@ -226,15 +223,14 @@ router.route('/:number')
    *       - Episodes
    *     description: Deletes a single episode
    *     summary: Remove a episode
-   *     produces:
-   *       - application/json
+   *     produces: application/json
    *     parameters:
    *       - name: emissionName
    *         description: Emission's name
    *         in: path
    *         required: true
    *         type: string
-   *       - name: number
+   *       - name: episodeNumber
    *         description: Episode's number
    *         in: path
    *         required: true
@@ -248,10 +244,10 @@ router.route('/:number')
       .remove()
       .then(function(result) {
         if (result !== null) {
-          logger.debug("Removed Episode " + req.params.number)
+          logger.debug("Removed Episode " + req.params.episodeNumber)
           res.status(204).json(result.toString())
         } else {
-          next({message:"Episode " + req.params.number + " wasn't deleted", status: 417})
+          next({message:"Episode " + req.params.episodeNumber + " wasn't deleted", status: 417})
         }
       })
       .catch(function(error) {
@@ -289,6 +285,6 @@ router.get('/:episode/full', (req, res) => {
     });
 });
 
-router.use('/:episode/news', news);
+router.use('/:episodeNumber/news', news);
 
 module.exports = router;

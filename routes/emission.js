@@ -78,7 +78,7 @@ router.route('/')
     });
 
 // Middleware : we check if the emission exists in the DB before going further
-router.param('name', function (req, res, next, value, name) {
+router.param('emissionName', function (req, res, next, value, name) {
   Emission
     .findOne({nom: value})
     .populate('episodes')
@@ -96,7 +96,7 @@ router.param('name', function (req, res, next, value, name) {
     })
 })
 
-router.route('/:name')
+router.route('/:emissionName')
   /**
    * @swagger
    * /emissions/{nom}:
@@ -190,10 +190,10 @@ router.route('/:name')
       .remove()
       .then(function(result) {
         if (result !== null) {
-          logger.debug("Removed Emission " + req.params.name)
+          logger.debug("Removed Emission " + req.params.emissionName)
           res.status(204).json(result.toString())
         } else {
-          next({message:"Emission " + req.params.name + " wasn't deleted", status: 417})
+          next({message:"Emission " + req.params.emissionName + " wasn't deleted", status: 417})
         }
       })
       .catch(function(error) {
@@ -201,6 +201,6 @@ router.route('/:name')
       })
   })
 
-router.use('/:name/episodes', require('./episode'));
+router.use('/:emissionName/episodes', require('./episode'));
 
 module.exports = router;
