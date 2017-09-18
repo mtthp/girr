@@ -8,6 +8,7 @@ const mongoose = require('mongoose');
 const basicAuth = require('express-basic-auth');
 const config = require("./config/server");
 const WebSockets = require("./src/websockets");
+const logger = require("./src/logger");
 const path = require('path')
 
 mongoose.Promise = Promise;
@@ -25,10 +26,23 @@ if(password) {
     realm: 'g1RR'
   }));
 }
+
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }))
 // parse application/json
 .use(bodyParser.json())
+// middleware to use for all requests
+.use(function (req, res, next) {
+  // do logging
+  logger.log('info',
+    '[%s] >> %s %s %s',
+    req.connection.remoteAddress,
+    req.method,
+    req.url,
+    Object.keys(req.body).length ? JSON.stringify(req.body) : ''
+  )
+  next() // make sure we go to the next routes and don't stop here
+})
 // Indique que le dossier /public contient des fichiers statiques
 // (middleware chargé de base)
 .use(express.static('./public'))
