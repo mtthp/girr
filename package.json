@@ -1,11 +1,11 @@
 {
   "name": "girr",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "GeekInc Remote Regie",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "dev": "nodemon --inspect=5858 app.js"
+    "dev": "nodemon --config config/nodemon.json app.js"
   },
   "author": "Christophe Camicas",
   "license": "MIT",
