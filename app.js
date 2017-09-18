@@ -7,14 +7,14 @@ const io = require('socket.io')(server);
 const mongoose = require('mongoose');
 const basicAuth = require('express-basic-auth');
 const config = require("./config/server");
-const WebSockets = require("./websockets");
+const WebSockets = require("./src/websockets");
 const path = require('path')
 
 mongoose.Promise = Promise;
 
 const websockets = new WebSockets(io);
 // monter les routes
-const emission = require('./routes/emission.js');
+const emission = require('./src/routes/emission.js');
 
 
 let password = process.env.GIRR_PASSWORD || config.password;
@@ -34,7 +34,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 .use(express.static('./public'))
 .use('/api/emissions', emission)
  // swagger.json
-.use('/', require('./swagger'))
+.use('/', require('./src/swagger'))
  // swagger UI
 .get('/api', function (req, res) {
   res.sendFile(path.resolve('public/swagger/index.html'))

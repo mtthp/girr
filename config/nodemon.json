@@ -9,9 +9,8 @@
     "js": "node --harmony"
   },
   "watch": [
-    "models/",
-    "config/"
-    "routes/",
+    "src/",
+    "config/",
     "app.js"
   ],
   "env": {

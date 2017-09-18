@@ -21,7 +21,7 @@ var options = {
   // import swaggerDefinitions
   swaggerDefinition: swaggerDefinition,
   // path to the API docs
-  apis: [path.resolve('routes/*.js')]
+  apis: [path.resolve('src/routes/*.js')]
 };
 
 // initialize swagger-jsdoc
