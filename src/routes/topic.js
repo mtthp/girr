@@ -98,7 +98,7 @@ router.route('/')
    */
   .post(function (req, res, next) {
     "use strict";
-    let topic = new Topic(req.body)
+    let topic = new Topic(Object.assign(req.body, {created: Date.now(), modified: Date.now()}))
     topic.episode = req.episode._id
 
     // provide a position if the user didn't specified one

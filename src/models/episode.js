@@ -7,6 +7,8 @@ let episodeSchema = new mongoose.Schema({
     position: { type: Number, required: true, index: true },
     name: { type: String },
     date: { type: Date, default: Date.now },
+    created: { type: Date, required: true },
+    modified: { type: Date, required: true },
     program: { type: mongoose.Schema.Types.ObjectId, ref:'Program', required: true, index: true },
     topics: [{ type: mongoose.Schema.Types.ObjectId, ref:'Topic' }]
 });
