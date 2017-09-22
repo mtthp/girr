@@ -60,6 +60,9 @@ typings/
 # all data files
 data
 
+# MacOS files
+.DS_Store
+
 # some mystical things link to Visual Code ? - @Matthieu Petit
 .vscode
 dump
