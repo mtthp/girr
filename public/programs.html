@@ -60,17 +60,17 @@
                 <div class="mdc-toolbar__row">
                     <section class="mdc-toolbar__section mdc-toolbar__section--align-start">
                         <a class="material-icons mdc-toolbar__icon--menu menu" aria-label="Menu" alt="Menu">menu</a>
-                        <span class="mdc-toolbar__title">GeekInc Remote Regie</span>
+                        <span class="mdc-toolbar__title">{{ programs.length }} Programs</span>
                     </section>
                     <section class="mdc-toolbar__section mdc-toolbar__section--align-end mdc-toolbar__section--shrink-to-fit">
-                        <a class="material-icons mdc-toolbar__icon mdc-ripple-surface mdc-ripple-surface--primary" href="/api" target="_blank" aria-label="API" alt="API">code</a>
+                        <a class="material-icons mdc-toolbar__icon mdc-ripple-surface mdc-ripple-surface--primary" href="/api#!/Programs/get_programs" target="_blank" aria-label="API" alt="API">code</a>
                     </section>
                 </div>
             </header>
         
             <main class="mdc-toolbar-fixed-adjust">
                 <div v-if="programs.length > 0" class="programs">
-                    <program v-for="program in programs" :key="program.name" :name="program.name"></program>
+                    <program v-for="program in programs" :key="program.name" :name="program.name" :created="program.created" :thumbnail="program.logo"></program>
                 </div>
                 <div class="no-programs" v-else></div>
                 <div class="mdc-snackbar mdc-snackbar--align-start">
@@ -81,7 +81,7 @@
                 </div>
             </main>
 
-            <button class="mdc-fab material-icons fab" aria-label="Favorite" v-on:click="addProgram">
+            <button class="mdc-fab material-icons fab" aria-label="add" data-mdc-auto-init="MDCRipple" v-on:click="addProgram">
                 <span class="mdc-fab__icon">
                     add
                 </span>
@@ -90,10 +90,10 @@
     </div>
 
     <template id="program-template">
-        <div class="mdc-card mdc-card--theme-dark program" :style="logo ? 'background-image: url(\'' + logo + '\');' : null">
+        <div class="mdc-card mdc-card--theme-dark program" :style="thumbnail ? 'background-image: url(\'' + thumbnail + '\');' : null">
             <section class="mdc-card__primary">
                 <h1 class="mdc-card__title mdc-card__title--large">{{ name }}</h1>
-                <h2 class="mdc-card__subtitle"></h2>
+                <h2 class="mdc-card__subtitle">Added {{ created | formatDate }}</h2>
             </section>
             <section class="mdc-card__actions">
                 <button class="mdc-button mdc-button--compact mdc-card__action" v-on:click="$parent.deleteProgram(name)">Delete</button>

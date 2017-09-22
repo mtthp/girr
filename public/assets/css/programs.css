@@ -10,20 +10,9 @@
 
 .program {
   margin: 15px;
-  width: calc(100%/3 - 30px);
+  width: calc(100% - 30px);
   -webkit-transition: all 0.2s ease-in-out;
   transition: all 0.2s ease-in-out;
-}
-
-@media screen and (max-width: 991px) {
-  .program {
-    width: calc(100%/2 - 30px);
-  }
-}
-@media screen and (max-width: 767px) {
-  .program {
-    width: calc(100% - 30px);
-  }
 }
 
 .program.mdc-card {

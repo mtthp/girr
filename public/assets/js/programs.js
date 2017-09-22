@@ -4,12 +4,21 @@ var Program = Vue.component('program', {
       type: String,
       required: true
     },
-    logo: {
+    thumbnail: {
       type: String
     },
-    programs: []
+    created: {
+      type: String
+    },
+    episodes: []
   },
   template: '#program-template'
+})
+
+Vue.filter('formatDate', function (value) {
+    if (value) {
+        return new Date(String(value)).toLocaleDateString();
+    }
 })
 
 var vm = new Vue({
