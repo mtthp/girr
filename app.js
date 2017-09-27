@@ -59,6 +59,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 
 
 mongoose.connect(config.mongo_endpoint, { useMongoClient: true })
+mongoose.connection.on('error', console.error.bind(console, 'connection error:'))
 mongoose.connection.on('open', () => {
   io.listen(app.listen(config.port, () => {
     console.log(`http://localhost:${config.port}/admin.html`);
