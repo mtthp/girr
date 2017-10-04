@@ -11,7 +11,7 @@ let programSchema = new mongoose.Schema({
     episodes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Episode' }]
 });
 
-// when a Emission is removed, delete all its Episodes
+// when a Program is removed, delete all its Episodes
 programSchema.post('remove', function(program) {
   Episode
     .remove({program: program._id})

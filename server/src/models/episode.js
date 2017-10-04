@@ -12,7 +12,7 @@ let episodeSchema = new mongoose.Schema({
     program: { type: mongoose.Schema.Types.ObjectId, ref:'Program', required: true, index: true },
     topics: [{ type: mongoose.Schema.Types.ObjectId, ref:'Topic' }]
 });
-episodeSchema.index({ position: 1, program: 1 }, { unique: true });
+episodeSchema.index({ number: 1, program: 1 }, { unique: true });
 
 // when an Episode is removed, delete all its Topics
 episodeSchema.post('remove', function(episode) {
