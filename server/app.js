@@ -38,6 +38,8 @@ app.use(bodyParser.urlencoded({ extended: false }))
     req.url,
     Object.keys(req.body).length ? JSON.stringify(req.body) : ''
   )
+  res.header("Access-Control-Allow-Origin", "*")
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
   next() // make sure we go to the next routes and don't stop here
 })
 // Indique que le dossier /public contient des fichiers statiques
