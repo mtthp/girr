@@ -4,7 +4,7 @@ const Topic = require('./topic');
 const logger = require('../logger');
 
 let episodeSchema = new mongoose.Schema({
-    position: { type: Number, required: true, index: true },
+    number: { type: Number, required: true, index: true },
     name: { type: String },
     date: { type: Date, default: Date.now },
     created: { type: Date, required: true },

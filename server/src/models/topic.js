@@ -4,8 +4,8 @@ const Media = require('./media');
 const logger = require('../logger');
 
 let topicSchema = new mongoose.Schema({
-    position: { type: Number, required: true },
-    title: { type: String },
+    title: { type: String, required: true },
+    position: { type: Number},
     created: { type: Date, required: true },
     modified: { type: Date, required: true },
     notes: String,

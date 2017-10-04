@@ -25,7 +25,7 @@ const Media = require('../models/media');
 router.route('/')
   /**
    * @swagger
-   * /programs/{programName}/episodes/{episodePosition}/topics:
+   * /programs/{programName}/episodes/{episodeNumber}/topics:
    *   get:
    *     tags:
    *       - Topic
@@ -38,8 +38,8 @@ router.route('/')
    *         in: path
    *         required: true
    *         type: string
-   *       - name: episodePosition
-   *         description: Episode's position
+   *       - name: episodeNumber
+   *         description: Episode's number
    *         in: path
    *         required: true
    *         type: integer
@@ -66,7 +66,7 @@ router.route('/')
   })
   /**
    * @swagger
-   * /programs/{programName}/episodes/{episodePosition}/topics:
+   * /programs/{programName}/episodes/{episodeNumber}/topics:
    *   post:
    *     tags:
    *       - Topic
@@ -79,8 +79,8 @@ router.route('/')
    *         in: path
    *         required: true
    *         type: string
-   *       - name: episodePosition
-   *         description: Episode's position
+   *       - name: episodeNumber
+   *         description: Episode's number
    *         in: path
    *         required: true
    *         type: integer
@@ -102,15 +102,20 @@ router.route('/')
     topic.episode = req.episode._id
 
     // provide a position if the user didn't specified one
+    if (typeof topic.title === "undefined") {
+        topic.title = "New title"
+    }
+
+    // provide a position if the user didn't specified one
     if (typeof topic.position === "undefined") {
         // Max topic position + 1 - inspired by https://stackoverflow.com/a/4020842
-        var maxTopicPosition = req.episode.topics.length > 0 ? Math.max.apply(
+        var maxTopicNumber = req.episode.topics.length > 0 ? Math.max.apply(
             Math,
             req.episode.topics.map(function(t){
                 return t.position;
             })
         ) : 0;
-        topic.position = 1 + maxTopicPosition;
+        topic.position = 1 + maxTopicNumber;
     }
 
     topic
@@ -129,7 +134,7 @@ router.route('/')
   })
 
 // Middleware : we check if the episode exists in the specified program before going further
-router.param('topicPosition', function (req, res, next, value, name) {
+router.param('topicNumber', function (req, res, next, value, name) {
   Topic
     .findOne({position: value, episode: req.episode._id})
     .then(function(topic) {
@@ -146,10 +151,10 @@ router.param('topicPosition', function (req, res, next, value, name) {
     })
 })
 
-router.route('/:topicPosition')
+router.route('/:topicNumber')
   /**
    * @swagger
-   * /programs/{programName}/episodes/{episodePosition}/topics/{topicPosition}:
+   * /programs/{programName}/episodes/{episodeNumber}/topics/{topicNumber}:
    *   get:
    *     tags:
    *       - Topic
@@ -162,12 +167,12 @@ router.route('/:topicPosition')
    *         in: path
    *         required: true
    *         type: string
-   *       - name: episodePosition
-   *         description: Episode's position
+   *       - name: episodeNumber
+   *         description: Episode's number
    *         in: path
    *         required: true
    *         type: integer
-   *       - name: topicPosition
+   *       - name: topicNumber
    *         description: Topic's position
    *         in: path
    *         required: true
@@ -183,7 +188,7 @@ router.route('/:topicPosition')
   })
   /**
    * @swagger
-   * /programs/{programName}/episodes/{episodePosition}/topics/{topicPosition}:
+   * /programs/{programName}/episodes/{episodeNumber}/topics/{topicNumber}:
    *   put:
    *     tags:
    *       - Topic
@@ -196,12 +201,12 @@ router.route('/:topicPosition')
    *         in: path
    *         required: true
    *         type: string
-   *       - name: episodePosition
-   *         description: Episode's position
+   *       - name: episodeNumber
+   *         description: Episode's number
    *         in: path
    *         required: true
    *         type: integer
-   *       - name: topicPosition
+   *       - name: topicNumber
    *         description: Topic's position
    *         in: path
    *         required: true
@@ -236,7 +241,7 @@ router.route('/:topicPosition')
   })
   /**
    * @swagger
-   * /programs/{programName}/episodes/{episodePosition}/topics/{topicPosition}:
+   * /programs/{programName}/episodes/{episodeNumber}/topics/{topicNumber}:
    *   delete:
    *     tags:
    *       - Topic
@@ -249,12 +254,12 @@ router.route('/:topicPosition')
    *         in: path
    *         required: true
    *         type: string
-   *       - name: episodePosition
-   *         description: Episode's position
+   *       - name: episodeNumber
+   *         description: Episode's number
    *         in: path
    *         required: true
    *         type: integer
-   *       - name: topicPosition
+   *       - name: topicNumber
    *         description: Topic's position
    *         in: path
    *         required: true
@@ -268,10 +273,10 @@ router.route('/:topicPosition')
       .remove()
       .then(function(result) {
         if (result !== null) {
-          logger.debug("Removed Topic " + req.params.topicPosition)
+          logger.debug("Removed Topic " + req.params.topicNumber)
           res.status(204).json(result.toString())
         } else {
-          next({message:"Topic " + req.params.topicPosition + " wasn't deleted", status: 417})
+          next({message:"Topic " + req.params.topicNumber + " wasn't deleted", status: 417})
         }
       })
       .catch(function(error) {
