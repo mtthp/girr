@@ -1,13 +1,39 @@
 <template>
   <div id="app">
-    <img src="./assets/logo.png">
-    <router-view></router-view>
+    <Toolbar :title="title"></Toolbar>
+    <main class="mdc-toolbar-fixed-adjust">
+      <router-view></router-view>
+      <Snackbar></Snackbar>
+    </main>
   </div>
 </template>
 
 <script>
+import Toolbar from './components/Toolbar'
+import Snackbar from './components/Snackbar'
+import {autoInit} from 'material-components-web'
+import Event from './utils/EventBus.js'
+
+autoInit() // autoInit MDC
+
 export default {
-  name: 'app'
+  name: 'app',
+  components: { Toolbar, Snackbar },
+  data () {
+    return {
+      title: 'GeekInc Remote Regie'
+    }
+  },
+  mounted: function () {
+    Event.$on('title.change', this.changeTitle)
+    this.changeTitle(this.title)
+  },
+  methods: {
+    changeTitle: function (title) {
+      this.title = title
+      document.title = this.title + ' - GIRR'
+    }
+  }
 }
 </script>
 
@@ -19,5 +45,19 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+</style>
+
+<!-- Material Design Components -->
+<style>@import '../node_modules/material-components-web/dist/material-components-web.min.css'</style>
+
+<!-- Google Material Icons -->
+<style>@import '../node_modules/material-design-icons/iconfont/material-icons.css'</style>
+
+<!-- Styling MDC -->
+<style>
+:root {
+    --mdc-theme-primary: #005976; /* customize MDC color */
+    --mdc-theme-secondary: #ff4200;
 }
 </style>
