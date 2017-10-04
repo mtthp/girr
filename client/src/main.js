@@ -8,6 +8,13 @@ Vue.use(VueResource)
 
 Vue.config.productionTip = false
 
+Vue.filter('formatDate', function (value) {
+  if (value) {
+    var date = new Date(String(value))
+    return date.toLocaleDateString() + ' at ' + date.toLocaleTimeString()
+  }
+})
+
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
