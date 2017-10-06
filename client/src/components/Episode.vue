@@ -1,24 +1,48 @@
 <template>
-  <div>
-    <div v-if="episode && episode.topics.length > 0" class="episodes">
-      
-    </div>
+  <div class="episode">
+    <TopicDialog></TopicDialog>
+    <draggable
+      v-if="episode && episode.topics.length > 0"
+      element="ul"
+      v-model="episode.topics"
+      :options="dragOptions"
+      class="topics mdc-list mdc-list--avatar-list mdc-list--two-line">
+      <transition-group name="fade">
+        <Topic v-for="topic in episode.topics" :key="topic._id" :topic="topic" ></Topic>
+      </transition-group>
+    </draggable>
     <button class="mdc-fab material-icons fab" aria-label="add" data-mdc-auto-init="MDCRipple" v-on:click="addTopic">
       <span class="mdc-fab__icon">
         add
       </span>
     </button>
-  </div>
+  </div>  
 </template>
 
 <script>
 import Event from '../utils/EventBus.js'
+import draggable from 'vuedraggable'
+import Topic from './Topic'
+import TopicDialog from './TopicDialog'
 
 export default {
   name: 'episode',
+  components: {
+    draggable,
+    Topic,
+    TopicDialog
+  },
+  computed: {
+    dragOptions () {
+      return {
+        animation: 0,
+        delay: 0
+      }
+    }
+  },
   data () {
     return {
-      episode: null
+      episode: {}
     }
   },
   created () {
@@ -32,7 +56,7 @@ export default {
     fetchData: function () {
       this.episode = null // reset the episode
       Event.$emit('progressbar.toggle', true)
-      this.$http.get(process.env.API_URL + '/programs/' + this.$route.params.programId + '/episodes/' + this.$route.params.episodeId).then(
+      this.$http.get('/api/programs/' + this.$route.params.programId + '/episodes/' + this.$route.params.episodeId).then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
           this.episode = response.body
@@ -47,7 +71,7 @@ export default {
     },
     deleteEpisode: function () {
       Event.$emit('progressbar.toggle', true)
-      this.$http.delete(process.env.API_URL + '/programs/' + this.$route.params.programId + '/episodes/' + this.$route.params.episodeId).then(
+      this.$http.delete('/api/programs/' + this.$route.params.programId + '/episodes/' + this.$route.params.episodeId).then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
         },
@@ -60,10 +84,10 @@ export default {
     },
     addTopic: function () {
       Event.$emit('progressbar.toggle', true)
-      this.$http.post(process.env.API_URL + '/programs/' + this.$route.params.programId + '/episodes/' + this.$route.params.episodeId + '/topics/').then(
+      this.$http.post('/api/programs/' + this.$route.params.programId + '/episodes/' + this.$route.params.episodeId + '/topics/').then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
-          this.episode.episodes.push(response.body)
+          this.episode.topics.push(response.body)
           Event.$emit('snackbar.message', 'Added a new episode')
         },
         function (response) {
@@ -79,6 +103,13 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+
+.topics {
+  max-width: 1024px;
+  margin: 0 auto;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
 .fab {
   position: fixed;
   bottom: 1rem;
@@ -90,5 +121,12 @@ export default {
     bottom: 1.5rem;
     right: 1.5rem;
   }
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0
 }
 </style>
