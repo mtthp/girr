@@ -3,11 +3,11 @@
     <drawer></drawer>
     <div class="mdc-toolbar__row">
       <section class="mdc-toolbar__section mdc-toolbar__section--align-start">
-          <a class="material-icons mdc-toolbar__icon--menu menu" aria-label="Menu" alt="Menu">menu</a>
-          <span class="mdc-toolbar__title">{{ title }}</span>
+        <a class="material-icons mdc-toolbar__icon--menu mdc-ripple-surface menu" aria-label="Menu" alt="Menu" data-mdc-auto-init="MDCRipple">menu</a>
+        <span class="mdc-toolbar__title">{{ title }}</span>
       </section>
       <section class="mdc-toolbar__section mdc-toolbar__section--align-end mdc-toolbar__section--shrink-to-fit">
-          <a class="material-icons mdc-toolbar__icon mdc-ripple-surface mdc-ripple-surface--primary" href="/api#!/Programs/get_programs" target="_blank" aria-label="API" alt="API">code</a>
+        <a class="material-icons mdc-toolbar__icon mdc-ripple-surface" data-mdc-auto-init="MDCRipple" href="/api#!/Programs/get_programs" target="_blank" aria-label="API" alt="API">code</a>
       </section>
     </div>
     <div role="progressbar" class="mdc-linear-progress">
@@ -54,4 +54,7 @@ export default {
 </script>
 
 <style scoped>
+.mdc-toolbar__title:hover {
+  cursor: pointer;
+}
 </style>

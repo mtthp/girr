@@ -7,16 +7,16 @@
             </div>
         </header>
         <nav id="icon-with-text-demo" class="mdc-temporary-drawer__content mdc-list">
-          <router-link :to="{ name: 'Programs' }" @click.native="dw.open = false" class="mdc-list-item mdc-temporary-drawer--selected">
+          <router-link :to="{ name: 'Programs' }" @click.native="dw.open = false" class="mdc-list-item mdc-temporary-drawer--selected" data-mdc-auto-init="MDCRipple">
             <i class="material-icons mdc-list-item__start-detail" aria-hidden="true">event</i>Programs
           </router-link>
-          <a class="mdc-list-item" href="/xsplit.html">
+          <a class="mdc-list-item" href="/xsplit.html" data-mdc-auto-init="MDCRipple">
             <i class="material-icons mdc-list-item__start-detail" aria-hidden="true">tv</i>Xsplit
           </a>
-          <a class="mdc-list-item" href="/admin.html">
+          <a class="mdc-list-item" href="/admin.html" data-mdc-auto-init="MDCRipple">
             <i class="material-icons mdc-list-item__start-detail" aria-hidden="true">build</i>Admin
           </a>
-          <router-link to="/api" class="mdc-list-item" target="_blank">
+          <router-link to="/api" class="mdc-list-item" target="_blank" data-mdc-auto-init="MDCRipple">
             <i class="material-icons mdc-list-item__start-detail" aria-hidden="true">code</i>API
           </router-link>
         </nav>
