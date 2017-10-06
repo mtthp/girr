@@ -126,7 +126,13 @@ router.route('/')
 router.param('episodeNumber', function (req, res, next, value, name) {
   Episode
     .findOne({number: value, program: req.program._id})
-    .populate('topics')
+    .populate({ 
+       path: 'topics',
+       populate: {
+         path: 'medias',
+         model: 'Media'
+       } 
+    })
     .then(function(episode) {
       if (episode !== null) {
         logger.debug("Found " + episode.toString())
