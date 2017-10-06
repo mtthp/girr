@@ -5,10 +5,10 @@ const logger = require('../logger');
 
 let topicSchema = new mongoose.Schema({
     title: { type: String, required: true },
+    description: String,
     position: { type: Number },
     created: { type: Date, required: true },
     modified: { type: Date, required: true },
-    notes: String,
     episode: { type: mongoose.Schema.Types.ObjectId, ref:'Episode' },
     medias: [{ type: mongoose.Schema.Types.ObjectId, ref:'Media' }]
 });
