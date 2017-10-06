@@ -11,10 +11,8 @@
 <script>
 import Toolbar from './components/Toolbar'
 import Snackbar from './components/Snackbar'
-import {autoInit} from 'material-components-web'
+import { autoInit } from 'material-components-web'
 import Event from './utils/EventBus.js'
-
-autoInit() // autoInit MDC
 
 export default {
   name: 'app',
@@ -27,6 +25,7 @@ export default {
   mounted: function () {
     Event.$on('title.change', this.changeTitle)
     this.changeTitle(this.title)
+    autoInit() // autoInit MDC
   },
   methods: {
     changeTitle: function (title) {
@@ -42,7 +41,6 @@ export default {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
   color: #2c3e50;
   margin-top: 60px;
 }

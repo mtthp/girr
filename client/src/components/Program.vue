@@ -37,7 +37,7 @@ export default {
     fetchData: function () {
       this.program = null // reset the program
       Event.$emit('progressbar.toggle', true)
-      this.$http.get(process.env.API_URL + '/programs/' + this.$route.params.programId).then(
+      this.$http.get('/api/programs/' + this.$route.params.programId).then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
           this.program = response.body
@@ -52,7 +52,7 @@ export default {
     },
     deleteProgram: function () {
       Event.$emit('progressbar.toggle', true)
-      this.$http.delete(process.env.API_URL + '/programs/' + this.$route.params.programId).then(
+      this.$http.delete('/api/programs/' + this.$route.params.programId).then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
         },
@@ -65,7 +65,7 @@ export default {
     },
     addEpisode: function () {
       Event.$emit('progressbar.toggle', true)
-      this.$http.post(process.env.API_URL + '/programs/' + this.$route.params.programId + '/episodes/').then(
+      this.$http.post('/api/programs/' + this.$route.params.programId + '/episodes/').then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
           this.program.episodes.push(response.body)
@@ -115,6 +115,7 @@ a {
 
 .mdc-card section {
   background: rgba(0, 0, 0, .4);
+  text-align: center;
 }
 
 .fab {

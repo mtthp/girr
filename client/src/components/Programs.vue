@@ -6,7 +6,7 @@
           <h2 class="mdc-card__subtitle">Added {{ program.created | formatDate }}</h2>
         </section>
       <section class="mdc-card__actions">
-        <button class="mdc-button mdc-button--compact mdc-card__action" v-on:click="$parent.deleteProgram(program.name)">Delete</button>
+        <button class="mdc-button mdc-button--compact mdc-card__action" v-on:click="deleteProgram(program.name)">Delete</button>
       </section>
     </router-link>
     <button class="mdc-fab material-icons fab" aria-label="add" data-mdc-auto-init="MDCRipple" v-on:click="addProgram">
@@ -32,44 +32,45 @@ export default {
   },
   methods: {
     addProgram: function () {
-      document.querySelector('.mdc-linear-progress').classList.add('mdc-linear-progress--indeterminate')
-      this.$http.post(process.env.API_URL + '/programs').then(
+      Event.$emit('progressbar.toggle', true)
+      this.$http.post('/api/programs').then(
         function (response) {
-          document.querySelector('.mdc-linear-progress').classList.remove('mdc-linear-progress--indeterminate')
+          Event.$emit('progressbar.toggle', false)
           this.programs.push(response.body)
           Event.$emit('snackbar.message', 'Added ' + response.body.name)
         },
         function (response) {
-          document.querySelector('.mdc-linear-progress').classList.remove('mdc-linear-progress--indeterminate')
+          Event.$emit('progressbar.toggle', false)
           console.error(response)
           Event.$emit('snackbar.message', 'Error : ' + (response.statusText ? response.statusText : 'no connection'))
         }
       )
     },
     getPrograms: function () {
-      document.querySelector('.mdc-linear-progress').classList.add('mdc-linear-progress--indeterminate')
-      this.$http.get(process.env.API_URL + '/programs').then(
+      Event.$emit('progressbar.toggle', true)
+      this.$http.get('/api/programs').then(
         function (response) {
-          document.querySelector('.mdc-linear-progress').classList.remove('mdc-linear-progress--indeterminate')
+          Event.$emit('progressbar.toggle', false)
           this.programs = response.body
           Event.$emit('title.change', this.programs.length + ' Programs')
         },
         function (response) {
-          document.querySelector('.mdc-linear-progress').classList.remove('mdc-linear-progress--indeterminate')
+          Event.$emit('progressbar.toggle', false)
           console.error(response)
           Event.$emit('snackbar.message', 'Error : ' + (response.statusText ? response.statusText : 'no connection'))
         }
       )
     },
     deleteProgram: function (id) {
-      document.querySelector('.mdc-linear-progress').classList.add('mdc-linear-progress--indeterminate')
-      this.$http.delete(process.env.API_URL + '/programs/' + id).then(
+      Event.$emit('progressbar.toggle', true)
+      this.$http.delete('/api/programs/' + id).then(
         function (response) {
-          document.querySelector('.mdc-linear-progress').classList.remove('mdc-linear-progress--indeterminate')
+          Event.$emit('progressbar.toggle', false)
           this.getPrograms()
+          Event.$emit('snackbar.message', 'Program ' + id + ' deleted')
         },
         function (response) {
-          document.querySelector('.mdc-linear-progress').classList.remove('mdc-linear-progress--indeterminate')
+          Event.$emit('progressbar.toggle', false)
           console.error(response)
           Event.$emit('snackbar.message', 'Error : ' + (response.statusText ? response.statusText : 'no connection'))
         }
