@@ -10,16 +10,16 @@ const Media = require('../models/media');
  * definitions:
  *   Topic:
  *     properties:
- *       position:
- *         type: integer
- *         description: unique identifier
- *         required: true
  *       title:
  *         type: string
  *         description: Topic's title
- *       notes:
+ *       description:
  *         type: string
  *         description: Some notes that should be useful
+ *       position:
+ *         type: integer
+ *         description: current position, because it can moved
+ *         required: true
  */
 
 router.route('/')
@@ -52,7 +52,6 @@ router.route('/')
    *             $ref: '#/definitions/Topic'
    */
   .get(function(req, res, next) {
-    logger.debug(req.episode.toString())
     Topic
         .find({ episode: req.episode._id })
         .sort({ 'position': 1 })
@@ -101,7 +100,7 @@ router.route('/')
     let topic = new Topic(Object.assign(req.body, {created: Date.now(), modified: Date.now()}))
     topic.episode = req.episode._id
 
-    // provide a position if the user didn't specified one
+    // provide a title if the user didn't specified one
     if (typeof topic.title === "undefined") {
         topic.title = "New title"
     }
@@ -133,10 +132,11 @@ router.route('/')
         })
   })
 
-// Middleware : we check if the episode exists in the specified program before going further
-router.param('topicNumber', function (req, res, next, value, name) {
+// Middleware : we check if the topic exists in the specified program before going further
+router.param('topicId', function (req, res, next, value, name) {
   Topic
-    .findOne({position: value, episode: req.episode._id})
+    .findOne({_id: value, episode: req.episode._id})
+    .populate('medias')
     .then(function(topic) {
       if (topic !== null) {
         logger.debug("Found " + topic.toString())
@@ -151,10 +151,10 @@ router.param('topicNumber', function (req, res, next, value, name) {
     })
 })
 
-router.route('/:topicNumber')
+router.route('/:topicId')
   /**
    * @swagger
-   * /programs/{programName}/episodes/{episodeNumber}/topics/{topicNumber}:
+   * /programs/{programName}/episodes/{episodeNumber}/topics/{topicId}:
    *   get:
    *     tags:
    *       - Topic
@@ -172,11 +172,11 @@ router.route('/:topicNumber')
    *         in: path
    *         required: true
    *         type: integer
-   *       - name: topicNumber
-   *         description: Topic's position
+   *       - name: topicId
+   *         description: Topic's id
    *         in: path
    *         required: true
-   *         type: integer
+   *         type: uuid
    *     responses:
    *       200:
    *         description: A single Topic
@@ -188,7 +188,7 @@ router.route('/:topicNumber')
   })
   /**
    * @swagger
-   * /programs/{programName}/episodes/{episodeNumber}/topics/{topicNumber}:
+   * /programs/{programName}/episodes/{episodeNumber}/topics/{topicId}:
    *   put:
    *     tags:
    *       - Topic
@@ -206,11 +206,11 @@ router.route('/:topicNumber')
    *         in: path
    *         required: true
    *         type: integer
-   *       - name: topicNumber
-   *         description: Topic's position
+   *       - name: topicId
+   *         description: Topic's id
    *         in: path
    *         required: true
-   *         type: integer
+   *         type: uuid
    *       - name: topic
    *         in: body
    *         description: Fields for the Topic resource
@@ -226,13 +226,13 @@ router.route('/:topicNumber')
   .put(function (req, res, next) {
     Topic
       // use findOneAndUpdate to get the new result (even if we already found the resource in the DB)
-      .findOneAndUpdate({position: req.topic.position, episode: req.episode._id}, Object.assign(req.body, {modified: Date.now()}), {new : true})
+      .findOneAndUpdate({_id: req.topic._id, episode: req.episode._id}, Object.assign(req.body, {modified: Date.now()}), {new : true})
       .then(function(topic) {
         if (topic !== null) {
           logger.debug("Updated " + topic.toString())
           res.json(topic)
         } else {
-          next({message:"Topic " + req.topic.position + " wasn't updated", status: 417})
+          next({message:"Topic " + req.topic._id + " wasn't updated", status: 417})
         }
       })
       .catch(function(error) {
@@ -241,7 +241,7 @@ router.route('/:topicNumber')
   })
   /**
    * @swagger
-   * /programs/{programName}/episodes/{episodeNumber}/topics/{topicNumber}:
+   * /programs/{programName}/episodes/{episodeNumber}/topics/{topicId}:
    *   delete:
    *     tags:
    *       - Topic
@@ -259,11 +259,11 @@ router.route('/:topicNumber')
    *         in: path
    *         required: true
    *         type: integer
-   *       - name: topicNumber
-   *         description: Topic's position
+   *       - name: topicId
+   *         description: Topic's id
    *         in: path
    *         required: true
-   *         type: integer
+   *         type: uuid
    *     responses:
    *       204:
    *         description: Successfully deleted
@@ -273,10 +273,10 @@ router.route('/:topicNumber')
       .remove()
       .then(function(result) {
         if (result !== null) {
-          logger.debug("Removed Topic " + req.params.topicNumber)
+          logger.debug("Removed Topic " + req.params.topicId)
           res.status(204).json(result.toString())
         } else {
-          next({message:"Topic " + req.params.topicNumber + " wasn't deleted", status: 417})
+          next({message:"Topic " + req.params.topicId + " wasn't deleted", status: 417})
         }
       })
       .catch(function(error) {
@@ -384,6 +384,6 @@ router.get('/:topic/recover', (req, res, next) => {
     });
 });
 
-router.use('/:topic/medias', require('./media'));
+router.use('/:topicId/medias', require('./media'));
 
 module.exports = router;

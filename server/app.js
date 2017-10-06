@@ -15,6 +15,9 @@ mongoose.Promise = Promise;
 
 const websockets = new WebSockets(io);
 
+// to retrieve the absolute project path without doing some magic (ie. '../../..')
+global.__base = __dirname + '/';
+
 let password = process.env.GIRR_PASSWORD || config.password;
 if(password) {
   app.use(basicAuth({
@@ -44,7 +47,8 @@ app.use(bodyParser.urlencoded({ extended: false }))
 })
 // Indique que le dossier /public contient des fichiers statiques
 // (middleware chargé de base)
-.use(express.static('./public'))
+.use(express.static('./dist'))
+.use('/data', express.static('./data'))
  // swagger.json
 .use('/', require('./src/swagger'))
  // swagger UI

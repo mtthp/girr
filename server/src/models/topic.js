@@ -13,7 +13,7 @@ let topicSchema = new mongoose.Schema({
     medias: [{ type: mongoose.Schema.Types.ObjectId, ref:'Media' }]
 });
 
-// when a News is removed, delete all its Incrusts
+// when a Topic is removed, delete all its Medias
 topicSchema.post('remove', function(topic) {
   Media
     .remove({topic: topic._id})
