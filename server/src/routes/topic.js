@@ -102,7 +102,7 @@ router.route('/')
 
     // provide a title if the user didn't specified one
     if (typeof topic.title === "undefined") {
-        topic.title = "New title"
+        topic.title = "Untitled topic"
     }
 
     // provide a position if the user didn't specified one
