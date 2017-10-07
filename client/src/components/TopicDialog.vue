@@ -23,6 +23,7 @@
             <li class="mdc-grid-tile" v-for="media in topic.medias">
               <div class="mdc-grid-tile__primary">
                 <img class="mdc-grid-tile__primary-content" :src="media.uri" />
+                <i class="material-icons" v-on:click="deleteMedia(media)">cancel</i>
               </div>
               <span class="mdc-grid-tile__secondary">
                 <span class="mdc-grid-tile__title">{{ media.label }}</span>
@@ -32,9 +33,19 @@
         </div>
       </section>
       <footer class="mdc-dialog__footer">
-        <button type="button" class="mdc-button mdc-dialog__footer__button delete">Delete</button>
+        <div style="margin-right: auto;">
+          <button type="button" class="mdc-button mdc-dialog__footer__button delete" v-on:click="deleteTopic">
+            <i class="material-icons mdc-button__icon">delete</i>
+            Delete
+          </button>
+          <button type="button" class="mdc-button mdc-dialog__footer__button upload" v-on:click="$event.currentTarget.querySelector('input').click()">
+            <input type="file" name="file" accept="image/*" class="input-file" v-on:change="fileChange($event.target.name, $event.target.files);" style="display: none;">
+            <i class="material-icons mdc-button__icon">file_upload</i>
+            Upload
+          </button>
+        </div>
         <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--cancel">Cancel</button>
-        <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--accept">Confirm</button>
+        <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--accept" v-on:click="confirm">Confirm</button>
       </footer>
     </div>
     <div class="mdc-dialog__backdrop"></div>
@@ -58,14 +69,6 @@ export default {
     textfield.MDCTextfield.attachTo(this.$el.querySelector('.mdc-textfield'))
     Event.$on('topicDialog.show', this.show)
     Event.$on('topicDialog.close', this.close)
-
-    this.$el.querySelector('button.mdc-dialog__footer__button--accept').addEventListener('click', function (event) {
-      Event.$emit('topic.update', this.topic)
-    }.bind(this))
-    this.$el.querySelector('button.delete').addEventListener('click', function (event) {
-      Event.$emit('topic.delete', this.topic)
-      this.close()
-    }.bind(this))
   },
   methods: {
     show: function (topic) {
@@ -77,6 +80,21 @@ export default {
     },
     close: function () {
       this.dialog.close()
+    },
+    confirm: function () {
+      Event.$emit('topic.update', this.topic)
+    },
+    deleteTopic: function () {
+      Event.$emit('topic.delete', this.topic)
+      this.close()
+    },
+    fileChange: function (name, files) {
+      if (files.length > 0) {
+        Event.$emit('topic.medias.add', this.topic, files[0])
+      }
+    },
+    deleteMedia: function (media) {
+      Event.$emit('topic.medias.delete', this.topic, media)
     }
   }
 }
@@ -93,7 +111,6 @@ export default {
 }
 
 button.delete {
-  margin-right: auto;
   color: red;
 }
 
@@ -101,7 +118,23 @@ button.delete {
   margin: 0 auto;
 }
 
-.mdc-grid-list img {
+.mdc-grid-tile {
+  --mdc-grid-list-tile-width: 192px;
+  margin: 2px auto;
+}
+
+.mdc-grid-tile img {
   object-fit: contain;
+}
+
+.mdc-button__icon {
+  vertical-align: text-bottom;
+}
+
+.mdc-grid-tile__primary i {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 3;
 }
 </style>
