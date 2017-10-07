@@ -123,35 +123,35 @@ router.route('/')
     media.topic = req.topic._id
 
     if (req.file) {
-        logger.debug('Receive a file : ')
-        logger.debug(req.file)
-        // provide a label if the user didn't specified one
-        if (typeof media.label === "undefined") { // something is wrong, the label cannot be sent in the request body
-            media.label = req.file.originalname
-        }
-        media.path = req.file.path;
-        media.uri = '/' + media.path // should be calculate automatically from the path instead
+      logger.debug('Receive a file : ')
+      logger.debug(req.file)
+      // provide a label if the user didn't specified one
+      if (typeof media.label === "undefined") { // something is wrong, the label cannot be sent in the request body
+        media.label = req.file.originalname
+      }
+      media.path = req.file.path;
+      media.uri = '/' + media.path // should be calculate automatically from the path instead
     } else if (media.uri) {
-        if (typeof media.label === "undefined") {
-            media.label = "untitled"
-        }
+      if (typeof media.label === "undefined") {
+        media.label = "untitled"
+      }
     } else {
-        next({message:"No media file or URI was provided", status: 417})
+      next({message:"No media file or URI was provided", status: 417})
     }
 
     media
-        .save()
-        .then(function(media) {
-            logger.debug("Added a new Media " + media.toString())
-            // add media to topic to retrieve them all by using 'populate'
-            req.topic.medias.push(media)
-            req.topic.save()
+      .save()
+      .then(function(media) {
+        logger.debug("Added a new Media " + media.toString())
+        // add media to topic to retrieve them all by using 'populate'
+        req.topic.medias.push(media)
+        req.topic.save()
 
-            res.json(media)
-        })
-        .catch(function(error) {
-            next(error)
-        })
+        res.json(media)
+      })
+      .catch(function(error) {
+        next(error)
+      })
   })
 
 // Middleware : we check if the media exists in the specified topic before going further
