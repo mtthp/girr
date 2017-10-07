@@ -4,6 +4,7 @@ const router = express.Router();
 const logger = require('../logger');
 const Topic = require('../models/topic');
 const Media = require('../models/media');
+const Episode = require('../models/episode');
 
 /**
  * @swagger
@@ -29,7 +30,7 @@ router.route('/')
    *   get:
    *     tags:
    *       - Topic
-   *     description: Returns all topic from an episode
+   *     description: Return all topic from an episode
    *     summary: Get all topic
    *     produces: application/json
    *     parameters:
@@ -69,7 +70,7 @@ router.route('/')
    *   post:
    *     tags:
    *       - Topic
-   *     description: Creates a new topic
+   *     description: Create a new topic
    *     summary: Add a topic
    *     produces: application/json
    *     parameters:
@@ -158,7 +159,7 @@ router.route('/:topicId')
    *   get:
    *     tags:
    *       - Topic
-   *     description: Returns a single topic
+   *     description: Return a single topic
    *     summary: Get a topic
    *     produces: application/json
    *     parameters:
@@ -192,7 +193,7 @@ router.route('/:topicId')
    *   put:
    *     tags:
    *       - Topic
-   *     description: Updates a single topic
+   *     description: Update a single topic
    *     summary: Edit a topic
    *     produces: application/json
    *     parameters:
@@ -245,7 +246,7 @@ router.route('/:topicId')
    *   delete:
    *     tags:
    *       - Topic
-   *     description: Deletes a single topic
+   *     description: Delete a single topic
    *     summary: Remove a topic
    *     produces: application/json
    *     parameters:
@@ -283,6 +284,85 @@ router.route('/:topicId')
         next(error)
       })
   })
+
+/**
+ * @swagger
+ * /programs/{programName}/episodes/{episodeNumber}/topics/{topicId}/move:
+ *   get:
+ *     tags:
+ *       - Topic
+ *     description: Move a topic to a new position and reindex the whole list
+ *     summary: Move a topic
+ *     produces: application/json
+ *     parameters:
+ *       - name: programName
+ *         description: Program's name
+ *         in: path
+ *         required: true
+ *         type: string
+ *       - name: episodeNumber
+ *         description: Episode's number
+ *         in: path
+ *         required: true
+ *         type: integer
+ *       - name: topicId
+ *         description: Topic's id
+ *         in: path
+ *         required: true
+ *         type: uuid
+ *       - name: position
+ *         description: New Topic's position
+ *         in: query
+ *         required: true
+ *         type: integer
+ *     responses:
+ *       200:
+ *         description: Episode updated (Topics list changed if a Topic moves)
+ *         schema:
+ *           $ref: '#/definitions/Episode'
+ */
+router.get('/:topicId/move', function (req, res, next) {
+  if (!req.query.position) {
+    next({message:"A new position is needed to perform a move", status: 417, example: '/move?position=10'})
+  }
+
+  /*
+   * DISCLAIMER : bon ok c'est pas vraiment ce qu'on veut,
+   * mais je m'en sors pas vraiment à essayer d'update l'attribut position d'un Topic
+   * est-ce la bonne solution ?
+   * comment faire pour à la fois update l'array de Topic d'un Episode et chaque Topic's position ?
+   * - @Matthieu Petit
+   */
+  var newPosition = parseInt(req.query.position)
+  for (var i = 0; i < req.episode.topics.length; i++) {
+    if (req.episode.topics[i]._id.equals(req.topic._id)) {
+      var topicToMove = req.episode.topics[i]
+      req.episode.topics.splice(i, 1)
+      break
+    }
+  }
+
+  if (topicToMove) {
+    req.episode.topics.splice(newPosition, 0, topicToMove)
+    // et on retourne un Episode parce que j'ai vraiment fait ce endpoint à l'arrache - @Matthieu Petit
+    Episode
+      // use findOneAndUpdate to get the new result (even if we already found the resource in the DB)
+      .findOneAndUpdate({number: req.episode.number, program: req.program._id}, Object.assign(req.episode, {modified: Date.now()}), {new : true})
+      .then(function(episode) {
+        if (episode !== null) {
+          logger.debug("Updated " + episode.toString())
+          res.json(episode)
+        } else {
+          next({message:"Episode " + req.episode.number + " wasn't updated", status: 417})
+        }
+      })
+      .catch(function(error) {
+        next(error)
+      })
+  } else {
+    next({message:"Couldn't move the Topic at the new position " + newPosition, status: 500})
+  }
+})
 
 // legacy code, est-il encore nécessaire ? - @Matthieu Petit
 router.get('/:topic/checkintegrity', (req, res, next) => {
