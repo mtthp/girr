@@ -18,7 +18,7 @@
       </span>
     </li>
     <div class="content">
-      {{ topic.description }}
+      {{ topic.description ? topic.description : 'Empty in here' }}
       <div class="mdc-grid-list">
         <ul class="mdc-grid-list__tiles">
           <li class="mdc-grid-tile" v-for="media in topic.medias">
@@ -122,8 +122,13 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 
+.topic .mdc-list-item {
+  cursor: pointer;
+}
+
 .topic .content {
   max-height: 0px;
+  margin: 10px 0;
   overflow: hidden;
   transition: all 0.2s, max-height 0.2s; /* close rapidly */
 }
@@ -141,6 +146,17 @@ export default {
 
 .topic.expanded .chevron {
   transform: rotate(-180deg);
+}
+
+.topic .mdc-list-item__start-detail {
+  cursor: move; /* fallback: */
+  cursor: -webkit-grab; /* Chrome 1-21, Safari 4+ */
+  cursor:    -moz-grab; /* Firefox 1.5-26 */
+  cursor:         grab; /* W3C standards syntax, should come least */
+}
+
+.topic img.mdc-list-item__start-detail {
+  object-fit: cover;
 }
 
 .topic.expanded .mdc-list-item__text,
@@ -209,6 +225,17 @@ a.mdc-list-item {
 .mdc-grid-tile {
   --mdc-grid-list-tile-width: 192px;
   margin: 2px auto;
+}
+
+@media screen and (max-width: 991px) {
+  .mdc-grid-tile {
+    --mdc-grid-list-tile-width: 144px;
+  }
+}
+@media screen and (max-width: 767px) {
+  .mdc-grid-tile {
+    --mdc-grid-list-tile-width: 96px;
+  }
 }
 
 .mdc-grid-tile img {
