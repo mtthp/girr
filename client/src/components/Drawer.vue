@@ -16,9 +16,9 @@
           <a class="mdc-list-item" href="/admin.html" data-mdc-auto-init="MDCRipple">
             <i class="material-icons mdc-list-item__start-detail" aria-hidden="true">build</i>Admin
           </a>
-          <router-link to="/api" class="mdc-list-item" target="_blank" data-mdc-auto-init="MDCRipple">
+          <a class="mdc-list-item" href="/api/" target="_blank" data-mdc-auto-init="MDCRipple">
             <i class="material-icons mdc-list-item__start-detail" aria-hidden="true">code</i>API
-          </router-link>
+          </a>
         </nav>
     </nav>
 </aside>
