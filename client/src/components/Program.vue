@@ -1,11 +1,12 @@
 <template>
   <div>
     <div v-if="program && program.episodes.length > 0" class="episodes">
-      <router-link :to="{ name: 'Episode', params: { programId: program.name, episodeId: episode.number }}" v-for="episode in program.episodes" :key="episode._id" class="mdc-card mdc-card--theme-dark episode" :style="episode.thumbnail ? 'background-image: url(\'' + episode.thumbnail + '\');' : null">
-        <section class="mdc-card__primary">
-          <h1 class="mdc-card__title mdc-card__title--large">{{ episode.name }}</h1>
-          <h2 class="mdc-card__subtitle">Added {{ episode.created | formatDate }}</h2>
-        </section>
+      <router-link
+        :to="{ name: 'Episode', params: { programId: program.name, episodeId: episode.number }}"
+        v-for="episode in program.episodes"
+        :key="episode._id"
+        class="episode-card">
+        <EpisodeCard :episode="episode"></EpisodeCard>
       </router-link>
     </div>
     <button class="mdc-fab material-icons fab" aria-label="add" data-mdc-auto-init="MDCRipple" v-on:click="addEpisode">
@@ -18,9 +19,14 @@
 
 <script>
 import Event from '../utils/EventBus.js'
+import EpisodeCard from './EpisodeCard'
+// import { menu } from 'material-components-web'
 
 export default {
   name: 'program',
+  components: {
+    EpisodeCard
+  },
   data () {
     return {
       program: null
@@ -28,6 +34,9 @@ export default {
   },
   created () {
     this.fetchData()
+    Event.$on('episode.delete', function (episode) {
+      this.deleteEpisode(episode)
+    }.bind(this))
   },
   watch: {
     // call again the method if the route changes
@@ -94,45 +103,33 @@ export default {
       flex-flow: row wrap;
 }
 
-.mdc-card  {
+.episodes .episode-card {
   margin: 15px;
   width: calc(100%/3 - 30px);
-  -webkit-transition: all 0.2s ease-in-out;
-  transition: all 0.2s ease-in-out;
-  background-image: url("../assets/geekinc-logo_512.png");
-  background-size: cover;
-  background-position: center center;
-  background-repeat: no-repeat;
-  height: 21.875rem;
 }
 
-a {
+@media screen and (max-width: 991px) {
+  .episodes .episode-card {
+    width: calc((100% / 2) - 30px);
+  }
+}
+@media screen and (max-width: 767px) {
+  .episodes .episode-card {
+    width: calc(100% - 30px);
+  }
+}
+
+a.episode-card {
   outline: 0;
   text-decoration: none;
   border: none;
   -moz-outline-style: none;
 }
 
-.mdc-card section {
-  background: rgba(0, 0, 0, .4);
-  text-align: center;
-}
-
 .fab {
   position: fixed;
   bottom: 1rem;
   right: 1rem;
-}
-
-@media screen and (max-width: 991px) {
-  .mdc-card {
-    width: calc((100% / 2) - 30px);
-  }
-}
-@media screen and (max-width: 767px) {
-  .mdc-card {
-    width: calc(100% - 30px);
-  }
 }
 
 @media(min-width: 1024px) {
