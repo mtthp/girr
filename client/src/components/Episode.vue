@@ -9,7 +9,7 @@
       @change="itemMoved"
       class="topics mdc-list mdc-list--avatar-list mdc-list--two-line">
       <transition-group name="fade">
-        <Topic v-for="topic in episode.topics" :key="topic._id" :topic="topic" ></Topic>
+        <TopicCard v-for="topic in episode.topics" :key="topic._id" :topic="topic" ></TopicCard>
       </transition-group>
     </draggable>
     <button class="mdc-fab material-icons fab" aria-label="add" data-mdc-auto-init="MDCRipple" v-on:click="addTopic">
@@ -23,14 +23,14 @@
 <script>
 import Event from '../utils/EventBus.js'
 import draggable from 'vuedraggable'
-import Topic from './Topic'
+import TopicCard from './TopicCard'
 import TopicDialog from './TopicDialog'
 
 export default {
   name: 'episode',
   components: {
     draggable,
-    Topic,
+    TopicCard,
     TopicDialog
   },
   computed: {
@@ -49,10 +49,10 @@ export default {
   },
   created () {
     this.fetchData()
-    Event.$on('topic.update', function updateTopic (topic) {
+    Event.$on('topic.update', function (topic) {
       this.updateTopic(topic)
     }.bind(this))
-    Event.$on('topic.delete', function deleteTopics (topic) {
+    Event.$on('topic.delete', function (topic) {
       this.deleteTopic(topic)
     }.bind(this))
   },
