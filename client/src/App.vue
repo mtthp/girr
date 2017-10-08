@@ -3,8 +3,8 @@
     <Toolbar :title="title"></Toolbar>
     <main class="mdc-toolbar-fixed-adjust">
       <router-view></router-view>
-      <Snackbar></Snackbar>
     </main>
+    <Snackbar></Snackbar>
   </div>
 </template>
 
