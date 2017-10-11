@@ -146,6 +146,12 @@ export default {
       flex-flow: row wrap;
 }
 
+@media (max-width: 1280px) {
+  .episodes {
+    padding-bottom: 72px
+  }
+}
+
 .episodes .episode-card {
   margin: 15px;
   width: calc(100%/3 - 30px);

@@ -132,6 +132,12 @@ export default {
       flex-flow: row wrap;
 }
 
+@media (max-width: 1280px) {
+  .programs {
+    padding-bottom: 72px
+  }
+}
+
 .programs .program-card {
   margin: 15px;
   width: calc(100% - 30px);
