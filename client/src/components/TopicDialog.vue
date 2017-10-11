@@ -45,7 +45,7 @@
           </button>
         </div>
         <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--cancel">Cancel</button>
-        <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--accept" v-on:click="confirm">Confirm</button>
+        <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--accept" v-on:click="confirm">Update</button>
       </footer>
     </div>
     <div class="mdc-dialog__backdrop"></div>
