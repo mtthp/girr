@@ -1,17 +1,17 @@
 <template>
-  <div class="episode mdc-card mdc-card--theme-dark" :style="episode.thumbnail ? 'background-image: url(\'' + episode.thumbnail + '\');' : null">
-    <section class="mdc-card__primary">
+  <div class="episode mdc-card mdc-card--theme-dark " :style="episode.thumbnail ? 'background-image: url(\'' + episode.thumbnail + '\');' : null">
+    <section class="mdc-card__primary mdc-menu-anchor">
       <h1 class="mdc-card__title mdc-card__title--large">{{ episode.name }}</h1>
       <h2 class="mdc-card__subtitle">Added {{ episode.created | formatDate }}</h2>
-    </section>
-    <div class="mdc-menu-anchor">
       <i class="mdc-icon-toggle material-icons toggle-menu" arial-label="Menu">more_vert</i>
-      <div class="mdc-simple-menu mdc-simple-menu--open-from-top-right" tabindex="-1">
+      <div class="mdc-simple-menu mdc-simple-menu--open-from-bottom-right" tabindex="-1">
         <ul class="mdc-simple-menu__items mdc-list" role="menu" aria-hidden="true">
-          <li class="mdc-list-item" role="menuitem" tabindex="0" v-on:click="deleteEpisode()">Delete</li>
+          <li class="mdc-list-item" role="menuitem" tabindex="0" v-on:click="editEpisode($event)">Edit</li>
+          <li class="mdc-list-item" role="menuitem" tabindex="0" v-on:click="deleteEpisode($event)">Delete</li>
         </ul>
       </div>
-    </div>
+    </section>
+      
   </div>
 </template>
 
@@ -30,8 +30,14 @@ export default {
     }.bind(this))
   },
   methods: {
+    editEpisode: function (event) {
+      event.preventDefault()
+      event.stopPropagation()
+      Event.$emit('episodeDialog.show', this.episode)
+    },
     deleteEpisode: function (event) {
       event.preventDefault()
+      event.stopPropagation()
       Event.$emit('episode.delete', this.episode)
     }
   }
@@ -43,7 +49,7 @@ export default {
 .episode.mdc-card  {
   position: relative;
   width: 100%;
-  height: 21.875rem;
+  height: 100%;
   background-image: url("../assets/geekinc-logo_512.png");
   background-size: cover;
   background-position: center center;
@@ -65,9 +71,17 @@ export default {
   left: 0;
 }
 
-.episode .mdc-menu-anchor {
+.episode .toggle-menu {
   position: absolute;
-  top: 0;
+  bottom: 0;
   right: 0;
+  color: white;
+}
+
+.episode .mdc-simple-menu {
+  bottom: 0;
+  right: 0;
+  top: inherit  !important;
+  left: inherit !important;
 }
 </style>
