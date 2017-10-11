@@ -20,7 +20,7 @@ export default new Router({
     },
     {
       name: 'Episode',
-      path: '/programs/:programId/episode/:episodeId',
+      path: '/programs/:programId/episodes/:episodeId',
       component: Episode
     }
   ]
