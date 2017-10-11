@@ -26,7 +26,7 @@ const Episode = require('../models/episode');
 router.route('/')
   /**
    * @swagger
-   * /programs/{programName}/episodes/{episodeNumber}/topics:
+   * /programs/{programId}/episodes/{episodeId}/topics:
    *   get:
    *     tags:
    *       - Topic
@@ -34,16 +34,16 @@ router.route('/')
    *     summary: Get all topic
    *     produces: application/json
    *     parameters:
-   *       - name: programName
-   *         description: Program's name
+   *       - name: programId
+   *         description: Program's id
    *         in: path
    *         required: true
-   *         type: string
-   *       - name: episodeNumber
-   *         description: Episode's number
+   *         type: uuid
+   *       - name: episodeId
+   *         description: Episode's id
    *         in: path
    *         required: true
-   *         type: integer
+   *         type: uuid
    *     responses:
    *       200:
    *         description: An array of topics
@@ -66,7 +66,7 @@ router.route('/')
   })
   /**
    * @swagger
-   * /programs/{programName}/episodes/{episodeNumber}/topics:
+   * /programs/{programId}/episodes/{episodeId}/topics:
    *   post:
    *     tags:
    *       - Topic
@@ -74,16 +74,16 @@ router.route('/')
    *     summary: Add a topic
    *     produces: application/json
    *     parameters:
-   *       - name: programName
-   *         description: Program's name
+   *       - name: programId
+   *         description: Program's id
    *         in: path
    *         required: true
-   *         type: string
-   *       - name: episodeNumber
-   *         description: Episode's number
+   *         type: uuid
+   *       - name: episodeId
+   *         description: Episode's id
    *         in: path
    *         required: true
-   *         type: integer
+   *         type: uuid
    *       - name: topic
    *         in: body
    *         description: Fields for the Topic resource
@@ -155,7 +155,7 @@ router.param('topicId', function (req, res, next, value, name) {
 router.route('/:topicId')
   /**
    * @swagger
-   * /programs/{programName}/episodes/{episodeNumber}/topics/{topicId}:
+   * /programs/{programId}/episodes/{episodeId}/topics/{topicId}:
    *   get:
    *     tags:
    *       - Topic
@@ -163,16 +163,16 @@ router.route('/:topicId')
    *     summary: Get a topic
    *     produces: application/json
    *     parameters:
-   *       - name: programName
-   *         description: Program's name
+   *       - name: programId
+   *         description: Program's id
    *         in: path
    *         required: true
-   *         type: string
-   *       - name: episodeNumber
-   *         description: Episode's number
+   *         type: uuid
+   *       - name: episodeId
+   *         description: Episode's id
    *         in: path
    *         required: true
-   *         type: integer
+   *         type: uuid
    *       - name: topicId
    *         description: Topic's id
    *         in: path
@@ -189,7 +189,7 @@ router.route('/:topicId')
   })
   /**
    * @swagger
-   * /programs/{programName}/episodes/{episodeNumber}/topics/{topicId}:
+   * /programs/{programId}/episodes/{episodeId}/topics/{topicId}:
    *   put:
    *     tags:
    *       - Topic
@@ -197,16 +197,16 @@ router.route('/:topicId')
    *     summary: Edit a topic
    *     produces: application/json
    *     parameters:
-   *       - name: programName
-   *         description: Program's name
+   *       - name: programId
+   *         description: Program's id
    *         in: path
    *         required: true
-   *         type: string
-   *       - name: episodeNumber
-   *         description: Episode's number
+   *         type: uuid
+   *       - name: episodeId
+   *         description: Episode's id
    *         in: path
    *         required: true
-   *         type: integer
+   *         type: uuid
    *       - name: topicId
    *         description: Topic's id
    *         in: path
@@ -242,7 +242,7 @@ router.route('/:topicId')
   })
   /**
    * @swagger
-   * /programs/{programName}/episodes/{episodeNumber}/topics/{topicId}:
+   * /programs/{programId}/episodes/{episodeId}/topics/{topicId}:
    *   delete:
    *     tags:
    *       - Topic
@@ -250,16 +250,16 @@ router.route('/:topicId')
    *     summary: Remove a topic
    *     produces: application/json
    *     parameters:
-   *       - name: programName
-   *         description: Program's name
+   *       - name: programId
+   *         description: Program's id
    *         in: path
    *         required: true
-   *         type: string
-   *       - name: episodeNumber
-   *         description: Episode's number
+   *         type: uuid
+   *       - name: episodeId
+   *         description: Episode's id
    *         in: path
    *         required: true
-   *         type: integer
+   *         type: uuid
    *       - name: topicId
    *         description: Topic's id
    *         in: path
@@ -287,7 +287,7 @@ router.route('/:topicId')
 
 /**
  * @swagger
- * /programs/{programName}/episodes/{episodeNumber}/topics/{topicId}/move:
+ * /programs/{programId}/episodes/{episodeId}/topics/{topicId}/move:
  *   get:
  *     tags:
  *       - Topic
@@ -295,16 +295,16 @@ router.route('/:topicId')
  *     summary: Move a topic
  *     produces: application/json
  *     parameters:
- *       - name: programName
- *         description: Program's name
+ *       - name: programId
+ *         description: Program's id
  *         in: path
  *         required: true
- *         type: string
- *       - name: episodeNumber
- *         description: Episode's number
+ *         type: uuid
+ *       - name: episodeId
+ *         description: Episode's id
  *         in: path
  *         required: true
- *         type: integer
+ *         type: uuid
  *       - name: topicId
  *         description: Topic's id
  *         in: path

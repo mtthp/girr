@@ -33,24 +33,24 @@ const upload = multer({ storage: storage })
 router.route('/')
   /**
    * @swagger
-   * /programs/{programName}/episodes/{episodeNumber}/topics/{topicId}/medias:
+   * /programs/{programId}/episodes/{episodeId}/topics/{topicId}/medias:
    *   get:
    *     tags:
    *       - Media
-   *     description: Returns all medias from an topic
+   *     description: Return all medias from an topic
    *     summary: Get all medias
    *     produces: application/json
    *     parameters:
-   *       - name: programName
-   *         description: Program's name
+   *       - name: programId
+   *         description: Program's id
    *         in: path
    *         required: true
-   *         type: string
-   *       - name: episodeNumber
-   *         description: Episode's number
+   *         type: uuid
+   *       - name: episodeId
+   *         description: Episode's id
    *         in: path
    *         required: true
-   *         type: integer
+   *         type: uuid
    *       - name: topicId
    *         description: Topic's id
    *         in: path
@@ -78,24 +78,24 @@ router.route('/')
   })
   /**
    * @swagger
-   * /programs/{programName}/episodes/{episodeNumber}/topics/{topicId}/medias:
+   * /programs/{programId}/episodes/{episodeId}/topics/{topicId}/medias:
    *   post:
    *     tags:
    *       - Media
-   *     description: Creates a new media
+   *     description: Create a new media
    *     summary: Add a media
    *     produces: application/json
    *     parameters:
-   *       - name: programName
-   *         description: Program's name
+   *       - name: programId
+   *         description: Program's id
    *         in: path
    *         required: true
-   *         type: string
-   *       - name: episodeNumber
-   *         description: Episode's number
+   *         type: uuid
+   *       - name: episodeId
+   *         description: Episode's id
    *         in: path
    *         required: true
-   *         type: integer
+   *         type: uuid
    *       - name: topicId
    *         description: Topic's id
    *         in: path
@@ -175,24 +175,24 @@ router.param('mediaId', function (req, res, next, value, name) {
 router.route('/:mediaId')
   /**
    * @swagger
-   * /programs/{programName}/episodes/{episodeNumber}/topics/{topicId}/medias/{mediaId}:
+   * /programs/{programId}/episodes/{episodeId}/topics/{topicId}/medias/{mediaId}:
    *   get:
    *     tags:
    *       - Media
-   *     description: Returns a single media
+   *     description: Return a single media
    *     summary: Get a media
    *     produces: application/json
    *     parameters:
-   *       - name: programName
-   *         description: Program's name
+   *       - name: programId
+   *         description: Program's id
    *         in: path
    *         required: true
-   *         type: string
-   *       - name: episodeNumber
-   *         description: Episode's number
+   *         type: uuid
+   *       - name: episodeId
+   *         description: Episode's id
    *         in: path
    *         required: true
-   *         type: integer
+   *         type: uuid
    *       - name: topicId
    *         description: Topic's id
    *         in: path
@@ -214,24 +214,24 @@ router.route('/:mediaId')
   })
   /**
    * @swagger
-   * /programs/{programName}/episodes/{episodeNumber}/topics/{topicId}/medias/{mediaId}:
+   * /programs/{programId}/episodes/{episodeId}/topics/{topicId}/medias/{mediaId}:
    *   put:
    *     tags:
    *       - Media
-   *     description: Updates a single media
+   *     description: Update a single media
    *     summary: Edit a media
    *     produces: application/json
    *     parameters:
-   *       - name: programName
-   *         description: Program's name
+   *       - name: programId
+   *         description: Program's id
    *         in: path
    *         required: true
-   *         type: string
-   *       - name: episodeNumber
-   *         description: Episode's number
+   *         type: uuid
+   *       - name: episodeId
+   *         description: Episode's id
    *         in: path
    *         required: true
-   *         type: integer
+   *         type: uuid
    *       - name: topicId
    *         description: Topic's id
    *         in: path
@@ -272,24 +272,24 @@ router.route('/:mediaId')
   })
   /**
    * @swagger
-   * /programs/{programName}/episodes/{episodeNumber}/topics/{topicId}/medias/{mediaId}:
+   * /programs/{programId}/episodes/{episodeId}/topics/{topicId}/medias/{mediaId}:
    *   delete:
    *     tags:
    *       - Media
-   *     description: Deletes a single media
+   *     description: Delete a single media
    *     summary: Remove a media
    *     produces: application/json
    *     parameters:
-   *       - name: programName
-   *         description: Program's name
+   *       - name: programId
+   *         description: Program's id
    *         in: path
    *         required: true
-   *         type: string
-   *       - name: episodeNumber
-   *         description: Episode's number
+   *         type: uuid
+   *       - name: episodeId
+   *         description: Episode's id
    *         in: path
    *         required: true
-   *         type: integer
+   *         type: uuid
    *       - name: topicId
    *         description: Topic's id
    *         in: path
@@ -328,7 +328,7 @@ router.route('/:mediaId')
 
 
 
-
+/* legacy code below this line */
 
 
 

@@ -28,7 +28,7 @@ router.route('/')
    *   get:
    *     tags:
    *       - Episodes
-   *     description: Returns all episodes from a program
+   *     description: Return all episodes from a program
    *     summary: Get all episodes
    *     produces: application/json
    *     parameters:
@@ -64,7 +64,7 @@ router.route('/')
    *   post:
    *     tags:
    *       - Episodes
-   *     description: Creates a new episode
+   *     description: Create a new episode
    *     summary: Add a new one
    *     produces: application/json
    *     parameters:
@@ -123,9 +123,9 @@ router.route('/')
   })
 
 // Middleware : we check if the episode exists in the specified program before going further
-router.param('episodeNumber', function (req, res, next, value, name) {
+router.param('episodeId', function (req, res, next, value, name) {
   Episode
-    .findOne({number: value, program: req.program._id})
+    .findOne({_id: value, program: req.program._id})
     .populate({ 
        path: 'topics',
        populate: {
@@ -147,14 +147,14 @@ router.param('episodeNumber', function (req, res, next, value, name) {
     })
 })
 
-router.route('/:episodeNumber')
+router.route('/:episodeId')
   /**
    * @swagger
-   * /programs/{programId}/episodes/{episodeNumber}:
+   * /programs/{programId}/episodes/{episodeId}:
    *   get:
    *     tags:
    *       - Episodes
-   *     description: Returns a single episode
+   *     description: Return a single episode
    *     summary: Get a episode
    *     produces: application/json
    *     parameters:
@@ -163,11 +163,11 @@ router.route('/:episodeNumber')
    *         in: path
    *         required: true
    *         type: uuid
-   *       - name: episodeNumber
-   *         description: Episode's number
+   *       - name: episodeId
+   *         description: Episode's id
    *         in: path
    *         required: true
-   *         type: integer
+   *         type: uuid
    *     responses:
    *       200:
    *         description: A single Episode
@@ -179,11 +179,11 @@ router.route('/:episodeNumber')
   })
   /**
    * @swagger
-   * /programs/{programId}/episodes/{episodeNumber}:
+   * /programs/{programId}/episodes/{episodeId}:
    *   put:
    *     tags:
    *       - Episodes
-   *     description: Updates a single episode
+   *     description: Update a single episode
    *     summary: Edit a episode
    *     produces: application/json
    *     parameters:
@@ -192,11 +192,11 @@ router.route('/:episodeNumber')
    *         in: path
    *         required: true
    *         type: uuid
-   *       - name: episodeNumber
-   *         description: Episode's number
+   *       - name: episodeId
+   *         description: Episode's id
    *         in: path
    *         required: true
-   *         type: integer
+   *         type: uuid
    *       - name: episode
    *         in: body
    *         description: Fields for the Episode resource
@@ -227,11 +227,11 @@ router.route('/:episodeNumber')
   })
   /**
    * @swagger
-   * /programs/{programId}/episodes/{episodeNumber}:
+   * /programs/{programId}/episodes/{episodeId}:
    *   delete:
    *     tags:
    *       - Episodes
-   *     description: Deletes a single episode
+   *     description: Delete a single episode
    *     summary: Remove a episode
    *     produces: application/json
    *     parameters:
@@ -240,11 +240,11 @@ router.route('/:episodeNumber')
    *         in: path
    *         required: true
    *         type: uuid
-   *       - name: episodeNumber
-   *         description: Episode's number
+   *       - name: episodeId
+   *         description: Episode's id
    *         in: path
    *         required: true
-   *         type: string
+   *         type: uuid
    *     responses:
    *       204:
    *         description: Successfully deleted
@@ -254,10 +254,10 @@ router.route('/:episodeNumber')
       .remove()
       .then(function(result) {
         if (result !== null) {
-          logger.debug("Removed Episode " + req.params.episodeNumber)
+          logger.debug("Removed Episode " + req.params.episodeId)
           res.status(204).json(result.toString())
         } else {
-          next({message:"Episode " + req.params.episodeNumber + " wasn't deleted", status: 417})
+          next({message:"Episode " + req.params.episodeId + " wasn't deleted", status: 417})
         }
       })
       .catch(function(error) {
@@ -296,6 +296,6 @@ router.get('/:episode/full', (req, res) => {
     });
 });
 
-router.use('/:episodeNumber/topics', require('./topic'));
+router.use('/:episodeId/topics', require('./topic'));
 
 module.exports = router;
