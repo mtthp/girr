@@ -24,7 +24,7 @@ const Topics = require('../models/topic')
 router.route('/')
   /**
    * @swagger
-   * /programs/{programName}/episodes:
+   * /programs/{programId}/episodes:
    *   get:
    *     tags:
    *       - Episodes
@@ -32,11 +32,11 @@ router.route('/')
    *     summary: Get all episodes
    *     produces: application/json
    *     parameters:
-   *       - name: programName
-   *         description: programName's name
+   *       - name: programId
+   *         description: Program's id
    *         in: path
    *         required: true
-   *         type: string
+   *         type: uuid
    *     responses:
    *       200:
    *         description: An array of episodes
@@ -60,7 +60,7 @@ router.route('/')
   })
   /**
    * @swagger
-   * /programs/{programName}/episodes:
+   * /programs/{programId}/episodes:
    *   post:
    *     tags:
    *       - Episodes
@@ -68,11 +68,11 @@ router.route('/')
    *     summary: Add a new one
    *     produces: application/json
    *     parameters:
-   *       - name: programName
-   *         description: Program's name
+   *       - name: programId
+   *         description: Program's id
    *         in: path
    *         required: true
-   *         type: string
+   *         type: uuid
    *       - name: episode
    *         in: body
    *         description: Fields for the Episode resource
@@ -150,7 +150,7 @@ router.param('episodeNumber', function (req, res, next, value, name) {
 router.route('/:episodeNumber')
   /**
    * @swagger
-   * /programs/{programName}/episodes/{episodeNumber}:
+   * /programs/{programId}/episodes/{episodeNumber}:
    *   get:
    *     tags:
    *       - Episodes
@@ -158,11 +158,11 @@ router.route('/:episodeNumber')
    *     summary: Get a episode
    *     produces: application/json
    *     parameters:
-   *       - name: programName
-   *         description: Program's name
+   *       - name: programId
+   *         description: Program's id
    *         in: path
    *         required: true
-   *         type: string
+   *         type: uuid
    *       - name: episodeNumber
    *         description: Episode's number
    *         in: path
@@ -179,7 +179,7 @@ router.route('/:episodeNumber')
   })
   /**
    * @swagger
-   * /programs/{programName}/episodes/{episodeNumber}:
+   * /programs/{programId}/episodes/{episodeNumber}:
    *   put:
    *     tags:
    *       - Episodes
@@ -187,11 +187,11 @@ router.route('/:episodeNumber')
    *     summary: Edit a episode
    *     produces: application/json
    *     parameters:
-   *       - name: programName
-   *         description: Program's name
+   *       - name: programId
+   *         description: Program's id
    *         in: path
    *         required: true
-   *         type: string
+   *         type: uuid
    *       - name: episodeNumber
    *         description: Episode's number
    *         in: path
@@ -227,7 +227,7 @@ router.route('/:episodeNumber')
   })
   /**
    * @swagger
-   * /programs/{programName}/episodes/{episodeNumber}:
+   * /programs/{programId}/episodes/{episodeNumber}:
    *   delete:
    *     tags:
    *       - Episodes
@@ -235,11 +235,11 @@ router.route('/:episodeNumber')
    *     summary: Remove a episode
    *     produces: application/json
    *     parameters:
-   *       - name: programName
-   *         description: Program's name
+   *       - name: programId
+   *         description: Program's id
    *         in: path
    *         required: true
-   *         type: string
+   *         type: uuid
    *       - name: episodeNumber
    *         description: Episode's number
    *         in: path
@@ -265,6 +265,7 @@ router.route('/:episodeNumber')
       })
   })
 
+/* legacy endpoint */
 router.get('/:episode/full', (req, res) => {
     "use strict";
     // this.episode = {

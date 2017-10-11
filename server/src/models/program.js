@@ -4,7 +4,7 @@ const Episode = require('./episode');
 const logger = require('../logger');
 
 let programSchema = new mongoose.Schema({
-    name: { type: String, unique: true, required: true},
+    name: { type: String, required: true},
     thumbnail: { type: String },
     created: { type: Date, required: true },
     modified: { type: Date, required: true },

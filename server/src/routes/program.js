@@ -11,11 +11,11 @@ const logger = require('../logger');
  *     properties:
  *       name:
  *         type: string
- *         description: unique identifier
+ *         description: a name to identify the Program between others
  *         required: true
- *       logo:
+ *       thumbnail:
  *         type: string
- *         description: buffer data
+ *         description: thumbnail uri
  */
 
 router.route('/')
@@ -76,9 +76,9 @@ router.route('/')
     });
 
 // Middleware : we check if the program exists in the DB before going further
-router.param('programName', function (req, res, next, value, name) {
+router.param('programId', function (req, res, next, value, name) {
   Program
-    .findOne({name: value})
+    .findOne({_id: value})
     .populate('episodes')
     .then(function(program) {
       if (program !== null) {
@@ -94,10 +94,10 @@ router.param('programName', function (req, res, next, value, name) {
     })
 })
 
-router.route('/:programName')
+router.route('/:programId')
   /**
    * @swagger
-   * /programs/{name}:
+   * /programs/{id}:
    *   get:
    *     tags:
    *       - Programs
@@ -106,11 +106,11 @@ router.route('/:programName')
    *     produces:
    *       - application/json
    *     parameters:
-   *       - name: name
-   *         description: Program's name
+   *       - name: id
+   *         description: Program's id
    *         in: path
    *         required: true
-   *         type: string
+   *         type: uuid
    *     responses:
    *       200:
    *         description: A single Program
@@ -122,7 +122,7 @@ router.route('/:programName')
   })
   /**
    * @swagger
-   * /programs/{name}:
+   * /programs/{id}:
    *   put:
    *     tags:
    *       - Programs
@@ -130,11 +130,11 @@ router.route('/:programName')
    *     summary: Edit a program
    *     produces: application/json
    *     parameters:
-   *       - name: name
-   *         description: Program's name
+   *       - name: id
+   *         description: Program's id
    *         in: path
    *         required: true
-   *         type: string
+   *         type: uuid
    *       - name: program
    *         in: body
    *         description: Fields for the Program resource
@@ -165,7 +165,7 @@ router.route('/:programName')
   })
   /**
    * @swagger
-   * /programs/{name}:
+   * /programs/{id}:
    *   delete:
    *     tags:
    *       - Programs
@@ -174,11 +174,11 @@ router.route('/:programName')
    *     produces:
    *       - application/json
    *     parameters:
-   *       - name: name
-   *         description: Program's name
+   *       - name: id
+   *         description: Program's id
    *         in: path
    *         required: true
-   *         type: string
+   *         type: uuid
    *     responses:
    *       204:
    *         description: Successfully deleted
@@ -188,10 +188,10 @@ router.route('/:programName')
       .remove()
       .then(function(result) {
         if (result !== null) {
-          logger.debug("Removed Program " + req.params.programName)
+          logger.debug("Removed Program " + req.params.programId)
           res.status(204).json(result.toString())
         } else {
-          next({message:"Program " + req.params.programName + " wasn't deleted", status: 417})
+          next({message:"Program " + req.params.programId + " wasn't deleted", status: 417})
         }
       })
       .catch(function(error) {
@@ -199,6 +199,6 @@ router.route('/:programName')
       })
   })
 
-router.use('/:programName/episodes', require('./episode'));
+router.use('/:programId/episodes', require('./episode'));
 
 module.exports = router;
