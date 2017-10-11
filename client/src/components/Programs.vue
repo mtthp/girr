@@ -2,7 +2,7 @@
   <div v-if="programs.length > 0" class="programs">
     <ProgramDialog></ProgramDialog>
     <router-link
-      :to="{ name: 'Program', params: { programId: program.name }}"
+      :to="{ name: 'Program', params: { programId: program._id }}"
       v-for="program in programs"
       :key="program.name"
       class="program-card">
@@ -78,7 +78,7 @@ export default {
     },
     updateProgram: function (program) {
       Event.$emit('progressbar.toggle', true)
-      this.$http.put('/api/programs/' + program.name, program).then(
+      this.$http.put('/api/programs/' + program._id, program).then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
           for (var i = 0; i < this.programs.length; i++) {
@@ -98,7 +98,7 @@ export default {
     },
     deleteProgram: function (program) {
       Event.$emit('progressbar.toggle', true)
-      this.$http.delete('/api/programs/' + program.name).then(
+      this.$http.delete('/api/programs/' + program._id).then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
           var index = this.programs.indexOf(this.programs.find(function (listProgram) {

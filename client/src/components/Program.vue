@@ -3,7 +3,7 @@
     <EpisodeDialog></EpisodeDialog>
     <div v-if="program && program.episodes.length > 0" class="episodes">
       <router-link
-        :to="{ name: 'Episode', params: { programId: program.name, episodeId: episode.number }}"
+        :to="{ name: 'Episode', params: { programId: program.name, episodeId: episode._id }}"
         v-for="episode in program.episodes"
         :key="episode._id"
         class="episode-card">
@@ -92,7 +92,7 @@ export default {
     },
     updateEpisode: function (episode) {
       Event.$emit('progressbar.toggle', true)
-      this.$http.put('/api/programs/' + this.$route.params.programId + '/episodes/' + episode.number, episode).then(
+      this.$http.put('/api/programs/' + this.$route.params.programId + '/episodes/' + episode._id, episode).then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
           for (var i = 0; i < this.program.episodes.length; i++) {
@@ -112,7 +112,7 @@ export default {
     },
     deleteEpisode: function (episode) {
       Event.$emit('progressbar.toggle', true)
-      this.$http.delete('/api/programs/' + this.$route.params.programId + '/episodes/' + episode.number).then(
+      this.$http.delete('/api/programs/' + this.$route.params.programId + '/episodes/' + episode._id).then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
           var index = this.program.episodes.indexOf(this.program.episodes.find(function (programEpisode) {
