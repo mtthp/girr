@@ -3,7 +3,7 @@
     <EpisodeDialog></EpisodeDialog>
     <div v-if="program && program.episodes.length > 0" class="episodes">
       <router-link
-        :to="{ name: 'Episode', params: { programId: program.name, episodeId: episode._id }}"
+        :to="{ name: 'Episode', params: { programId: program._id, episodeId: episode._id }}"
         v-for="episode in program.episodes"
         :key="episode._id"
         class="episode-card">
