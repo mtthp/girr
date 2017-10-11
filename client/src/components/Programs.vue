@@ -1,13 +1,12 @@
 <template>
   <div v-if="programs.length > 0" class="programs">
-    <router-link :to="{ name: 'Program', params: { programId: program.name }}" v-for="program in programs" :key="program.name" class="mdc-card mdc-card--theme-dark program" :style="program.thumbnail ? 'background-image: url(\'' + program.thumbnail + '\');' : null">
-        <section class="mdc-card__primary">
-          <h1 class="mdc-card__title mdc-card__title--large">{{ program.name }}</h1>
-          <h2 class="mdc-card__subtitle">Added {{ program.created | formatDate }}</h2>
-        </section>
-      <section class="mdc-card__actions">
-        <button class="mdc-button mdc-button--compact mdc-card__action" v-on:click="deleteProgram(program.name)">Delete</button>
-      </section>
+    <ProgramDialog></ProgramDialog>
+    <router-link
+      :to="{ name: 'Program', params: { programId: program.name }}"
+      v-for="program in programs"
+      :key="program.name"
+      class="program-card">
+      <ProgramCard :program="program"></ProgramCard>
     </router-link>
     <button class="mdc-fab material-icons fab" aria-label="add" data-mdc-auto-init="MDCRipple" v-on:click="addProgram">
       <span class="mdc-fab__icon">
@@ -19,16 +18,32 @@
 
 <script>
 import Event from '../utils/EventBus.js'
+import ProgramCard from './ProgramCard'
+import ProgramDialog from './ProgramDialog'
 
 export default {
   name: 'programs',
+  components: {
+    ProgramCard,
+    ProgramDialog
+  },
   data () {
     return {
       programs: []
     }
   },
-  mounted: function () {
+  created () {
     this.getPrograms()
+    Event.$on('program.update', function (program) {
+      this.updateProgram(program)
+    }.bind(this))
+    Event.$on('program.delete', function (program) {
+      this.deleteProgram(program)
+    }.bind(this))
+  },
+  watch: {
+    // call again the method if the route changes
+    '$route': 'getPrograms'
   },
   methods: {
     addProgram: function () {
@@ -61,13 +76,38 @@ export default {
         }
       )
     },
-    deleteProgram: function (id) {
+    updateProgram: function (program) {
       Event.$emit('progressbar.toggle', true)
-      this.$http.delete('/api/programs/' + id).then(
+      this.$http.put('/api/programs/' + program.name, program).then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
-          this.getPrograms()
-          Event.$emit('snackbar.message', 'Program ' + id + ' deleted')
+          for (var i = 0; i < this.programs.length; i++) {
+            if (this.programs[i] === program) {
+              this.programs[i] = response.body
+              Event.$emit('snackbar.message', 'Program ' + this.programs[i].name + ' updated')
+              break
+            }
+          }
+        },
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          console.error(response)
+          Event.$emit('snackbar.message', 'Error : ' + (response.statusText ? response.statusText : 'no connection'))
+        }
+      )
+    },
+    deleteProgram: function (program) {
+      Event.$emit('progressbar.toggle', true)
+      this.$http.delete('/api/programs/' + program.name).then(
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          var index = this.programs.indexOf(this.programs.find(function (listProgram) {
+            return listProgram === program
+          }))
+          if (index > -1) {
+            this.programs.splice(index, 1)
+            Event.$emit('snackbar.message', 'Program ' + program.name + ' deleted')
+          }
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
@@ -92,19 +132,12 @@ export default {
       flex-flow: row wrap;
 }
 
-.program {
+.programs .program-card {
   margin: 15px;
   width: calc(100% - 30px);
+  height: 21.875rem;
   -webkit-transition: all 0.2s ease-in-out;
   transition: all 0.2s ease-in-out;
-}
-
-.program.mdc-card {
-  background-image: url("../assets/geekinc-logo_512.png");
-  background-size: cover;
-  background-position: center center;
-  background-repeat: no-repeat;
-  height: 21.875rem;
 }
 
 .program.mdc-card section {
