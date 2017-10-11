@@ -129,12 +129,13 @@ router.route('/')
       if (typeof media.label === "undefined") { // something is wrong, the label cannot be sent in the request body
         media.label = req.file.originalname
       }
-      media.path = req.file.path;
+      media.path = req.file.path
       media.uri = '/' + media.path // should be calculate automatically from the path instead
-    } else if (media.uri) {
-      if (typeof media.label === "undefined") {
-        media.label = "untitled"
-      }
+      media.mimeType = req.file.mimetype
+    // } else if (media.uri) { // otherwise, tries to download the file and place it under the data directory
+    //   if (typeof media.label === "undefined") {
+    //     media.label = "untitled"
+    //   }
     } else {
       next({message:"No media file or URI was provided", status: 417})
     }
