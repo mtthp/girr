@@ -5,7 +5,7 @@ const logger = require('../logger');
 
 let programSchema = new mongoose.Schema({
     name: { type: String, unique: true, required: true},
-    logo: { data: Buffer, contentType: String },
+    thumbnail: { type: String },
     created: { type: Date, required: true },
     modified: { type: Date, required: true },
     episodes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Episode' }]
