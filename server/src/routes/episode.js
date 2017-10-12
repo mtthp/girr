@@ -212,7 +212,7 @@ router.route('/:episodeId')
   .put(function (req, res, next) {
     Episode
       // use findOneAndUpdate to get the new result (even if we already found the resource in the DB)
-      .findOneAndUpdate({number: req.episode.number, program: req.program._id}, Object.assign(req.body, {modified: Date.now()}), {new : true})
+      .findOneAndUpdate({_id: req.episode._id, program: req.program._id}, Object.assign(req.body, {modified: Date.now()}), {new : true})
       .then(function(episode) {
         if (episode !== null) {
           logger.debug("Updated " + episode.toString())
