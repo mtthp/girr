@@ -112,7 +112,12 @@ export default {
       this.$http.post('/api/programs/' + this.$route.params.programId + '/episodes/' + this.$route.params.episodeId + '/topics/').then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
-          this.episode.topics.push(response.body)
+          var index = this.episode.topics.indexOf(this.episode.topics.find(function (episodeTopic) {
+            return episodeTopic._id === response.body._id
+          }))
+          if (index < 0) {
+            this.episode.topics.push(response.body)
+          }
           Event.$emit('snackbar.message', 'Added a new topic')
         },
         function (response) {

@@ -93,7 +93,10 @@ export default {
       this.$http.post('/api/programs/' + this.$route.params.programId + '/episodes/' + this.$route.params.episodeId + '/topics/' + this.topic._id + '/medias/', formData).then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
-          this.topic.medias.push(response.body)
+          var index = this.topic.medias.indexOf(this.topic.medias.find(function (topicMedia) {
+            return topicMedia._id === response.body._id
+          }))
+          if (index < 0) this.topic.medias.push(response.body)
           Event.$emit('snackbar.message', 'Added ' + response.body.label)
         },
         function (response) {

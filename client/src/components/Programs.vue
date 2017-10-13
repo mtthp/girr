@@ -78,7 +78,10 @@ export default {
       this.$http.post('/api/programs').then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
-          this.programs.push(response.body)
+          var index = this.programs.indexOf(this.programs.find(function (listProgram) {
+            return listProgram._id === response.body._id
+          }))
+          if (index < 0) this.programs.push(response.body)
           Event.$emit('snackbar.message', 'Added ' + response.body.name)
         },
         function (response) {

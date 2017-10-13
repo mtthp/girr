@@ -100,7 +100,12 @@ export default {
       this.$http.post('/api/programs/' + this.$route.params.programId + '/episodes/').then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
-          this.program.episodes.push(response.body)
+          var index = this.program.episodes.indexOf(this.program.episodes.find(function (programEpisode) {
+            return programEpisode._id === response.body._id
+          }))
+          if (index < 0) {
+            this.program.episodes.push(response.body)
+          }
           Event.$emit('snackbar.message', 'Added a new episode')
         },
         function (response) {
