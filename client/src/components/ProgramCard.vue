@@ -20,6 +20,14 @@ import { menu } from 'material-components-web'
 
 export default {
   props: ['program'],
+  created () {
+    this.$options.sockets['programs.' + this.program._id + '.delete'] = function (data) {
+      Event.$emit('program.deleted', data)
+    }
+    this.$options.sockets['programs.' + this.program._id] = function (data) {
+      Event.$emit('program.updated', data)
+    }
+  },
   mounted () {
     this.menu = new menu.MDCSimpleMenu(this.$el.querySelector('.mdc-simple-menu'))
     // Add event listener to some button to toggle the menu on and off.

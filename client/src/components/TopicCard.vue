@@ -48,6 +48,12 @@ export default {
   // },
   created () {
     this.topic.expanded = false
+    this.$options.sockets['topics.' + this.topic._id + '.delete'] = function (data) {
+      Event.$emit('topic.deleted', data)
+    }
+    this.$options.sockets['topics.' + this.topic._id] = function (data) {
+      Event.$emit('topic.updated', data)
+    }
   },
   mounted () {
     // code here executes once the component is rendered

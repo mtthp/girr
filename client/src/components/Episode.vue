@@ -62,6 +62,23 @@ export default {
     Event.$on('topic.delete', function (topic) {
       this.deleteTopic(topic)
     }.bind(this))
+    Event.$on('topic.updated', function (topic) {
+      for (var i = 0; i < this.episode.topics.length; i++) {
+        if (this.episode.topics[i]._id === topic._id) {
+          this.episode.topics[i] = topic
+          this.$forceUpdate()
+          break
+        }
+      }
+    }.bind(this))
+    Event.$on('topic.deleted', function (topic) {
+      var index = this.episode.topics.indexOf(this.episode.topics.find(function (episodeTopic) {
+        return episodeTopic._id === topic._id
+      }))
+      if (index > -1) {
+        this.episode.topics.splice(index, 1)
+      }
+    }.bind(this))
   },
   watch: {
     // call again the method if the route changes
@@ -75,20 +92,10 @@ export default {
         function (response) {
           Event.$emit('progressbar.toggle', false)
           this.episode = response.body
+          this.$options.sockets['episodes.' + this.episode._id] = function (data) {
+            this.episode = data
+          }.bind(this)
           Event.$emit('title.change', this.episode.name)
-        },
-        function (response) {
-          Event.$emit('progressbar.toggle', false)
-          console.error(response)
-          Event.$emit('snackbar.message', 'Error : ' + (response.statusText ? response.statusText : 'no connection'))
-        }
-      )
-    },
-    deleteEpisode: function () {
-      Event.$emit('progressbar.toggle', true)
-      this.$http.delete('/api/programs/' + this.$route.params.programId + '/episodes/' + this.$route.params.episodeId).then(
-        function (response) {
-          Event.$emit('progressbar.toggle', false)
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
@@ -117,13 +124,8 @@ export default {
       this.$http.put('/api/programs/' + this.$route.params.programId + '/episodes/' + this.$route.params.episodeId + '/topics/' + topic._id, topic).then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
-          for (var i = 0; i < this.episode.topics.length; i++) {
-            if (this.episode.topics[i] === topic) {
-              this.episode.topics[i] = response.body
-              Event.$emit('snackbar.message', 'Topic ' + this.episode.topics[i].title + ' updated')
-              break
-            }
-          }
+          Event.$emit('topic.updated', response.body)
+          Event.$emit('snackbar.message', 'Topic ' + response.body.title + ' updated')
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
@@ -137,13 +139,8 @@ export default {
       this.$http.delete('/api/programs/' + this.$route.params.programId + '/episodes/' + this.$route.params.episodeId + '/topics/' + topic._id).then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
-          var index = this.episode.topics.indexOf(this.episode.topics.find(function (episodeTopic) {
-            return episodeTopic === topic
-          }))
-          if (index > -1) {
-            this.episode.topics.splice(index, 1)
-            Event.$emit('snackbar.message', 'Topic ' + topic.title + ' deleted')
-          }
+          Event.$emit('topic.deleted', topic)
+          Event.$emit('snackbar.message', 'Topic ' + topic.title + ' deleted')
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)

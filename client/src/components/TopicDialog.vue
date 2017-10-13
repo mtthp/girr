@@ -72,10 +72,8 @@ export default {
   },
   methods: {
     show: function (topic) {
-      if (this.topic._id !== topic._id) {
-        this.topic = topic
-        this.$el.querySelector('textarea').value = this.topic.description ? this.topic.description : ''
-      }
+      this.topic = topic
+      this.$el.querySelector('textarea').value = this.topic.description ? this.topic.description : ''
       this.dialog.show()
     },
     close: function () {

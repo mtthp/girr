@@ -47,6 +47,23 @@ export default {
     Event.$on('program.delete', function (program) {
       this.deleteProgram(program)
     }.bind(this))
+    Event.$on('program.updated', function (program) {
+      for (var i = 0; i < this.programs.length; i++) {
+        if (this.programs[i]._id === program._id) {
+          this.programs[i] = program
+          this.$forceUpdate()
+          break
+        }
+      }
+    }.bind(this))
+    Event.$on('program.deleted', function (program) {
+      var index = this.programs.indexOf(this.programs.find(function (listProgram) {
+        return listProgram._id === program._id
+      }))
+      if (index > -1) {
+        this.programs.splice(index, 1)
+      }
+    }.bind(this))
   },
   watch: {
     // call again the method if the route changes
@@ -98,14 +115,8 @@ export default {
       this.$http.put('/api/programs/' + program._id, data).then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
-          for (var i = 0; i < this.programs.length; i++) {
-            if (this.programs[i]._id === program._id) {
-              this.programs[i] = response.body
-              this.$forceUpdate()
-              Event.$emit('snackbar.message', 'Program ' + this.programs[i].name + ' updated')
-              break
-            }
-          }
+          Event.$emit('program.updated', response.body)
+          Event.$emit('snackbar.message', 'Program ' + response.body.name + ' updated')
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
@@ -119,13 +130,8 @@ export default {
       this.$http.delete('/api/programs/' + program._id).then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
-          var index = this.programs.indexOf(this.programs.find(function (listProgram) {
-            return listProgram._id === program._id
-          }))
-          if (index > -1) {
-            this.programs.splice(index, 1)
-            Event.$emit('snackbar.message', 'Program ' + program.name + ' deleted')
-          }
+          Event.$emit('program.deleted', response.body)
+          Event.$emit('snackbar.message', 'Program ' + program.name + ' deleted')
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
