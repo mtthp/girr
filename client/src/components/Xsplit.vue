@@ -1,35 +1,42 @@
 <template>
-  <main class="xsplit">
-  	<div class="title">{{ title }}</div>
+  <main class="xsplit" :style="{ 'background-image': xsplit.picture ? 'url(' + require('../assets/brick-wall.jpg') + ')' : null }">
+    <div class="title">{{ xsplit.title }}</div>
     <div class="content">
-    	<img :src="imgUri">
+      <img :src="xsplit.picture">
    	</div>
   </main>
 </template>
 
 <script>
-// import Event from '../utils/EventBus.js'
-import Vue from 'vue'
-import VueSocketio from 'vue-socket.io'
-Vue.use(VueSocketio, 'http://localhost:8080')
+import Event from '../utils/EventBus.js'
 
 export default {
   name: 'xsplit',
   data () {
     return {
-      title: 'Ohlalalalalalalalalalalalalalalalala',
-      imgUri: require('../assets/geekinc-logo_512.png')
+      xsplit: {}
     }
   },
-  sockets: {
-    connect: function () {
-      console.log('socket connected')
-    },
-    customEmit: function (val) {
-      console.log('this method was fired by the socket server. eg: io.emit("customEmit", data)')
-    }
+  created () {
+    this.fetchData()
+    // malheureusement, je n'ai pas trouvé d'autre moyen pour observer un event contenant un '.' - @Matthieu Petit
+    // si jamais on en a besoin, je laisse ça ici
+    this.$options.sockets['xsplit'] = function (data) {
+      this.xsplit = data
+    }.bind(this)
   },
   methods: {
+    fetchData: function () {
+      this.$http.get('/api/xsplit/').then(
+        function (response) {
+          this.xsplit = response.body
+        },
+        function (response) {
+          console.error(response)
+          Event.$emit('snackbar.message', 'Error : ' + (response.statusText ? response.statusText : 'no connection'))
+        }
+      )
+    }
   }
 }
 </script>
@@ -39,8 +46,8 @@ export default {
 .xsplit {
 	display: flex;
 	flex-flow: column-reverse;
-  background-image: url('../assets/brick-wall.jpg');
   background-repeat: no-repeat;
+  background-position: center center;
   background-size: cover;
   width: 100vw;
   height: 100vh;
