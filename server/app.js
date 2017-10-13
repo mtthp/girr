@@ -54,6 +54,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
   app.use('/', express.static('public/swagger'))
 })
 .use('/api/programs', require('./src/routes/program.js'))
+.use('/api/xsplit', require('./src/routes/xsplit.js'))
 // error middleware
 .use((err, req, res, next) => {
   logger.error(err);
