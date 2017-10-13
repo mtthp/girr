@@ -15,6 +15,7 @@
             <TopicCard v-for="topic in episode.topics" :key="topic._id" :topic="topic" ></TopicCard>
           </transition-group>
         </draggable>
+        <EmptyState v-else></EmptyState>
         <button class="mdc-fab material-icons fab" aria-label="add" data-mdc-auto-init="MDCRipple" v-on:click="addTopic">
           <span class="mdc-fab__icon">
             add
@@ -31,6 +32,7 @@ import draggable from 'vuedraggable'
 import TopicCard from './TopicCard'
 import TopicDialog from './TopicDialog'
 import Toolbar from './Toolbar'
+import EmptyState from './EmptyState'
 
 export default {
   name: 'episode',
@@ -38,7 +40,8 @@ export default {
     draggable,
     TopicCard,
     TopicDialog,
-    Toolbar
+    Toolbar,
+    EmptyState
   },
   computed: {
     dragOptions () {

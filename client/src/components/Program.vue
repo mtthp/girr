@@ -13,6 +13,7 @@
             <EpisodeCard :episode="episode"></EpisodeCard>
           </router-link>
         </div>
+        <EmptyState v-else></EmptyState>
         <button class="mdc-fab material-icons fab" aria-label="add" data-mdc-auto-init="MDCRipple" v-on:click="addEpisode">
           <span class="mdc-fab__icon">
             add
@@ -29,13 +30,15 @@ import EpisodeCard from './EpisodeCard'
 import EpisodeDialog from './EpisodeDialog'
 // import { menu } from 'material-components-web'
 import Toolbar from './Toolbar'
+import EmptyState from './EmptyState'
 
 export default {
   name: 'program',
   components: {
     EpisodeCard,
     EpisodeDialog,
-    Toolbar
+    Toolbar,
+    EmptyState
   },
   data () {
     return {

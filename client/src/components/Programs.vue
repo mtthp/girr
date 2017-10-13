@@ -17,6 +17,7 @@
           </span>
         </button>
       </div>
+      <EmptyState v-else></EmptyState>
     </main>
   </div>
 </template>
@@ -26,13 +27,15 @@ import Event from '../utils/EventBus.js'
 import ProgramCard from './ProgramCard'
 import ProgramDialog from './ProgramDialog'
 import Toolbar from './Toolbar'
+import EmptyState from './EmptyState'
 
 export default {
   name: 'programs',
   components: {
     ProgramCard,
     ProgramDialog,
-    Toolbar
+    Toolbar,
+    EmptyState
   },
   data () {
     return {

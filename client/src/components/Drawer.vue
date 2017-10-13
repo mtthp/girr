@@ -21,7 +21,7 @@
           </a>
         </nav>
     </nav>
-</aside>
+  </aside>
 </template>
 
 <script>
