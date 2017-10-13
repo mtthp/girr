@@ -38,7 +38,10 @@ export default {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
-  margin-top: 60px;
+}
+
+body {
+  margin: 0;
 }
 </style>
 
@@ -51,7 +54,7 @@ export default {
 <!-- Styling MDC -->
 <style>
 :root {
-    --mdc-theme-primary: #005976; /* customize MDC color */
-    --mdc-theme-secondary: #ff4200;
+  --mdc-theme-primary: #005976; /* customize MDC color */
+  --mdc-theme-secondary: #ff4200;
 }
 </style>
