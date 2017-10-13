@@ -7,10 +7,10 @@
             </div>
         </header>
         <nav id="icon-with-text-demo" class="mdc-temporary-drawer__content mdc-list">
-          <router-link :to="{ name: 'Programs' }" @click.native="dw.open = false" class="mdc-list-item" active-class="mdc-temporary-drawer--selected" data-mdc-auto-init="MDCRipple">
+          <router-link :to="{ name: 'Programs' }" @click.native="toggleDrawer(false)" class="mdc-list-item" active-class="mdc-temporary-drawer--selected" data-mdc-auto-init="MDCRipple">
             <i class="material-icons mdc-list-item__start-detail" aria-hidden="true">event</i>Programs
           </router-link>
-          <router-link :to="{ name: 'Xsplit' }" @click.native="dw.open = false" class="mdc-list-item" active-class="mdc-temporary-drawer--selected" data-mdc-auto-init="MDCRipple">
+          <router-link :to="{ name: 'Xsplit' }" @click.native="toggleDrawer(false)" class="mdc-list-item" active-class="mdc-temporary-drawer--selected" data-mdc-auto-init="MDCRipple">
             <i class="material-icons mdc-list-item__start-detail" aria-hidden="true">tv</i>Xsplit
           </router-link>
           <a class="mdc-list-item" href="/admin.html" data-mdc-auto-init="MDCRipple">
@@ -36,6 +36,11 @@ export default {
   methods: {
     toggleDrawer: function (bool) {
       this.dw.open = bool
+
+      // fix body.mdc-drawer-scroll-lock when changing routes
+      if (!this.dw.open) {
+        document.querySelector('body').classList.remove('mdc-drawer-scroll-lock')
+      }
     }
   }
 }
