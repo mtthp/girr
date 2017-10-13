@@ -2,7 +2,7 @@
   <main class="xsplit" :style="{ 'background-image': xsplit.picture ? 'url(' + require('../assets/brick-wall.jpg') + ')' : null }">
     <div class="title">{{ xsplit.title }}</div>
     <div class="content">
-      <img :src="xsplit.picture">
+      <img :src="xsplit.picture" class="loader">
    	</div>
   </main>
 </template>
@@ -94,5 +94,48 @@ export default {
 .xsplit .content img {
 	width: 100%;
 	object-fit: contain;
+}
+
+.loader {
+  background: transparent;
+  background-repeat: no-repeat;
+  background-position: center center;
+  /* inspired by http://david.ingledow.co.uk/blog/google-material-designs-animated-loading-spinner-svg-and-css/ and https://stackoverflow.com/a/41935729 */
+  background-image: url("\
+  data:image/svg+xml;utf8, \
+    <svg xmlns='http://www.w3.org/2000/svg' version='1.1' width='100px' height='100px' \
+      style='-webkit-transform-origin: center center; \
+            transform-origin: center center; \
+            -webkit-animation: rotate 2s linear infinite; \
+            animation: rotate 2s linear infinite; \
+            position: absolute; \
+            top: 0; \
+            bottom: 0; \
+            left: 0; \
+            right: 0; \
+            margin: auto;'> \
+      <style type='text/css'> \
+        .path { \
+          stroke-dasharray: 1,200; \
+          stroke-dashoffset: 0; \
+          animation: dash 1.5s ease-in-out infinite, color 6s ease-in-out infinite; \
+          stroke-linecap: round; \
+        } \
+        @keyframes rotate { 100% { transform: rotate(360deg); } } \
+        @keyframes dash { \
+          0% { stroke-dasharray: 1,200; stroke-dashoffset: 0; } \
+          50% { stroke-dasharray: 89,200; stroke-dashoffset: -35; } \
+          100% { stroke-dasharray: 89,200; stroke-dashoffset: -124; } \
+        } \
+        %40keyframes color { \
+          100%, 0% { stroke: #d62d20; } \
+          40% { stroke: #0057e7; } \
+          66% { stroke: #008744; } \
+          80%, 90% { stroke: #ffa700; } \
+        } \
+      %3C/style%3E \
+      <circle cx='50' cy='50' r='20' fill='none' stroke-width='2' stroke-miterlimit='10' class='path'/> \
+    </svg>\
+  ");
 }
 </style>
