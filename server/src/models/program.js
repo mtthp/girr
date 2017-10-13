@@ -16,6 +16,7 @@ let programSchema = new mongoose.Schema({
 
 // when a Program is removed, delete all its Episodes
 programSchema.post('remove', function(program) {
+  websockets.sockets.emit('programs.delete', program)
   Episode
     .remove({program: program._id})
     .then(function(result) {
@@ -29,7 +30,15 @@ programSchema.post('remove', function(program) {
   }
 })
 
+programSchema.pre('save', function(next) {
+  this.wasNew = this.isNew
+  next()
+})
+
 programSchema.post('save', function(program) {
+  if (this.wasNew) {
+    websockets.sockets.emit('programs.add', program)
+  }
   websockets.sockets.emit('programs.' + program._id, program)
 })
 

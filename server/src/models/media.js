@@ -22,12 +22,21 @@ mediaSchema.methods.toJSON = function() {
 
 // when a Media is removed, delete its file
 mediaSchema.post('remove', function(media) {
+  websockets.sockets.emit('medias.' + media._id + '.delete', media)
   if (fs.existsSync(path.join(__base, media.path))) {
     fs.unlinkSync(path.join(__base, media.path))
   }
 })
 
+mediaSchema.pre('save', function(next) {
+  this.wasNew = this.isNew
+  next()
+})
+
 mediaSchema.post('save', function(media) {
+  if (this.wasNew) {
+    websockets.sockets.emit('medias.add', media)
+  }
   websockets.sockets.emit('medias.' + media._id, media)
 })
 
