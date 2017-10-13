@@ -1,20 +1,25 @@
 <template>
-  <div class="program">
-    <EpisodeDialog></EpisodeDialog>
-    <div v-if="program && program.episodes.length > 0" class="episodes">
-      <router-link
-        :to="{ name: 'Episode', params: { programId: program._id, episodeId: episode._id }}"
-        v-for="episode in program.episodes"
-        :key="episode._id"
-        class="episode-card">
-        <EpisodeCard :episode="episode"></EpisodeCard>
-      </router-link>
-    </div>
-    <button class="mdc-fab material-icons fab" aria-label="add" data-mdc-auto-init="MDCRipple" v-on:click="addEpisode">
-      <span class="mdc-fab__icon">
-        add
-      </span>
-    </button>
+  <div>
+    <Toolbar :title="program.name"></Toolbar>
+    <main class="mdc-toolbar-fixed-adjust"> 
+      <div class="program">
+        <EpisodeDialog></EpisodeDialog>
+        <div v-if="program.episodes && program.episodes.length > 0" class="episodes">
+          <router-link
+            :to="{ name: 'Episode', params: { programId: program._id, episodeId: episode._id }}"
+            v-for="episode in program.episodes"
+            :key="episode._id"
+            class="episode-card">
+            <EpisodeCard :episode="episode"></EpisodeCard>
+          </router-link>
+        </div>
+        <button class="mdc-fab material-icons fab" aria-label="add" data-mdc-auto-init="MDCRipple" v-on:click="addEpisode">
+          <span class="mdc-fab__icon">
+            add
+          </span>
+        </button>
+      </div>
+    </main>
   </div>
 </template>
 
@@ -23,16 +28,18 @@ import Event from '../utils/EventBus.js'
 import EpisodeCard from './EpisodeCard'
 import EpisodeDialog from './EpisodeDialog'
 // import { menu } from 'material-components-web'
+import Toolbar from './Toolbar'
 
 export default {
   name: 'program',
   components: {
     EpisodeCard,
-    EpisodeDialog
+    EpisodeDialog,
+    Toolbar
   },
   data () {
     return {
-      program: null
+      program: {}
     }
   },
   created () {
@@ -50,7 +57,7 @@ export default {
   },
   methods: {
     fetchData: function () {
-      this.program = null // reset the program
+      this.program = {} // reset the program
       Event.$emit('progressbar.toggle', true)
       this.$http.get('/api/programs/' + this.$route.params.programId).then(
         function (response) {

@@ -1,18 +1,23 @@
 <template>
-  <div v-if="programs.length > 0" class="programs">
-    <ProgramDialog></ProgramDialog>
-    <router-link
-      :to="{ name: 'Program', params: { programId: program._id }}"
-      v-for="program in programs"
-      :key="program._id"
-      class="program-card">
-      <ProgramCard :program="program"></ProgramCard>
-    </router-link>
-    <button class="mdc-fab material-icons fab" aria-label="add" data-mdc-auto-init="MDCRipple" v-on:click="addProgram">
-      <span class="mdc-fab__icon">
-        add
-      </span>
-    </button>
+  <div>
+    <Toolbar :title="programs.length + ' Programs'"></Toolbar>
+    <main class="mdc-toolbar-fixed-adjust">
+      <div v-if="programs.length > 0" class="programs">
+        <ProgramDialog></ProgramDialog>
+        <router-link
+          :to="{ name: 'Program', params: { programId: program._id }}"
+          v-for="program in programs"
+          :key="program._id"
+          class="program-card">
+          <ProgramCard :program="program"></ProgramCard>
+        </router-link>
+        <button class="mdc-fab material-icons fab" aria-label="add" data-mdc-auto-init="MDCRipple" v-on:click="addProgram">
+          <span class="mdc-fab__icon">
+            add
+          </span>
+        </button>
+      </div>
+    </main>
   </div>
 </template>
 
@@ -20,12 +25,14 @@
 import Event from '../utils/EventBus.js'
 import ProgramCard from './ProgramCard'
 import ProgramDialog from './ProgramDialog'
+import Toolbar from './Toolbar'
 
 export default {
   name: 'programs',
   components: {
     ProgramCard,
-    ProgramDialog
+    ProgramDialog,
+    Toolbar
   },
   data () {
     return {

@@ -1,22 +1,18 @@
 <template>
   <div id="app">
-    <Toolbar :title="title"></Toolbar>
-    <main class="mdc-toolbar-fixed-adjust">
-      <router-view></router-view>
-    </main>
+    <router-view></router-view>
     <Snackbar></Snackbar>
   </div>
 </template>
 
 <script>
-import Toolbar from './components/Toolbar'
 import Snackbar from './components/Snackbar'
 import { autoInit } from 'material-components-web'
 import Event from './utils/EventBus.js'
 
 export default {
   name: 'app',
-  components: { Toolbar, Snackbar },
+  components: { Snackbar },
   data () {
     return {
       title: 'GeekInc Remote Regie'

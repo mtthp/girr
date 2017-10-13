@@ -1,23 +1,28 @@
 <template>
-  <div class="episode">
-    <TopicDialog></TopicDialog>
-    <draggable
-      v-if="episode && episode.topics.length > 0"
-      element="ul"
-      v-model="episode.topics"
-      :options="dragOptions"
-      @change="itemMoved"
-      class="topics mdc-list mdc-list--avatar-list mdc-list--two-line">
-      <transition-group name="fade">
-        <TopicCard v-for="topic in episode.topics" :key="topic._id" :topic="topic" ></TopicCard>
-      </transition-group>
-    </draggable>
-    <button class="mdc-fab material-icons fab" aria-label="add" data-mdc-auto-init="MDCRipple" v-on:click="addTopic">
-      <span class="mdc-fab__icon">
-        add
-      </span>
-    </button>
-  </div>  
+  <div>
+    <Toolbar :title="episode.name"></Toolbar>
+    <main class="mdc-toolbar-fixed-adjust">
+      <div class="episode">
+        <TopicDialog></TopicDialog>
+        <draggable
+          v-if="episode.topics && episode.topics.length > 0"
+          element="ul"
+          v-model="episode.topics"
+          :options="dragOptions"
+          @change="itemMoved"
+          class="topics mdc-list mdc-list--avatar-list mdc-list--two-line">
+          <transition-group name="fade">
+            <TopicCard v-for="topic in episode.topics" :key="topic._id" :topic="topic" ></TopicCard>
+          </transition-group>
+        </draggable>
+        <button class="mdc-fab material-icons fab" aria-label="add" data-mdc-auto-init="MDCRipple" v-on:click="addTopic">
+          <span class="mdc-fab__icon">
+            add
+          </span>
+        </button>
+      </div>
+    </main>
+  </div>
 </template>
 
 <script>
@@ -25,13 +30,15 @@ import Event from '../utils/EventBus.js'
 import draggable from 'vuedraggable'
 import TopicCard from './TopicCard'
 import TopicDialog from './TopicDialog'
+import Toolbar from './Toolbar'
 
 export default {
   name: 'episode',
   components: {
     draggable,
     TopicCard,
-    TopicDialog
+    TopicDialog,
+    Toolbar
   },
   computed: {
     dragOptions () {
@@ -62,7 +69,7 @@ export default {
   },
   methods: {
     fetchData: function () {
-      this.episode = null // reset the episode
+      this.episode = {} // reset the episode
       Event.$emit('progressbar.toggle', true)
       this.$http.get('/api/programs/' + this.$route.params.programId + '/episodes/' + this.$route.params.episodeId).then(
         function (response) {
