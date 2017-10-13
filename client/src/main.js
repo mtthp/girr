@@ -4,7 +4,10 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import VueResource from 'vue-resource'
+import VueSocketio from 'vue-socket.io'
+
 Vue.use(VueResource)
+Vue.use(VueSocketio, 'http://localhost:8080')
 
 Vue.config.productionTip = false
 

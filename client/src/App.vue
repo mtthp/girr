@@ -28,6 +28,14 @@ export default {
       this.title = title
       document.title = this.title + ' - GIRR'
     }
+  },
+  sockets: {
+    connect: function () {
+      console.log('Websocket connection established')
+    },
+    disconnect: function () {
+      console.warn('Disconnected from Websocket')
+    }
   }
 }
 </script>
