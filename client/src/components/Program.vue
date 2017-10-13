@@ -37,6 +37,9 @@ export default {
   },
   created () {
     this.fetchData()
+    Event.$on('episode.update', function (episode) {
+      this.updateEpisode(episode)
+    }.bind(this))
     Event.$on('episode.delete', function (episode) {
       this.deleteEpisode(episode)
     }.bind(this))
