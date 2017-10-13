@@ -10,9 +10,9 @@
           <router-link :to="{ name: 'Programs' }" @click.native="dw.open = false" class="mdc-list-item" active-class="mdc-temporary-drawer--selected" data-mdc-auto-init="MDCRipple">
             <i class="material-icons mdc-list-item__start-detail" aria-hidden="true">event</i>Programs
           </router-link>
-          <a class="mdc-list-item" href="/xsplit.html" data-mdc-auto-init="MDCRipple">
+          <router-link :to="{ name: 'Xsplit' }" @click.native="dw.open = false" class="mdc-list-item" active-class="mdc-temporary-drawer--selected" data-mdc-auto-init="MDCRipple">
             <i class="material-icons mdc-list-item__start-detail" aria-hidden="true">tv</i>Xsplit
-          </a>
+          </router-link>
           <a class="mdc-list-item" href="/admin.html" data-mdc-auto-init="MDCRipple">
             <i class="material-icons mdc-list-item__start-detail" aria-hidden="true">build</i>Admin
           </a>

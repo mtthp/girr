@@ -28,6 +28,11 @@ export default new Router({
       name: 'Episode',
       path: '/programs/:programId/episodes/:episodeId',
       component: Episode
+    },
+    {
+      name: 'Xsplit',
+      path: '/xsplit',
+      component: Xsplit
     }
   ]
 })
