@@ -2,8 +2,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
-const server = require('http').Server(app);
-const io = require('socket.io')(server);
+const io = require("./src/websockets")()
 const mongoose = require('mongoose');
 const basicAuth = require('express-basic-auth');
 const config = require("./config/server");
@@ -12,8 +11,6 @@ const logger = require("./src/logger");
 const path = require('path')
 
 mongoose.Promise = Promise;
-
-const websockets = new WebSockets(io);
 
 // to retrieve the absolute project path without doing some magic (ie. '../../..')
 global.__base = __dirname + '/';
@@ -67,8 +64,10 @@ app.use(bodyParser.urlencoded({ extended: false }))
 mongoose.connect(config.mongo_endpoint, { useMongoClient: true })
 mongoose.connection.on('error', console.error.bind(console, 'connection error:'))
 mongoose.connection.on('open', () => {
-  io.listen(app.listen(config.port, () => {
-    console.log(`http://localhost:${config.port}/admin.html`);
-    console.log(`http://localhost:${config.port}/xsplit.html`);
-  }));
+  io.listen(
+    app.listen(config.port, () => {
+      console.log(`http://localhost:${config.port}/admin.html`);
+      console.log(`http://localhost:${config.port}/xsplit.html`);
+    })
+  );
 });
