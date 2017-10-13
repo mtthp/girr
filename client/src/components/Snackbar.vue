@@ -20,7 +20,8 @@ export default {
   methods: {
     showMessage: function (message) {
       this.sb.show({
-        message: message
+        message: message,
+        timeout: 2000
       })
     }
   }
