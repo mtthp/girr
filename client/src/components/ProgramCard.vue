@@ -1,5 +1,5 @@
 <template>
-  <div class="program mdc-card mdc-card--theme-dark " :style="program.thumbnail ? 'background-image: url(\'' + program.thumbnail + '\');' : null">
+  <div class="program mdc-card mdc-card--theme-dark " :style="{ 'background-image': program.thumbnail ? 'url(' + program.thumbnail + ')' : null }">
     <section class="mdc-card__primary mdc-menu-anchor">
       <h1 class="mdc-card__title mdc-card__title--large">{{ program.name }}</h1>
       <h2 class="mdc-card__subtitle">Added {{ program.created | formatDate }}</h2>
@@ -11,7 +11,6 @@
         </ul>
       </div>
     </section>
-      
   </div>
 </template>
 

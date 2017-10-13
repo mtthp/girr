@@ -16,7 +16,11 @@
           <input type="text" id="name" class="mdc-textfield__input" :value="program.name" v-model.lazy="program.name">
           <label for="name" class="mdc-textfield__label" v-bind:class="{ 'mdc-textfield__label--float-above' : program.name }">Name</label>
         </div>
-        <img :src="program.thumbnail"/>
+        <div class="thumbnail" v-on:click="$event.currentTarget.querySelector('input').click()">
+          <i class="material-icons">edit</i>
+          <img :src="program.thumbnail"/>
+          <input type="file" name="file" accept="image/*" class="input-file" v-on:change="fileChange($event.target.name, $event.target.files);" style="display: none;">
+        </div>
       </section>
       <footer class="mdc-dialog__footer">
         <div style="margin-right: auto;">
@@ -55,6 +59,7 @@ export default {
     show: function (program) {
       if (this.program._id !== program._id) {
         this.program = program
+        this.$el.querySelector('input[type=file]').value = null
       }
       this.dialog.show()
     },
@@ -62,7 +67,16 @@ export default {
       this.dialog.close()
     },
     confirm: function () {
-      Event.$emit('program.update', this.program)
+      Event.$emit('program.update', this.program, this.$el.querySelector('input[type=file]').files[0])
+    },
+    fileChange: function (name, files) {
+      if (files.length > 0) {
+        var FR = new FileReader()
+        FR.addEventListener('load', function (e) {
+          this.$el.querySelector('img').src = e.target.result
+        }.bind(this))
+        FR.readAsDataURL(files[0])
+      }
     },
     deleteProgram: function () {
       Event.$emit('program.delete', this.program)
@@ -82,32 +96,44 @@ export default {
   max-height: calc(80vh - 56px - 52px); /* main - header - footer */
 }
 
-button.delete {
-  color: red;
+.mdc-dialog__body .thumbnail {
+  position: relative;
+  cursor: pointer;
 }
 
-.mdc-grid-list {
-  margin: 0 auto;
-}
-
-.mdc-grid-tile {
-  --mdc-grid-list-tile-width: 192px;
-  margin: 2px auto;
-}
-
-.mdc-grid-tile img {
-  object-fit: contain;
-}
-
-.mdc-button__icon {
-  vertical-align: text-bottom;
-}
-
-.mdc-grid-tile__primary i {
+.mdc-dialog__body .thumbnail .material-icons {
   position: absolute;
   top: 0;
   right: 0;
-  z-index: 3;
+  padding: 4px;
+}
+
+.mdc-dialog__body .thumbnail:not(:hover) .material-icons {
+  display: none;
+}
+
+.mdc-dialog__body .thumbnail img {
+  object-fit: contain;
+  min-height: 100px;
+  width: 100%;
+  background: transparent;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-image: url("\
+  data:image/svg+xml;utf8, \
+    <svg xmlns='http://www.w3.org/2000/svg' version='1.1' width='170px' height='50px'> \
+      <rect x='0' y='0' width='200' height='100'\
+        style='fill: transparent; fill-opacity: 0.7; '/> \
+      <text x='85' y='28' \
+        style='text-anchor: middle' font-size='16'> \
+        Thumbnail \
+      </text> \
+    </svg>\
+  ");
+}
+
+button.delete {
+  color: red;
 }
 
 /* fix mdc-textfield--fullwidth padding */

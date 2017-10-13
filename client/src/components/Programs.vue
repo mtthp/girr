@@ -4,7 +4,7 @@
     <router-link
       :to="{ name: 'Program', params: { programId: program._id }}"
       v-for="program in programs"
-      :key="program.name"
+      :key="program._id"
       class="program-card">
       <ProgramCard :program="program"></ProgramCard>
     </router-link>
@@ -34,8 +34,8 @@ export default {
   },
   created () {
     this.getPrograms()
-    Event.$on('program.update', function (program) {
-      this.updateProgram(program)
+    Event.$on('program.update', function (program, file) {
+      this.updateProgram(program, file)
     }.bind(this))
     Event.$on('program.delete', function (program) {
       this.deleteProgram(program)
@@ -76,14 +76,25 @@ export default {
         }
       )
     },
-    updateProgram: function (program) {
+    updateProgram: function (program, file) {
+      var data = program
+      if (typeof file !== 'undefined') {
+        data = new FormData()
+        data.append('thumbnail', file)
+        for (var key in program) {
+          if (!(program[key] instanceof Object)) {
+            data.append(key, program[key])
+          }
+        }
+      }
       Event.$emit('progressbar.toggle', true)
-      this.$http.put('/api/programs/' + program._id, program).then(
+      this.$http.put('/api/programs/' + program._id, data).then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
           for (var i = 0; i < this.programs.length; i++) {
-            if (this.programs[i] === program) {
+            if (this.programs[i]._id === program._id) {
               this.programs[i] = response.body
+              this.$forceUpdate()
               Event.$emit('snackbar.message', 'Program ' + this.programs[i].name + ' updated')
               break
             }
@@ -102,7 +113,7 @@ export default {
         function (response) {
           Event.$emit('progressbar.toggle', false)
           var index = this.programs.indexOf(this.programs.find(function (listProgram) {
-            return listProgram === program
+            return listProgram._id === program._id
           }))
           if (index > -1) {
             this.programs.splice(index, 1)
