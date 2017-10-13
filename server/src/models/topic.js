@@ -1,7 +1,8 @@
 "use strict";
-const mongoose = require('mongoose');
-const Media = require('./media');
-const logger = require('../logger');
+const mongoose = require('mongoose')
+const Media = require('./media')
+const logger = require('../logger')
+const websockets = require('../websockets')()
 
 let topicSchema = new mongoose.Schema({
     title: { type: String, required: true },
@@ -11,7 +12,7 @@ let topicSchema = new mongoose.Schema({
     modified: { type: Date, required: true },
     episode: { type: mongoose.Schema.Types.ObjectId, ref:'Episode' },
     medias: [{ type: mongoose.Schema.Types.ObjectId, ref:'Media' }]
-});
+})
 
 // when a Topic is removed, delete all its Medias
 topicSchema.post('remove', function(topic) {
@@ -25,4 +26,8 @@ topicSchema.post('remove', function(topic) {
     })
 })
 
-module.exports = mongoose.model('Topic', topicSchema);
+topicSchema.post('save', function(topic) {
+  websockets.sockets.emit('topics.' + topic._id, topic)
+})
+
+module.exports = mongoose.model('Topic', topicSchema)

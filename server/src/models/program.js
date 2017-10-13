@@ -4,6 +4,7 @@ const Episode = require('./episode')
 const logger = require('../logger')
 const path = require('path')
 const fs = require('fs')
+const websockets = require('../websockets')()
 
 let programSchema = new mongoose.Schema({
     name: { type: String, required: true},
@@ -28,4 +29,8 @@ programSchema.post('remove', function(program) {
   }
 })
 
-module.exports = mongoose.model('Program', programSchema);
+programSchema.post('save', function(program) {
+  websockets.sockets.emit('programs.' + program._id, program)
+})
+
+module.exports = mongoose.model('Program', programSchema)

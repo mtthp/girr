@@ -1,7 +1,8 @@
 "use strict";
-const mongoose = require('mongoose');
-const Topic = require('./topic');
-const logger = require('../logger');
+const mongoose = require('mongoose')
+const Topic = require('./topic')
+const logger = require('../logger')
+const websockets = require('../websockets')()
 
 let episodeSchema = new mongoose.Schema({
     number: { type: Number, required: true, index: true },
@@ -12,7 +13,7 @@ let episodeSchema = new mongoose.Schema({
     program: { type: mongoose.Schema.Types.ObjectId, ref:'Program', required: true, index: true },
     topics: [{ type: mongoose.Schema.Types.ObjectId, ref:'Topic' }]
 });
-episodeSchema.index({ number: 1, program: 1 }, { unique: true });
+episodeSchema.index({ number: 1, program: 1 }, { unique: true })
 
 // when an Episode is removed, delete all its Topics
 episodeSchema.post('remove', function(episode) {
@@ -26,4 +27,8 @@ episodeSchema.post('remove', function(episode) {
     })
 })
 
-module.exports = mongoose.model('Episode', episodeSchema);
+episodeSchema.post('save', function(episode) {
+  websockets.sockets.emit('episodes.' + episode._id, episode)
+})
+
+module.exports = mongoose.model('Episode', episodeSchema)

@@ -2,6 +2,7 @@
 const mongoose = require('mongoose')
 const fs = require('fs')
 const path  = require('path')
+const websockets = require('../websockets')()
 
 let mediaSchema = new mongoose.Schema({
   label: { type: String },
@@ -26,4 +27,8 @@ mediaSchema.post('remove', function(media) {
   }
 })
 
-module.exports = mongoose.model('Media', mediaSchema);
+mediaSchema.post('save', function(media) {
+  websockets.sockets.emit('medias.' + media._id, media)
+})
+
+module.exports = mongoose.model('Media', mediaSchema)
