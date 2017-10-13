@@ -1,7 +1,9 @@
 "use strict";
-const mongoose = require('mongoose');
-const Episode = require('./episode');
-const logger = require('../logger');
+const mongoose = require('mongoose')
+const Episode = require('./episode')
+const logger = require('../logger')
+const path = require('path')
+const fs = require('fs')
 
 let programSchema = new mongoose.Schema({
     name: { type: String, required: true},
@@ -21,6 +23,9 @@ programSchema.post('remove', function(program) {
     .catch(function(error) {
       logger.error(error)
     })
+  if (fs.existsSync(path.join(__base, program.thumbnail))) {
+    fs.unlinkSync(path.join(__base, program.thumbnail))
+  }
 })
 
 module.exports = mongoose.model('Program', programSchema);

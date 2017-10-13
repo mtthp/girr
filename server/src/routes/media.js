@@ -4,14 +4,15 @@ const router = express.Router();
 const logger = require('../logger');
 const Media = require('../models/media');
 const Topic = require('../models/topic');
-const multer  = require('multer')
+const path = require('path')
+const multer = require('multer')
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, 'data/uploads')
   },
   filename: function (req, file, cb) {
-    cb(null, path.basename(file.originalname, path.extname(file.originalname)) + '-' + Date.now() + path.extname(file.originalname))
+    cb(null, path.basename(file.originalname, path.extname(file.originalname)).replace(/\s/g, "_") + '-' + Date.now() + path.extname(file.originalname))
   }
 })
 const upload = multer({ storage: storage })
@@ -332,8 +333,6 @@ router.route('/:mediaId')
 /* legacy code below this line */
 
 
-
-const path = require('path');
 const request = require('request');
 
 router.get('/', (req, res) => {

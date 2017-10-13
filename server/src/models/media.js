@@ -21,7 +21,9 @@ mediaSchema.methods.toJSON = function() {
 
 // when a Media is removed, delete its file
 mediaSchema.post('remove', function(media) {
-  fs.unlinkSync(path.join(__base, media.path))
+  if (fs.existsSync(path.join(__base, media.path))) {
+    fs.unlinkSync(path.join(__base, media.path))
+  }
 })
 
 module.exports = mongoose.model('Media', mediaSchema);

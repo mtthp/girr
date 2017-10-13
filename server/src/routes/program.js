@@ -1,8 +1,20 @@
 "use strict";
-const express = require('express');
-const router = express.Router();
-const Program = require('../models/program');
-const logger = require('../logger');
+const express = require('express')
+const router = express.Router()
+const logger = require('../logger')
+const Program = require('../models/program')
+const path = require('path')
+const multer = require('multer')
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'data/uploads')
+  },
+  filename: function (req, file, cb) {
+    cb(null, path.basename(file.originalname, path.extname(file.originalname)).replace(/\s/g, "_") + '-' + Date.now() + path.extname(file.originalname))
+  }
+})
+const upload = multer({ storage: storage })
 
 /**
  * @swagger
@@ -25,7 +37,7 @@ router.route('/')
      *   get:
      *     tags:
      *       - Programs
-     *     description: Returns all programs
+     *     description: Return all programs
      *     summary: Get all programs
      *     produces: application/json
      *     responses:
@@ -38,7 +50,7 @@ router.route('/')
      */
     .get((req, res) => {
         Program.find((err, programs) => {
-            res.send(programs);
+            res.send(programs)
         })
     })
     /**
@@ -47,7 +59,7 @@ router.route('/')
      *   post:
      *     tags:
      *       - Programs
-     *     description: Creates a new program
+     *     description: Create a new program
      *     summary: Add a new one
      *     produces: application/json
      *     parameters:
@@ -101,7 +113,7 @@ router.route('/:programId')
    *   get:
    *     tags:
    *       - Programs
-   *     description: Returns a single program
+   *     description: Return a single program
    *     summary: Get a program
    *     produces:
    *       - application/json
@@ -126,9 +138,11 @@ router.route('/:programId')
    *   put:
    *     tags:
    *       - Programs
-   *     description: Updates a single program
+   *     description: Update a single program
    *     summary: Edit a program
    *     produces: application/json
+   *     consumes:
+   *       - multipart/form-data
    *     parameters:
    *       - name: id
    *         description: Program's id
@@ -147,7 +161,13 @@ router.route('/:programId')
    *         schema:
    *           $ref: '#/definitions/Program'
    */
-  .put(function (req, res, next) {
+  .put(upload.single('thumbnail'), function (req, res, next) {
+    if (req.file) {
+      logger.debug('Receive a file : ')
+      logger.debug(req.file)
+      req.body.thumbnail = '/' + req.file.path
+    }
+
     Program
       // use findOneAndUpdate to get the new result (even if we already found the resource in the DB)
       .findByIdAndUpdate(req.program._id, Object.assign(req.body, {modified: Date.now()}), {new : true})
@@ -169,7 +189,7 @@ router.route('/:programId')
    *   delete:
    *     tags:
    *       - Programs
-   *     description: Deletes a single program
+   *     description: Delete a single program
    *     summary: Remove a program
    *     produces:
    *       - application/json
