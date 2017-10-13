@@ -59,12 +59,12 @@ export default {
     // code here executes once the component is rendered
     autoInit(this.$el) // reapply MDCRipple to all mdc-list-item
     Event.$on('topic.medias.add', function deleteTopics (topic, file) {
-      if (topic === this.topic) {
+      if (topic._id === this.topic._id) {
         this.addMedia(file)
       }
     }.bind(this))
     Event.$on('topic.medias.delete', function deleteTopics (topic, media) {
-      if (topic === this.topic) {
+      if (topic._id === this.topic._id) {
         this.deleteMedia(media)
       }
     }.bind(this))
@@ -109,7 +109,7 @@ export default {
         function (response) {
           Event.$emit('progressbar.toggle', false)
           var index = this.topic.medias.indexOf(this.topic.medias.find(function (topicMedia) {
-            return topicMedia === media
+            return topicMedia._id === media._id
           }))
           if (index > -1) this.topic.medias.splice(index, 1)
           Event.$emit('snackbar.message', 'Media ' + media.label + ' deleted')

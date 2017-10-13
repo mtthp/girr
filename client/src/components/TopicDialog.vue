@@ -134,5 +134,6 @@ button.delete {
   top: 0;
   right: 0;
   z-index: 3;
+  cursor: pointer;
 }
 </style>
