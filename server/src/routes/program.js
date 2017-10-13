@@ -168,16 +168,12 @@ router.route('/:programId')
       req.body.thumbnail = '/' + req.file.path
     }
 
-    Program
-      // use findOneAndUpdate to get the new result (even if we already found the resource in the DB)
-      .findByIdAndUpdate(req.program._id, Object.assign(req.body, {modified: Date.now()}), {new : true})
+    req.program = Object.assign(req.program, req.body, {modified: Date.now()})
+    req.program
+      .save()
       .then(function(program) {
-        if (program !== null) {
-          logger.debug("Updated " + program.toString())
-          res.json(program)
-        } else {
-          next({message:"Program " + req.program.name + " wasn't updated", status: 417})
-        }
+        logger.debug("Updated " + program.toString())
+        res.json(program)
       })
       .catch(function(error) {
         next(error)

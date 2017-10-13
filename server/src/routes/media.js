@@ -257,16 +257,12 @@ router.route('/:mediaId')
    *           $ref: '#/definitions/Media'
    */
   .put(function (req, res, next) {
-    Media
-      // use findOneAndUpdate to get the new result (even if we already found the resource in the DB)
-      .findOneAndUpdate({_id: req.media._id, topic: req.topic._id}, Object.assign(req.body, {modified: Date.now()}), {new : true})
+    req.media = Object.assign(req.media, req.body, {modified: Date.now()})
+    req.media
+      .save()
       .then(function(media) {
-        if (media !== null) {
-          logger.debug("Updated " + media.toString())
-          res.json(media)
-        } else {
-          next({message:"Media " + req.media._id + " wasn't updated", status: 417})
-        }
+        logger.debug("Updated " + media.toString())
+        res.json(media)
       })
       .catch(function(error) {
         next(error)

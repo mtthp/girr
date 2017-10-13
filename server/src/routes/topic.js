@@ -225,16 +225,12 @@ router.route('/:topicId')
    *           $ref: '#/definitions/Topic'
    */
   .put(function (req, res, next) {
-    Topic
-      // use findOneAndUpdate to get the new result (even if we already found the resource in the DB)
-      .findOneAndUpdate({_id: req.topic._id, episode: req.episode._id}, Object.assign(req.body, {modified: Date.now()}), {new : true})
+    req.topic = Object.assign(req.topic, req.body, {modified: Date.now()})
+    req.topic
+      .save()
       .then(function(topic) {
-        if (topic !== null) {
-          logger.debug("Updated " + topic.toString())
-          res.json(topic)
-        } else {
-          next({message:"Topic " + req.topic._id + " wasn't updated", status: 417})
-        }
+        logger.debug("Updated " + topic.toString())
+        res.json(topic)
       })
       .catch(function(error) {
         next(error)
