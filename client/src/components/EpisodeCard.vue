@@ -2,7 +2,7 @@
   <div class="episode mdc-card mdc-card--theme-dark " :style="episode.thumbnail ? 'background-image: url(\'' + episode.thumbnail + '\');' : null">
     <section class="mdc-card__primary mdc-menu-anchor">
       <h1 class="mdc-card__title mdc-card__title--large">{{ episode.name }}</h1>
-      <h2 class="mdc-card__subtitle">Added {{ episode.created | formatDate }}</h2>
+      <h2 class="mdc-card__subtitle">Episode #{{ episode.number }} - {{ episode.created | formatDate }}</h2>
       <i class="mdc-icon-toggle material-icons toggle-menu" arial-label="Menu">more_vert</i>
       <div class="mdc-simple-menu mdc-simple-menu--open-from-bottom-right" tabindex="-1">
         <ul class="mdc-simple-menu__items mdc-list" role="menu" aria-hidden="true">
@@ -11,7 +11,6 @@
         </ul>
       </div>
     </section>
-      
   </div>
 </template>
 
