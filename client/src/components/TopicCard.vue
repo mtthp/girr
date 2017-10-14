@@ -1,7 +1,7 @@
 <template>
   <div class="topic" v-bind:class="{ expanded : topic.expanded }">
     <li role="separator" class="mdc-list-divider"></li>
-    <li class="mdc-list-item" data-mdc-auto-init="MDCRipple" v-on:click="toggle()">
+    <li class="mdc-list-item" data-mdc-auto-init="MDCRipple" v-on:click="toggle(! topic.expanded)">
       <img v-if="topic.medias.length > 0" class="mdc-list-item__start-detail" :src="topic.medias[0].uri" width="56" height="56" alt="topic.medias[0].label">
       <span v-else class="mdc-list-item__start-detail" role="presentation">
         <i class="material-icons" aria-hidden="true">comment</i>
@@ -13,7 +13,8 @@
       <span class="mdc-list-item__end-detail">
         <time v-if="topic.playing" datetime="2014-01-28T04:36:00.000Z">00:00</time>
         <i v-if="topic.expanded" class="mdc-icon-toggle material-icons" arial-label="Edit" v-on:click="editTopic">edit</i>
-        <i v-if="topic.playing" class="material-icons" arial-label="Playing">play_arrow</i>
+        <i v-if="topic.started !== null && topic.ended === null" class="mdc-icon-toggle material-icons" arial-label="Stop" v-on:click="stop">stop</i>
+        <i v-else class="mdc-icon-toggle material-icons" arial-label="Playing" v-on:click="start">play_arrow</i>
         <i class="material-icons chevron" arial-label="Chevron">keyboard_arrow_down</i>
       </span>
     </li>
@@ -23,7 +24,7 @@
         <ul class="mdc-grid-list__tiles">
           <li class="mdc-grid-tile" v-for="media in topic.medias">
             <div class="mdc-grid-tile__primary">
-              <img class="mdc-grid-tile__primary-content" :src="media.uri" />
+              <img class="mdc-grid-tile__primary-content" :src="media.uri" v-on:click="showMedia(media)" />
             </div>
             <span class="mdc-grid-tile__secondary">
               <span class="mdc-grid-tile__title">{{ media.label }}</span>
@@ -77,14 +78,24 @@ export default {
     }.bind(this))
   },
   methods: {
-    toggle: function () {
+    toggle: function (bool) {
       Event.$emit('topic.toggle', this.topic)
-      this.topic.expanded = !this.topic.expanded
+      this.topic.expanded = bool
       this.$forceUpdate()
     },
     editTopic: function (event) {
       event.stopImmediatePropagation()
       Event.$emit('topicDialog.show', this.topic)
+    },
+    start: function (event) {
+      event.stopImmediatePropagation()
+      this.toggle(true)
+      Event.$emit('topic.start', this.topic)
+      Event.$emit('xsplit.update', { title: this.topic.title, picture: null })
+    },
+    stop: function (event) {
+      event.stopImmediatePropagation()
+      Event.$emit('topic.stop', this.topic)
     },
     addMedia: function (file) {
       var formData = new FormData()
@@ -123,6 +134,10 @@ export default {
           Event.$emit('snackbar.message', 'Error : ' + (response.statusText ? response.statusText : 'no connection'))
         }
       )
+    },
+    showMedia: function (media) {
+      Event.$emit('topic.start', this.topic)
+      Event.$emit('xsplit.update', { title: this.topic.title, picture: media.uri })
     }
   }
 }
@@ -218,8 +233,8 @@ export default {
   background-color: rgba(0, 0, 0, .26);
 }
 
-.mdc-list-item .mdc-icon-toggle::before,
-.mdc-list-item .mdc-icon-toggle::after {
+.topic .mdc-icon-toggle::before,
+.topic .mdc-icon-toggle::after {
   width: 100%;
   height: 100%;
   top: 0;
@@ -249,5 +264,6 @@ a.mdc-list-item {
 
 .mdc-grid-tile img {
   object-fit: contain;
+  cursor: pointer;
 }
 </style>

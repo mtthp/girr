@@ -65,9 +65,20 @@ export default {
     Event.$on('topic.delete', function (topic) {
       this.deleteTopic(topic)
     }.bind(this))
+    Event.$on('topic.start', function (topic) {
+      this.startTopic(topic)
+    }.bind(this))
+    Event.$on('topic.stop', function (topic) {
+      this.stopTopic(topic)
+      this.updateXsplit({title: this.episode.name, picture: null})
+    }.bind(this))
+    Event.$on('xsplit.update', function (data) {
+      this.updateXsplit(data)
+    }.bind(this))
     Event.$on('topic.updated', function (topic) {
       for (var i = 0; i < this.episode.topics.length; i++) {
         if (this.episode.topics[i]._id === topic._id) {
+          topic.expanded = this.episode.topics[i].expanded // to keep expanded topics, well... expanded
           this.episode.topics[i] = topic
           this.$forceUpdate()
           break
@@ -96,6 +107,15 @@ export default {
           Event.$emit('progressbar.toggle', false)
           this.episode = response.body
           this.$options.sockets['episodes.' + this.episode._id] = function (data) {
+            // to keep expanded topics, well... expanded
+            data.topics.forEach(function (topic) {
+              for (var i = 0; i < this.episode.topics.length; i++) {
+                if (this.episode.topics[i]._id === topic._id) {
+                  topic.expanded = this.episode.topics[i].expanded
+                  break
+                }
+              }
+            }.bind(this))
             this.episode = data
           }.bind(this)
           Event.$emit('title.change', this.episode.name)
@@ -157,6 +177,36 @@ export default {
         }
       )
     },
+    startTopic: function (topic) {
+      Event.$emit('progressbar.toggle', true)
+      this.$http.get('/api/programs/' + this.$route.params.programId + '/episodes/' + this.$route.params.episodeId + '/topics/' + topic._id + '/start').then(
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          Event.$emit('topic.updated', response.body)
+          Event.$emit('snackbar.message', 'Topic ' + response.body.title + ' started')
+        },
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          console.error(response)
+          Event.$emit('snackbar.message', 'Error : ' + (response.statusText ? response.statusText : 'no connection'))
+        }
+      )
+    },
+    stopTopic: function (topic) {
+      Event.$emit('progressbar.toggle', true)
+      this.$http.get('/api/programs/' + this.$route.params.programId + '/episodes/' + this.$route.params.episodeId + '/topics/' + topic._id + '/stop').then(
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          Event.$emit('topic.updated', response.body)
+          Event.$emit('snackbar.message', 'Topic ' + response.body.title + ' stopped')
+        },
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          console.error(response)
+          Event.$emit('snackbar.message', 'Error : ' + (response.statusText ? response.statusText : 'no connection'))
+        }
+      )
+    },
     moveTopic: function (topic, newPosition) {
       Event.$emit('progressbar.toggle', true)
       this.$http.get('/api/programs/' + this.$route.params.programId + '/episodes/' + this.$route.params.episodeId + '/topics/' + topic._id + '/move',
@@ -166,6 +216,19 @@ export default {
           }
         }
       ).then(
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+        },
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          console.error(response)
+          Event.$emit('snackbar.message', 'Error : ' + (response.statusText ? response.statusText : 'no connection'))
+        }
+      )
+    },
+    updateXsplit: function (data) {
+      Event.$emit('progressbar.toggle', true)
+      this.$http.put('/api/xsplit/', data).then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
         },
