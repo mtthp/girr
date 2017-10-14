@@ -61,6 +61,9 @@ export default {
     this.fetchData()
     Event.$on('topic.update', function (topic) {
       this.updateTopic(topic)
+      if (topic.started !== null && topic.ended === null) { // isPlaying
+        this.updateXsplit({ title: topic.title })
+      }
     }.bind(this))
     Event.$on('topic.delete', function (topic) {
       this.deleteTopic(topic)
