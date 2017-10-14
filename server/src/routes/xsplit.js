@@ -81,8 +81,8 @@ router.route('/')
     }
     var xsplit = cache.get('xsplit') !== null ? cache.get('xsplit') : { title: 'Title', picture: null, created: Date.now() }
     var data = {}
-    if (req.body.title) data.title = req.body.title
-    if (req.body.picture) data.picture = req.body.picture
+    if (typeof req.body.title !== "undefined") data.title = req.body.title
+    if (typeof req.body.picture !== "undefined") data.picture = req.body.picture
     cache.put('xsplit', Object.assign(xsplit, data, {modified: Date.now()}))
     websockets.sockets.emit('xsplit', cache.get('xsplit'))
     res.json(cache.get('xsplit'))
