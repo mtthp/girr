@@ -341,16 +341,11 @@ router.get('/:topicId/move', function (req, res, next) {
   if (topicToMove) {
     req.episode.topics.splice(newPosition, 0, topicToMove)
     // et on retourne un Episode parce que j'ai vraiment fait ce endpoint à l'arrache - @Matthieu Petit
-    Episode
-      // use findOneAndUpdate to get the new result (even if we already found the resource in the DB)
-      .findOneAndUpdate({number: req.episode.number, program: req.program._id}, Object.assign(req.episode, {modified: Date.now()}), {new : true})
+    req.episode
+      .save()
       .then(function(episode) {
-        if (episode !== null) {
-          logger.debug("Updated " + episode.toString())
-          res.json(episode)
-        } else {
-          next({message:"Episode " + req.episode.number + " wasn't updated", status: 417})
-        }
+        logger.debug("Updated " + episode.toString())
+        res.json(episode)
       })
       .catch(function(error) {
         next(error)
