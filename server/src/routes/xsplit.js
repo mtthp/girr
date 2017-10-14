@@ -80,7 +80,10 @@ router.route('/')
       }
     }
     var xsplit = cache.get('xsplit') !== null ? cache.get('xsplit') : { title: 'Title', picture: null, created: Date.now() }
-    cache.put('xsplit', Object.assign(xsplit, {title: req.body.title, picture: req.body.picture}, {modified: Date.now()}))
+    var data = {}
+    if (req.body.title) data.title = req.body.title
+    if (req.body.picture) data.picture = req.body.picture
+    cache.put('xsplit', Object.assign(xsplit, data, {modified: Date.now()}))
     websockets.sockets.emit('xsplit', cache.get('xsplit'))
     res.json(cache.get('xsplit'))
   });
