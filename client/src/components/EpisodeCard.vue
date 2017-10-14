@@ -7,7 +7,6 @@
       <div class="mdc-simple-menu mdc-simple-menu--open-from-bottom-right" tabindex="-1">
         <ul class="mdc-simple-menu__items mdc-list" role="menu" aria-hidden="true">
           <li class="mdc-list-item" role="menuitem" tabindex="0" v-on:click="editEpisode($event)">Edit</li>
-          <li class="mdc-list-item" role="menuitem" tabindex="0" v-on:click="deleteEpisode($event)">Delete</li>
         </ul>
       </div>
     </section>
