@@ -1,7 +1,7 @@
 <template>
-  <div class="topic" v-bind:class="{ expanded : topic.expanded }">
+  <div class="topic" v-bind:class="{ expanded : topic.expanded, playing : topic.started !== null && topic.ended === null }">
     <li role="separator" class="mdc-list-divider"></li>
-    <li class="mdc-list-item" data-mdc-auto-init="MDCRipple" v-on:click="toggle(! topic.expanded)">
+    <li class="mdc-list-item" data-mdc-auto-init="MDCRipple" v-on:click="toggle(!topic.expanded)">
       <img v-if="topic.medias.length > 0" class="mdc-list-item__start-detail" :src="topic.medias[0].uri" width="56" height="56" alt="topic.medias[0].label">
       <span v-else class="mdc-list-item__start-detail" role="presentation">
         <i class="material-icons" aria-hidden="true">comment</i>
@@ -11,7 +11,7 @@
         <span class="mdc-list-item__text__secondary">{{ topic.description }}</span>
       </span>
       <span class="mdc-list-item__end-detail">
-        <time v-if="topic.playing" datetime="2014-01-28T04:36:00.000Z">00:00</time>
+        <time v-if="topic.started !== null">{{ timePlayed | formatTime }}</time>
         <i v-if="topic.expanded" class="mdc-icon-toggle material-icons" arial-label="Edit" v-on:click="editTopic">edit</i>
         <i v-if="topic.started !== null && topic.ended === null" class="mdc-icon-toggle material-icons" arial-label="Stop" v-on:click="stop">stop</i>
         <i v-else class="mdc-icon-toggle material-icons" arial-label="Playing" v-on:click="start">play_arrow</i>
@@ -42,11 +42,11 @@ import { autoInit } from 'material-components-web'
 
 export default {
   props: ['topic'],
-  // data () {
-  //   return {
-  //     topic: JSON.parse(JSON.stringify(this.topic))
-  //   }
-  // },
+  data () {
+    return {
+      timePlayed: this.topic.started === null ? 0 : (this.topic.ended !== null ? new Date(this.topic.ended).getTime() : new Date().getTime()) - new Date(this.topic.started).getTime()
+    }
+  },
   created () {
     this.topic.expanded = false
     this.$options.sockets['topics.' + this.topic._id + '.delete'] = function (data) {
@@ -54,6 +54,25 @@ export default {
     }
     this.$options.sockets['topics.' + this.topic._id] = function (data) {
       Event.$emit('topic.updated', data)
+    }
+    if (this.topic.started !== null && this.topic.ended === null) {
+      this.timePlayedHandler = window.setInterval(() => {
+        this.timePlayed = this.topic.started === null ? 0 : (this.topic.ended !== null ? new Date(this.topic.ended).getTime() : new Date().getTime()) - new Date(this.topic.started).getTime()
+      }, 1000)
+    }
+  },
+  watch: {
+    'topic.started' (value) {
+      if (value !== null && this.topic.ended === null) {
+        this.timePlayedHandler = window.setInterval(() => {
+          this.timePlayed = this.topic.started === null ? 0 : (this.topic.ended !== null ? new Date(this.topic.ended).getTime() : new Date().getTime()) - new Date(this.topic.started).getTime()
+        }, 1000)
+      }
+    },
+    'topic.ended' (value) {
+      if (value !== null && this.topic.started !== null) {
+        window.clearInterval(this.timePlayedHandler)
+      }
     }
   },
   mounted () {
@@ -136,7 +155,9 @@ export default {
       )
     },
     showMedia: function (media) {
-      Event.$emit('topic.start', this.topic)
+      if (this.topic.started !== null && this.topic.ended !== null) {
+        Event.$emit('topic.start', this.topic)
+      }
       Event.$emit('xsplit.update', { title: this.topic.title, picture: media.uri })
     }
   }
@@ -172,6 +193,10 @@ export default {
   transform: rotate(-180deg);
 }
 
+.topic time {
+  margin: auto;
+}
+
 .topic .mdc-list-item__start-detail {
   cursor: move; /* fallback: */
   cursor: -webkit-grab; /* Chrome 1-21, Safari 4+ */
@@ -183,10 +208,10 @@ export default {
   object-fit: cover;
 }
 
-.topic.expanded .mdc-list-item__text,
-.topic.expanded .mdc-list-item__start-detail,
-.topic.expanded .mdc-list-item__end-detail,
-.topic.expanded i {
+.topic.playing .mdc-list-item__text,
+.topic.playing .mdc-list-item__start-detail,
+.topic.playing .mdc-list-item__end-detail,
+.topic.playing i {
   color: var(--mdc-theme-secondary,#ff4081);
 }
 
@@ -225,6 +250,7 @@ export default {
   flex-direction: row;
   align-items: flex-end;
 }
+
 .mdc-list-item .mdc-list-item__start-detail {
   display: inline-flex;
   align-items: center;
