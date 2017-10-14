@@ -11,7 +11,7 @@
         <span class="mdc-list-item__text__secondary">{{ topic.description }}</span>
       </span>
       <span class="mdc-list-item__end-detail">
-        <time v-if="topic.started !== null">{{ timePlayed | formatTime }}</time>
+        <time v-if="topic.started">{{ timePlayed | formatTime }}</time>
         <i v-if="topic.expanded" class="mdc-icon-toggle material-icons" arial-label="Edit" v-on:click="editTopic">edit</i>
         <i v-if="topic.started !== null && topic.ended === null" class="mdc-icon-toggle material-icons" arial-label="Stop" v-on:click="stop">stop</i>
         <i v-else class="mdc-icon-toggle material-icons" arial-label="Playing" v-on:click="start">play_arrow</i>
@@ -44,7 +44,7 @@ export default {
   props: ['topic'],
   data () {
     return {
-      timePlayed: this.topic.started === null ? 0 : (this.topic.ended !== null ? new Date(this.topic.ended).getTime() : new Date().getTime()) - new Date(this.topic.started).getTime()
+      timePlayed: !this.topic.started ? 0 : (this.topic.ended ? new Date(this.topic.ended).getTime() : new Date().getTime()) - new Date(this.topic.started).getTime()
     }
   },
   created () {
@@ -57,7 +57,7 @@ export default {
     }
     if (this.topic.started !== null && this.topic.ended === null) {
       this.timePlayedHandler = window.setInterval(() => {
-        this.timePlayed = this.topic.started === null ? 0 : (this.topic.ended !== null ? new Date(this.topic.ended).getTime() : new Date().getTime()) - new Date(this.topic.started).getTime()
+        this.timePlayed = !this.topic.startedl ? 0 : (this.topic.ended ? new Date(this.topic.ended).getTime() : new Date().getTime()) - new Date(this.topic.started).getTime()
       }, 1000)
     }
   },
@@ -65,7 +65,7 @@ export default {
     'topic.started' (value) {
       if (value !== null && this.topic.ended === null) {
         this.timePlayedHandler = window.setInterval(() => {
-          this.timePlayed = this.topic.started === null ? 0 : (this.topic.ended !== null ? new Date(this.topic.ended).getTime() : new Date().getTime()) - new Date(this.topic.started).getTime()
+          this.timePlayed = !this.topic.started ? 0 : (this.topic.ended ? new Date(this.topic.ended).getTime() : new Date().getTime()) - new Date(this.topic.started).getTime()
         }, 1000)
       }
     },
