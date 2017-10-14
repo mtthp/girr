@@ -55,6 +55,7 @@
 <script>
 import Event from '../utils/EventBus.js'
 import { dialog, textfield } from 'material-components-web'
+import assign from 'object-assign'
 
 export default {
   name: 'TopicDialog',
@@ -72,7 +73,7 @@ export default {
   },
   methods: {
     show: function (topic) {
-      this.topic = topic
+      this.topic = assign({}, topic)
       this.$el.querySelector('textarea').value = this.topic.description ? this.topic.description : ''
       this.dialog.show()
     },

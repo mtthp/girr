@@ -40,6 +40,7 @@
 <script>
 import Event from '../utils/EventBus.js'
 import { dialog, textfield } from 'material-components-web'
+import assign from 'object-assign'
 
 export default {
   name: 'EpisodeDialog',
@@ -58,7 +59,7 @@ export default {
   methods: {
     show: function (episode) {
       if (this.episode._id !== episode._id) {
-        this.episode = episode
+        this.episode = assign({}, episode)
       }
       this.dialog.show()
     },

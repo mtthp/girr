@@ -40,6 +40,7 @@
 <script>
 import Event from '../utils/EventBus.js'
 import { dialog, textfield } from 'material-components-web'
+import assign from 'object-assign'
 
 export default {
   name: 'ProgramDialog',
@@ -57,10 +58,8 @@ export default {
   },
   methods: {
     show: function (program) {
-      if (this.program._id !== program._id) {
-        this.program = program
-        this.$el.querySelector('input[type=file]').value = null
-      }
+      this.program = assign({}, program)
+      this.$el.querySelector('input[type=file]').value = null
       this.dialog.show()
     },
     close: function () {
