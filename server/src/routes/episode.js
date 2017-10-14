@@ -127,11 +127,14 @@ router.param('episodeId', function (req, res, next, value, name) {
   Episode
     .findOne({_id: value, program: req.program._id})
     .populate({ 
-       path: 'topics',
-       populate: {
-         path: 'medias',
-         model: 'Media'
-       } 
+      path: 'topics',
+      // options: {
+      //   sort: { position: 1 }
+      // },
+      populate: {
+        path: 'medias',
+        model: 'Media'
+      } 
     })
     .then(function(episode) {
       if (episode !== null) {

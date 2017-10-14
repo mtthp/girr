@@ -283,6 +283,94 @@ router.route('/:topicId')
 
 /**
  * @swagger
+ * /programs/{programId}/episodes/{episodeId}/topics/{topicId}/start:
+ *   get:
+ *     tags:
+ *       - Topic
+ *     description: Start a topic
+ *     summary: Start a topic
+ *     produces: application/json
+ *     parameters:
+ *       - name: programId
+ *         description: Program's id
+ *         in: path
+ *         required: true
+ *         type: uuid
+ *       - name: episodeId
+ *         description: Episode's id
+ *         in: path
+ *         required: true
+ *         type: uuid
+ *       - name: topicId
+ *         description: Topic's id
+ *         in: path
+ *         required: true
+ *         type: uuid
+ *     responses:
+ *       200:
+ *         description: Topic started
+ *         schema:
+ *           $ref: '#/definitions/Topic'
+ */
+router.get('/:topicId/start', function (req, res, next) {
+  req.topic.started = Date.now()
+  req.topic
+      .save()
+      .then(function(topic) {
+        logger.debug("Started " + topic.toString())
+        res.json(topic)
+      })
+      .catch(function(error) {
+        next(error)
+      })
+})
+
+/**
+ * @swagger
+ * /programs/{programId}/episodes/{episodeId}/topics/{topicId}/stop:
+ *   get:
+ *     tags:
+ *       - Topic
+ *     description: Stop a topic
+ *     summary: Stop a topic
+ *     produces: application/json
+ *     parameters:
+ *       - name: programId
+ *         description: Program's id
+ *         in: path
+ *         required: true
+ *         type: uuid
+ *       - name: episodeId
+ *         description: Episode's id
+ *         in: path
+ *         required: true
+ *         type: uuid
+ *       - name: topicId
+ *         description: Topic's id
+ *         in: path
+ *         required: true
+ *         type: uuid
+ *     responses:
+ *       200:
+ *         description: Topic stopped
+ *         schema:
+ *           $ref: '#/definitions/Topic'
+ */
+router.get('/:topicId/stop', function (req, res, next) {
+  req.topic.ended = Date.now()
+  req.topic
+      .save()
+      .then(function(topic) {
+        logger.debug("Started " + topic.toString())
+        res.json(topic)
+      })
+      .catch(function(error) {
+        next(error)
+      })
+})
+
+/**
+ * @swagger
  * /programs/{programId}/episodes/{episodeId}/topics/{topicId}/move:
  *   get:
  *     tags:

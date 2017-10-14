@@ -13,6 +13,7 @@ function stopPlayingTopics (time_value) {
     .find({ ended : null })
     .where('_id').ne(this._id)
     .where('started').ne(null)
+    .populate('medias')
     .then(function(results) { // we end all topics that are playing
       results.forEach(function (topic) {
         topic.ended = Date.now()
