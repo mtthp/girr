@@ -61,8 +61,9 @@ export default {
   height: 100vh;
 }
 
-.title {
-	flex: 1 0 auto; /* sized to content */
+.xsplit .title {
+  align-self: flex-start; /* sized to content */
+  flex: 1 0 auto; /* grow to content */
   margin: 0.5em 1em;
   padding: 0em 0.3em;
   max-width: calc(100% - 400px); /* je ne sais pas quelle taille fait exactement le twitch chat donc j'ai mis 400px à l'arrache */
@@ -74,16 +75,16 @@ export default {
   text-overflow: ellipsis; /* ou au pire clip */
   overflow: hidden;
   box-sizing: border-box;
-  background-color: white; 
+  background-color: white;
 }
 
-.title:not(.hidden) {
+.xsplit .title:not(.hidden) {
   /* en mode apparition, on veut que le texte apparaisse vers la fin de l'animation */
   transition: transform 1s, color 2s ease-in-out;
   transform-origin: left;
 }
 
-.title.hidden {
+.xsplit .title.hidden {
   /* en mode disparition, on veut que le texte disparaisse plus tôt pour éviter l'écrasement */
   transition: transform 1s, color 0.5s ease-in-out;
   transform : scaleX(0);
