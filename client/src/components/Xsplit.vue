@@ -2,7 +2,7 @@
   <main class="xsplit" :style="{ 'background-image': xsplit.picture ? 'url(' + require('../assets/brick-wall.jpg') + ')' : null }">
     <div class="title">{{ xsplit.title }}</div>
     <div class="content">
-      <img :src="xsplit.picture" class="loader">
+      <img :src="xsplit.picture" v-bind:class="{ loading: xsplit.picture }" v-on:load="loaded($event)" v-on:error="failed($event)">
    	</div>
   </main>
 </template>
@@ -36,6 +36,14 @@ export default {
           Event.$emit('snackbar.message', 'Error : ' + (response.statusText ? response.statusText : 'no connection'))
         }
       )
+    },
+    loaded: function (event) {
+      event.target.classList.remove('loading')
+      event.target.classList.remove('failed')
+    },
+    failed: function (event) {
+      event.target.classList.remove('loading')
+      event.target.classList.add('failed')
     }
   }
 }
@@ -54,7 +62,6 @@ export default {
 }
 
 .title {
-	display: inline-block;
 	flex: 1 0 auto; /* sized to content */
   margin: 0.5em 1em;
   padding: 0em 0.3em;
@@ -96,7 +103,7 @@ export default {
 	object-fit: contain;
 }
 
-.loader {
+.loading {
   background: transparent;
   background-repeat: no-repeat;
   background-position: center center;
@@ -137,5 +144,12 @@ export default {
       <circle cx='50' cy='50' r='20' fill='none' stroke-width='2' stroke-miterlimit='10' class='path'/> \
     </svg>\
   ");
+}
+
+.failed {
+  background: transparent;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-image: url('../assets/error.gif');
 }
 </style>
