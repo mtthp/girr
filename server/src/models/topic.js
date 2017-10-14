@@ -4,10 +4,36 @@ const Media = require('./media')
 const logger = require('../logger')
 const websockets = require('../websockets')()
 
+/*
+ * The purpose of this setter is to end all playing topics
+ * because there can be only one to rule them all
+ */
+function stopPlayingTopics (time_value) {
+  this.constructor // get the Model to execute queries
+    .find({ ended : null })
+    .where('_id').ne(this._id)
+    .where('started').ne(null)
+    .then(function(results) { // we end all topics that are playing
+      results.forEach(function (topic) {
+        topic.ended = Date.now()
+        topic.save()
+      })
+    })
+    .catch(function(error) {
+      logger.error(error)
+    })
+
+  this.ended = null
+
+  return time_value // hmm, we can also return Date.now() instead ?
+}
+
 let topicSchema = new mongoose.Schema({
     title: { type: String, required: true },
     description: String,
     position: { type: Number },
+    started: { type: Date, set: stopPlayingTopics },
+    ended: { type: Date },
     created: { type: Date, required: true },
     modified: { type: Date, required: true },
     episode: { type: mongoose.Schema.Types.ObjectId, ref:'Episode' },
