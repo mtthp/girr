@@ -22,7 +22,7 @@
       {{ topic.description ? topic.description : 'Empty in here' }}
       <div class="mdc-grid-list">
         <ul class="mdc-grid-list__tiles">
-          <MediaTile v-for="media in topic.medias" :media="media" :topicId="topic._id"></MediaTile>
+          <MediaTile v-for="media in topic.medias" :key="media._id" :media="media" :topicId="topic._id"></MediaTile>
         </ul>
       </div>
     </div>
