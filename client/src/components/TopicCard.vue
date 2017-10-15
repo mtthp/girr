@@ -53,6 +53,11 @@ export default {
     this.$options.sockets['topics.' + this.topic._id] = function (data) {
       Event.$emit('topic.updated', data)
     }
+    this.$options.sockets['medias.add'] = function (media) {
+      if (media.topic === this.topic._id) {
+        Event.$emit('topic.' + this.topic._id + '.media.added', media)
+      }
+    }.bind(this)
     if (this.topic.started !== null && this.topic.ended === null) {
       this.timePlayedHandler = window.setInterval(() => {
         this.timePlayed = !this.topic.started ? 0 : (this.topic.ended ? new Date(this.topic.ended).getTime() : new Date().getTime()) - new Date(this.topic.started).getTime()
@@ -77,14 +82,25 @@ export default {
   mounted () {
     // code here executes once the component is rendered
     autoInit(this.$el) // reapply MDCRipple to all mdc-list-item
-    Event.$on('topic.medias.add', function deleteTopics (topic, file) {
-      if (topic._id === this.topic._id) {
-        this.addMedia(file)
-      }
-    }.bind(this))
-    Event.$on('topic.medias.delete', function deleteTopics (topic, media) {
-      if (topic._id === this.topic._id) {
-        this.deleteMedia(media)
+    Event.$on('topic.update', function (dialogTopic, dialogMedias) {
+      if (dialogTopic._id === this.topic._id) {
+        // parcours des Topic's medias pour savoir lesquels sont à supprimer
+        topicMediasLoop:
+        for (var i = 0; i < this.medias.length; i++) {
+          for (var j = 0; j < dialogMedias.length; j++) {
+            if (this.medias[i]._id === dialogMedias[j]._id) {
+              continue topicMediasLoop
+            }
+          }
+          this.deleteMedia(this.medias[i])
+        }
+
+        // parcours des Dialog's medias pour savoir lesquels sont à ajouter
+        dialogMedias.forEach(function (dialogMedia) {
+          if (!dialogMedia._id && dialogMedia.file) {
+            this.addMedia(dialogMedia.file)
+          }
+        }.bind(this))
       }
     }.bind(this))
     // remove this to expand multiple topics at the same time
@@ -93,6 +109,12 @@ export default {
         this.topic.expanded = false
         this.$forceUpdate()
       }
+    }.bind(this))
+    Event.$on('topic.' + this.topic._id + '.media.added', function (media) {
+      var index = this.medias.indexOf(this.medias.find(function (topicMedia) {
+        return topicMedia._id === media._id
+      }))
+      if (index < 0) this.medias.push(media)
     }.bind(this))
     Event.$on('topic.' + this.topic._id + '.media.updated', function (media) {
       for (var i = 0; i < this.medias.length; i++) {
@@ -132,7 +154,7 @@ export default {
     },
     editTopic: function (event) {
       event.stopImmediatePropagation()
-      Event.$emit('topicDialog.show', this.topic)
+      Event.$emit('topicDialog.show', this.topic, this.medias)
     },
     start: function (event) {
       event.stopImmediatePropagation()
@@ -152,7 +174,8 @@ export default {
       this.$http.post('/api/programs/' + this.$route.params.programId + '/episodes/' + this.$route.params.episodeId + '/topics/' + this.topic._id + '/medias/', formData).then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
-          Event.$emit('topic.' + this.topic._id + '.media.updated', response.body)
+          // Event.$emit('topic.' + this.topic._id + '.media.updated', response.body)
+          Event.$emit('topic.' + this.topic._id + '.media.added', response.body)
           Event.$emit('snackbar.message', 'Added ' + response.body.label)
         }.bind(this),
         function (response) {

@@ -65,7 +65,7 @@ export default {
         Event.$emit('topic.added', topic)
       }
     }.bind(this)
-    Event.$on('topic.update', function (topic) {
+    Event.$on('topic.update', function (topic, medias) {
       this.updateTopic(topic)
     }.bind(this))
     Event.$on('topic.delete', function (topic) {

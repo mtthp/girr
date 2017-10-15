@@ -20,7 +20,7 @@
         </div>
         <div class="mdc-grid-list">
           <ul class="mdc-grid-list__tiles">
-            <li class="mdc-grid-tile" v-for="media in topic.medias">
+            <li class="mdc-grid-tile" v-for="media in medias">
               <div class="mdc-grid-tile__primary">
                 <img class="mdc-grid-tile__primary-content" :src="media.uri" />
                 <i class="material-icons" v-on:click="deleteMedia(media)">cancel</i>
@@ -62,7 +62,8 @@ export default {
   data () {
     return {
       dialog: null,
-      topic: {}
+      topic: {},
+      medias: []
     }
   },
   mounted () {
@@ -72,8 +73,9 @@ export default {
     Event.$on('topicDialog.close', this.close)
   },
   methods: {
-    show: function (topic) {
+    show: function (topic, medias) {
       this.topic = assign({}, topic)
+      this.medias = assign([], medias)
       this.$el.querySelector('textarea').value = this.topic.description ? this.topic.description : ''
       this.dialog.show()
     },
@@ -81,7 +83,7 @@ export default {
       this.dialog.close()
     },
     confirm: function () {
-      Event.$emit('topic.update', this.topic)
+      Event.$emit('topic.update', this.topic, this.medias)
     },
     deleteTopic: function () {
       Event.$emit('topic.delete', this.topic)
@@ -89,11 +91,20 @@ export default {
     },
     fileChange: function (name, files) {
       if (files.length > 0) {
-        Event.$emit('topic.medias.add', this.topic, files[0])
+        var FR = new FileReader()
+        FR.addEventListener('load', function (e) {
+          this.medias.push({uri: e.target.result, label: files[0].name, file: files[0]})
+          console.log(this.medias)
+        }.bind(this))
+        FR.readAsDataURL(files[0])
       }
     },
     deleteMedia: function (media) {
-      Event.$emit('topic.medias.delete', this.topic, media)
+      var index = this.medias.indexOf(this.medias.find(function (dialogMedia) {
+        return dialogMedia === media
+      }))
+      if (index > -1) this.medias.splice(index, 1)
+      // Event.$emit('topic.medias.delete', this.topic, media)
     }
   }
 }
