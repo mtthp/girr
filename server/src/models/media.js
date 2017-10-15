@@ -3,6 +3,7 @@ const mongoose = require('mongoose')
 const fs = require('fs')
 const path  = require('path')
 const websockets = require('../websockets')()
+const cache = require('memory-cache')
 
 /*
  * The purpose of this setter is to end all playing medias
@@ -24,6 +25,11 @@ function stopPlayingMedias (time_value) {
     })
 
   this.ended = null
+
+  var xsplit = cache.get('xsplit') !== null ? cache.get('xsplit') : { title: null, picture: null, created: Date.now(), modified: Date.now() }
+  xsplit = Object.assign(xsplit, { picture: this.uri, modified: Date.now() })
+  cache.put('xsplit', xsplit)
+  websockets.sockets.emit('xsplit', xsplit)
 
   return time_value // hmm, we can also return Date.now() instead ?
 }

@@ -38,14 +38,10 @@ router.route('/')
     if (cache.get('xsplit') !== null) {
       res.json(cache.get('xsplit'))
     } else {
-      cache.put('xsplit', {
-        title: null,
-        picture: null,
-        created: Date.now(),
-        modified: Date.now()
-      })
-      websockets.sockets.emit('xsplit', cache.get('xsplit')) // on avertit quand même le reste du monde
-      res.json(cache.get('xsplit'))
+      var xsplit = cache.get('xsplit') !== null ? cache.get('xsplit') : { title: null, picture: null, created: Date.now(), modified: Date.now() }
+      cache.put('xsplit', xsplit)
+      websockets.sockets.emit('xsplit', xsplit) // on avertit quand même le reste du monde
+      res.json(xsplit)
     }
   })
   /**
@@ -71,15 +67,7 @@ router.route('/')
    *           $ref: '#/definitions/Xsplit'
    */
   .put(function (req, res, next) {
-    if (cache.get('xsplit') === null) {
-      var xsplit = {
-        title: 'Default',
-        picture: null,
-        created: Date.now(),
-        modified: Date.now()
-      }
-    }
-    var xsplit = cache.get('xsplit') !== null ? cache.get('xsplit') : { title: 'Title', picture: null, created: Date.now() }
+    var xsplit = cache.get('xsplit') !== null ? cache.get('xsplit') : { title: null, picture: null, created: Date.now() }
     var data = {}
     if (typeof req.body.title !== "undefined") data.title = req.body.title
     if (typeof req.body.picture !== "undefined") data.picture = req.body.picture
