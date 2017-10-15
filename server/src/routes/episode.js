@@ -84,21 +84,23 @@ router.route('/')
    *         schema:
    *           $ref: '#/definitions/Episode'
    */
-  .post(function (req, res, next) {
+  .post(async function (req, res, next) {
     "use strict";
     let episode = new Episode(Object.assign(req.body, {created: Date.now(), modified: Date.now()}))
     episode.program = req.program._id
     
     // provide a number if the user didn't specified one
     if (typeof episode.number === "undefined") {
-        // Max episode number + 1 - inspired by https://stackoverflow.com/a/4020842
-        var maxEpisodeNumber = req.program.episodes.length > 0 ? Math.max.apply(
-            Math,
-            req.program.episodes.map(function(e){
-                return e.number;
-            })
-        ) : 0;
-        episode.number = 1 + maxEpisodeNumber;
+      var programEpisodes = await Episode.find({ program: req.program._id }).exec()
+
+      // Max episode number + 1 - inspired by https://stackoverflow.com/a/4020842
+      var maxEpisodeNumber = programEpisodes.length > 0 ? Math.max.apply(
+          Math,
+          programEpisodes.map(function(e){
+              return e.number
+          })
+      ) : 0
+      episode.number = 1 + maxEpisodeNumber
     }
 
     // provide a name if the user didn't specified one

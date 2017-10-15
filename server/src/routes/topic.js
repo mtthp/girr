@@ -102,7 +102,7 @@ router.route('/')
    *         schema:
    *           $ref: '#/definitions/Topic'
    */
-  .post(function (req, res, next) {
+  .post(async function (req, res, next) {
     delete req.body.started
     delete req.body.ended
 
@@ -116,10 +116,12 @@ router.route('/')
 
     // provide a position if the user didn't specified one
     if (typeof topic.position === "undefined") {
+        var episodeTopics = await Topic.find({ episode: req.episode._id }).exec()
+
         // Max topic position + 1 - inspired by https://stackoverflow.com/a/4020842
-        var maxTopicNumber = req.episode.topics.length > 0 ? Math.max.apply(
+        var maxTopicNumber = episodeTopics.length > 0 ? Math.max.apply(
             Math,
-            req.episode.topics.map(function(t){
+            episodeTopics.map(function(t){
                 return t.position;
             })
         ) : 0;
