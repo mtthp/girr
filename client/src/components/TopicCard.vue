@@ -2,7 +2,7 @@
   <div class="topic" v-bind:class="{ expanded : topic.expanded, playing : topic.started !== null && topic.ended === null }">
     <li role="separator" class="mdc-list-divider"></li>
     <li class="mdc-list-item" data-mdc-auto-init="MDCRipple" v-on:click="toggle(!topic.expanded)">
-      <img v-if="topic.medias.length > 0" class="mdc-list-item__start-detail" :src="topic.medias[0].uri" width="56" height="56" alt="topic.medias[0].label">
+      <img v-if="medias.length > 0" class="mdc-list-item__start-detail" :src="medias[0].uri" width="56" height="56" alt="medias[0].label">
       <span v-else class="mdc-list-item__start-detail" role="presentation">
         <i class="material-icons" aria-hidden="true">comment</i>
       </span>
@@ -22,7 +22,7 @@
       {{ topic.description ? topic.description : 'Empty in here' }}
       <div class="mdc-grid-list">
         <ul class="mdc-grid-list__tiles">
-          <MediaTile v-for="media in topic.medias" :key="media._id" :media="media" :topicId="topic._id"></MediaTile>
+          <MediaTile v-for="media in medias" :key="media._id" :media="media" :topicId="topic._id"></MediaTile>
         </ul>
       </div>
     </div>
@@ -38,7 +38,8 @@ export default {
   props: ['topic'],
   data () {
     return {
-      timePlayed: !this.topic.started ? 0 : (this.topic.ended ? new Date(this.topic.ended).getTime() : new Date().getTime()) - new Date(this.topic.started).getTime()
+      timePlayed: !this.topic.started ? 0 : (this.topic.ended ? new Date(this.topic.ended).getTime() : new Date().getTime()) - new Date(this.topic.started).getTime(),
+      medias: []
     }
   },
   components: {
@@ -57,6 +58,7 @@ export default {
         this.timePlayed = !this.topic.started ? 0 : (this.topic.ended ? new Date(this.topic.ended).getTime() : new Date().getTime()) - new Date(this.topic.started).getTime()
       }, 1000)
     }
+    this.fetchMedias()
   },
   watch: {
     'topic.started' (value) {
@@ -93,22 +95,36 @@ export default {
       }
     }.bind(this))
     Event.$on('topic.' + this.topic._id + '.media.updated', function (media) {
-      for (var i = 0; i < this.topic.medias.length; i++) {
-        if (this.topic.medias[i]._id === media._id) {
-          this.topic.medias[i] = media
+      for (var i = 0; i < this.medias.length; i++) {
+        if (this.medias[i]._id === media._id) {
+          this.medias[i] = media
           this.$forceUpdate()
           break
         }
       }
     }.bind(this))
     Event.$on('topic.' + this.topic._id + '.media.deleted', function (media) {
-      var index = this.topic.medias.indexOf(this.topic.medias.find(function (topicMedia) {
+      var index = this.medias.indexOf(this.medias.find(function (topicMedia) {
         return topicMedia._id === media._id
       }))
-      if (index > -1) this.topic.medias.splice(index, 1)
+      if (index > -1) this.medias.splice(index, 1)
     }.bind(this))
   },
   methods: {
+    fetchMedias: function () {
+      Event.$emit('progressbar.toggle', true)
+      this.$http.get('/api/programs/' + this.$route.params.programId + '/episodes/' + this.$route.params.episodeId + '/topics/' + this.topic._id + '/medias').then(
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          this.medias = response.body
+        },
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          console.error(response)
+          Event.$emit('snackbar.message', 'Error : ' + (response.statusText ? response.statusText : 'no connection'))
+        }
+      )
+    },
     toggle: function (bool) {
       Event.$emit('topic.toggle', this.topic)
       this.topic.expanded = bool

@@ -4,10 +4,10 @@
     <main class="mdc-toolbar-fixed-adjust"> 
       <div class="program">
         <EpisodeDialog></EpisodeDialog>
-        <div v-if="program.episodes && program.episodes.length > 0" class="episodes">
+        <div v-if="episodes && episodes.length > 0" class="episodes">
           <router-link
             :to="{ name: 'Episode', params: { programId: program._id, episodeId: episode._id }}"
-            v-for="episode in program.episodes"
+            v-for="episode in episodes"
             :key="episode._id"
             class="episode-card">
             <EpisodeCard :episode="episode"></EpisodeCard>
@@ -42,7 +42,8 @@ export default {
   },
   data () {
     return {
-      program: {}
+      program: {},
+      episodes: []
     }
   },
   created () {
@@ -86,7 +87,22 @@ export default {
           this.$options.sockets['programs.' + this.program._id] = function (data) {
             this.program = data
           }.bind(this)
+          this.fetchEpisodes()
           Event.$emit('title.change', this.program.name)
+        },
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          console.error(response)
+          Event.$emit('snackbar.message', 'Error : ' + (response.statusText ? response.statusText : 'no connection'))
+        }
+      )
+    },
+    fetchEpisodes: function () {
+      Event.$emit('progressbar.toggle', true)
+      this.$http.get('/api/programs/' + this.$route.params.programId + '/episodes').then(
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          this.episodes = response.body
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
@@ -100,11 +116,11 @@ export default {
       this.$http.post('/api/programs/' + this.$route.params.programId + '/episodes/').then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
-          var index = this.program.episodes.indexOf(this.program.episodes.find(function (programEpisode) {
+          var index = this.episodes.indexOf(this.episodes.find(function (programEpisode) {
             return programEpisode._id === response.body._id
           }))
           if (index < 0) {
-            this.program.episodes.push(response.body)
+            this.episodes.push(response.body)
           }
           Event.$emit('snackbar.message', 'Added a new episode')
         },

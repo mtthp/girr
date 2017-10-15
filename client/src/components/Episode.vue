@@ -5,14 +5,14 @@
       <div class="episode">
         <TopicDialog></TopicDialog>
         <draggable
-          v-if="episode.topics && episode.topics.length > 0"
+          v-if="topics && topics.length > 0"
           element="ul"
           v-model="episode.topics"
           :options="dragOptions"
           @change="itemMoved"
           class="topics mdc-list mdc-list--avatar-list mdc-list--two-line">
           <transition-group name="fade">
-            <TopicCard v-for="topic in episode.topics" :key="topic._id" :topic="topic" ></TopicCard>
+            <TopicCard v-for="topic in topics" :key="topic._id" :topic="topic" ></TopicCard>
           </transition-group>
         </draggable>
         <EmptyState v-else></EmptyState>
@@ -54,7 +54,8 @@ export default {
   },
   data () {
     return {
-      episode: {}
+      episode: {},
+      topics: []
     }
   },
   created () {
@@ -73,21 +74,21 @@ export default {
       this.updateXsplit({title: this.episode.name, picture: null})
     }.bind(this))
     Event.$on('topic.updated', function (topic) {
-      for (var i = 0; i < this.episode.topics.length; i++) {
-        if (this.episode.topics[i]._id === topic._id) {
-          topic.expanded = this.episode.topics[i].expanded // to keep expanded topics, well... expanded
-          this.episode.topics[i] = topic
+      for (var i = 0; i < this.topics.length; i++) {
+        if (this.topics[i]._id === topic._id) {
+          topic.expanded = this.topics[i].expanded // to keep expanded topics, well... expanded
+          this.topics[i] = topic
           this.$forceUpdate()
           break
         }
       }
     }.bind(this))
     Event.$on('topic.deleted', function (topic) {
-      var index = this.episode.topics.indexOf(this.episode.topics.find(function (episodeTopic) {
+      var index = this.topics.indexOf(this.topics.find(function (episodeTopic) {
         return episodeTopic._id === topic._id
       }))
       if (index > -1) {
-        this.episode.topics.splice(index, 1)
+        this.topics.splice(index, 1)
       }
     }.bind(this))
   },
@@ -104,18 +105,23 @@ export default {
           Event.$emit('progressbar.toggle', false)
           this.episode = response.body
           this.$options.sockets['episodes.' + this.episode._id] = function (data) {
-            // to keep expanded topics, well... expanded
-            data.topics.forEach(function (topic) {
-              for (var i = 0; i < this.episode.topics.length; i++) {
-                if (this.episode.topics[i]._id === topic._id) {
-                  topic.expanded = this.episode.topics[i].expanded
-                  break
-                }
-              }
-            }.bind(this))
             this.episode = data
           }.bind(this)
-          Event.$emit('title.change', this.episode.name)
+          this.fetchTopics()
+        },
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          console.error(response)
+          Event.$emit('snackbar.message', 'Error : ' + (response.statusText ? response.statusText : 'no connection'))
+        }
+      )
+    },
+    fetchTopics: function () {
+      Event.$emit('progressbar.toggle', true)
+      this.$http.get('/api/programs/' + this.$route.params.programId + '/episodes/' + this.$route.params.episodeId + '/topics').then(
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          this.topics = response.body
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
@@ -129,11 +135,11 @@ export default {
       this.$http.post('/api/programs/' + this.$route.params.programId + '/episodes/' + this.$route.params.episodeId + '/topics/').then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
-          var index = this.episode.topics.indexOf(this.episode.topics.find(function (episodeTopic) {
+          var index = this.topics.indexOf(this.topics.find(function (episodeTopic) {
             return episodeTopic._id === response.body._id
           }))
           if (index < 0) {
-            this.episode.topics.push(response.body)
+            this.topics.push(response.body)
           }
           Event.$emit('snackbar.message', 'Added a new topic')
         },

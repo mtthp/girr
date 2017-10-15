@@ -30,7 +30,6 @@ export default {
         function (response) {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('topic.' + this.topicId + '.media.updated', response.body)
-          Event.$emit('xsplit.update', { picture: media.uri })
           Event.$emit('snackbar.message', 'Media ' + response.body.label + ' started')
         }.bind(this),
         function (response) {
