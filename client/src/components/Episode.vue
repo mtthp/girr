@@ -260,6 +260,12 @@ export default {
   border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
+@media (max-width: 1280px) {
+  .topics {
+    padding-bottom: 72px
+  }
+}
+
 .fab {
   position: fixed;
   bottom: 1rem;
