@@ -25,7 +25,7 @@ programSchema.post('remove', function(program) {
     .catch(function(error) {
       logger.error(error)
     })
-  if (fs.existsSync(path.join(__base, program.thumbnail))) {
+  if (program.thumbnail && fs.existsSync(path.join(__base, program.thumbnail))) {
     fs.unlinkSync(path.join(__base, program.thumbnail))
   }
 })
