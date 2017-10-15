@@ -66,7 +66,7 @@ export default {
   flex: 1 0 auto; /* grow to content */
   margin: 0.5em 1em;
   padding: 0em 0.3em;
-  max-width: calc(100% - 400px); /* je ne sais pas quelle taille fait exactement le twitch chat donc j'ai mis 400px à l'arrache */
+  max-width: calc(100% - 2em - 400px); /* je ne sais pas quelle taille fait exactement le twitch chat donc j'ai mis 400px à l'arrache */
   font-family: 'Oswald', sans-serif;
   font-weight: 400;
   font-size: 52px;
@@ -76,6 +76,20 @@ export default {
   overflow: hidden;
   box-sizing: border-box;
   background-color: white;
+}
+
+@media (min-width: 481px) and (max-width: 840px) {
+   .xsplit .title {
+    margin: 0.5 0.5em;
+    max-width: calc(100% - 1em);
+  }
+}
+
+@media (max-width: 480px) {
+   .xsplit .title {
+    margin: 0;
+    max-width: calc(100%);
+  }
 }
 
 .xsplit .title:not(.hidden) {
