@@ -29,6 +29,12 @@ const upload = multer({ storage: storage })
  *         type: string
  *         description: Path to the media file
  *         required: true
+ *       started:
+ *         type: date
+ *         description: time and date when the Media has started
+ *       ended:
+ *         type: date
+ *         description: time and date when the Media has ended
  */
 
 router.route('/')
@@ -318,6 +324,103 @@ router.route('/:mediaId')
       })
   })
 
+/**
+ * @swagger
+ * /programs/{programId}/episodes/{episodeId}/topics/{topicId}/medias/{mediaId}/start:
+ *   get:
+ *     tags:
+ *       - Media
+ *     description: Start playing media
+ *     summary: Start a media
+ *     produces: application/json
+ *     parameters:
+ *       - name: programId
+ *         description: Program's id
+ *         in: path
+ *         required: true
+ *         type: uuid
+ *       - name: episodeId
+ *         description: Episode's id
+ *         in: path
+ *         required: true
+ *         type: uuid
+ *       - name: topicId
+ *         description: Topic's id
+ *         in: path
+ *         required: true
+ *         type: uuid
+ *       - name: mediaId
+ *         description: Media's id
+ *         in: path
+ *         required: true
+ *         type: uuid
+ *     responses:
+ *       200:
+ *         description: Media started
+ *         schema:
+ *           $ref: '#/definitions/Media'
+ */
+router.get('/:mediaId/start', function (req, res, next) {
+  req.media.started = Date.now()
+  req.media
+      .save()
+      .then(function(media) {
+        logger.debug("Started " + media.toString())
+        res.json(media)
+      })
+      .catch(function(error) {
+        next(error)
+      })
+})
+
+/**
+ * @swagger
+ * /programs/{programId}/episodes/{episodeId}/topics/{topicId}/medias/{mediaId}/stop:
+ *   get:
+ *     tags:
+ *       - Media
+ *     description: Stop playing media
+ *     summary: Stop a media
+ *     produces: application/json
+ *     parameters:
+ *       - name: programId
+ *         description: Program's id
+ *         in: path
+ *         required: true
+ *         type: uuid
+ *       - name: episodeId
+ *         description: Episode's id
+ *         in: path
+ *         required: true
+ *         type: uuid
+ *       - name: topicId
+ *         description: Topic's id
+ *         in: path
+ *         required: true
+ *         type: uuid
+ *       - name: mediaId
+ *         description: Media's id
+ *         in: path
+ *         required: true
+ *         type: uuid
+ *     responses:
+ *       200:
+ *         description: Media stooped
+ *         schema:
+ *           $ref: '#/definitions/Media'
+ */
+router.get('/:mediaId/stop', function (req, res, next) {
+  req.media.ended = Date.now()
+  req.media
+      .save()
+      .then(function(media) {
+        logger.debug("Started " + media.toString())
+        res.json(media)
+      })
+      .catch(function(error) {
+        next(error)
+      })
+})
 
 
 

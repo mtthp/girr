@@ -4,11 +4,37 @@ const fs = require('fs')
 const path  = require('path')
 const websockets = require('../websockets')()
 
+/*
+ * The purpose of this setter is to end all playing medias
+ * because there can be only one to rule them all
+ */
+function stopPlayingMedias (time_value) {
+  this.constructor // get the Model to execute queries
+    .find({ ended : null })
+    .where('_id').ne(this._id)
+    .where('started').ne(null)
+    .then(function(results) { // we end all medias that are playing
+      results.forEach(function (media) {
+        media.ended = Date.now()
+        media.save()
+      })
+    })
+    .catch(function(error) {
+      logger.error(error)
+    })
+
+  this.ended = null
+
+  return time_value // hmm, we can also return Date.now() instead ?
+}
+
 let mediaSchema = new mongoose.Schema({
   label: { type: String },
   uri: { type: String, required: true},
   mimeType: { type: String, required: true},
   path: { type: String }, // in the case of a local file
+  started: { type: Date, set: stopPlayingMedias },
+  ended: { type: Date },
   created: { type: Date, required: true },
   modified: { type: Date, required: true },
   topic: { type: mongoose.Schema.Types.ObjectId, ref:'Topic', required: true },

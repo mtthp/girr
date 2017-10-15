@@ -21,6 +21,12 @@ const Episode = require('../models/episode');
  *         type: integer
  *         description: current position, because it can moved
  *         required: true
+ *       started:
+ *         type: date
+ *         description: time and date when the Topic has started
+ *       ended:
+ *         type: date
+ *         description: time and date when the Topic has ended
  */
 
 router.route('/')
