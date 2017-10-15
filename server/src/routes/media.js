@@ -371,6 +371,26 @@ router.get('/:mediaId/start', function (req, res, next) {
       .catch(function(error) {
         next(error)
       })
+
+  // we start the parent Topic if it isn't already
+  Topic
+    .find({ _id: req.media.topic })
+    .where({
+      $or : [
+        { started: null, ended: null},
+        { started: {"$ne": null}, ended: {"$ne": null}}
+      ]
+    })
+    .populate('medias')
+    .then(function (results) {
+      results.forEach(function (topic) {
+        topic.started = Date.now()
+        topic.save()
+      })
+    })
+    .catch(function(error) {
+      logger.error(error)
+    })
 })
 
 /**

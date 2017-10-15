@@ -52,15 +52,6 @@ export default {
     this.$options.sockets['topics.' + this.topic._id] = function (data) {
       Event.$emit('topic.updated', data)
     }
-    this.$options.sockets['xsplit'] = function (data) {
-      for (var i = 0; i < this.topic.medias.length; i++) {
-        if (this.topic.medias[i].uri === data.picture) {
-          this.topic.medias[i].active = true
-        } else {
-          this.topic.medias[i].active = false
-        }
-      }
-    }.bind(this)
     if (this.topic.started !== null && this.topic.ended === null) {
       this.timePlayedHandler = window.setInterval(() => {
         this.timePlayed = !this.topic.started ? 0 : (this.topic.ended ? new Date(this.topic.ended).getTime() : new Date().getTime()) - new Date(this.topic.started).getTime()
