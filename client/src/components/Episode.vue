@@ -7,7 +7,7 @@
         <draggable
           v-if="topics && topics.length > 0"
           element="ul"
-          v-model="episode.topics"
+          v-model="topics"
           :options="dragOptions"
           @change="itemMoved"
           class="topics mdc-list mdc-list--avatar-list mdc-list--two-line">
@@ -91,6 +91,9 @@ export default {
         if (this.topics[i]._id === topic._id) {
           topic.expanded = this.topics[i].expanded // to keep expanded topics, well... expanded
           this.topics[i] = topic
+          this.topics.sort(function (t1, t2) {
+            return t1.position === t2.position ? 0 : (t1.position < t2.position ? -1 : 1)
+          })
           this.$forceUpdate()
           break
         }

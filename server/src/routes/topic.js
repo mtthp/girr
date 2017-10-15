@@ -465,43 +465,36 @@ router.get('/:topicId/stop', function (req, res, next) {
  *         type: integer
  *     responses:
  *       200:
- *         description: Episode updated (Topics list changed if a Topic moves)
+ *         description: All Episode's Topics
  *         schema:
- *           $ref: '#/definitions/Episode'
+ *           type: array
+ *           items:
+ *             $ref: '#/definitions/Topic'
  */
-router.get('/:topicId/move', function (req, res, next) {
+router.get('/:topicId/move', async function (req, res, next) {
   if (!req.query.position) {
     next({message:"A new position is needed to perform a move", status: 417, example: '/move?position=10'})
   }
 
-  /*
-   * DISCLAIMER : bon ok c'est pas vraiment ce qu'on veut,
-   * mais je m'en sors pas vraiment à essayer d'update l'attribut position d'un Topic
-   * est-ce la bonne solution ?
-   * comment faire pour à la fois update l'array de Topic d'un Episode et chaque Topic's position ?
-   * - @Matthieu Petit
-   */
   var newPosition = parseInt(req.query.position)
-  for (var i = 0; i < req.episode.topics.length; i++) {
-    if (req.episode.topics[i]._id.equals(req.topic._id)) {
-      var topicToMove = req.episode.topics[i]
-      req.episode.topics.splice(i, 1)
+
+  var episodeTopics = await Topic.find({ episode: req.episode._id }).sort({ 'position': 1 }).exec()
+  for (var i = 0; i < episodeTopics.length; i++) {
+    if (episodeTopics[i]._id.equals(req.topic._id)) {
+      var topicToMove = episodeTopics[i]
+      episodeTopics.splice(i, 1)
+      episodeTopics.splice(newPosition, 0, topicToMove)
       break
     }
   }
 
   if (topicToMove) {
-    req.episode.topics.splice(newPosition, 0, topicToMove)
-    // et on retourne un Episode parce que j'ai vraiment fait ce endpoint à l'arrache - @Matthieu Petit
-    req.episode
-      .save()
-      .then(function(episode) {
-        logger.debug("Updated " + episode.toString())
-        res.json(episode)
-      })
-      .catch(function(error) {
-        next(error)
-      })
+    for (var i = 0; i < episodeTopics.length; i++) {
+      episodeTopics[i].position = i
+      episodeTopics[i].save()
+    }
+
+    res.json(episodeTopics)
   } else {
     next({message:"Couldn't move the Topic at the new position " + newPosition, status: 500})
   }
