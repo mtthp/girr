@@ -48,15 +48,19 @@ let topicSchema = new mongoose.Schema({
 
 // when a Topic is removed, delete all its Medias
 topicSchema.post('remove', function(topic) {
+  logger.debug("Removed Topic " + topic._id)
   websockets.sockets.emit('topics.' + topic._id + '.delete', topic)
+
   Media
-    .remove({topic: topic._id})
-    .then(function(result) {
-      logger.debug("Removed all Medias from Topic " + topic._id)
+    .find({ topic: topic._id })
+    .then(function(medias) {
+      medias.forEach(function (media) {
+        media.remove()
+      })
     })
     .catch(function(error) {
-      logger.error(error)
-    })
+        next(error)
+    });
 })
 
 topicSchema.pre('save', function(next) {

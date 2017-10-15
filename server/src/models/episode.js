@@ -17,15 +17,19 @@ episodeSchema.index({ number: 1, program: 1 }, { unique: true })
 
 // when an Episode is removed, delete all its Topics
 episodeSchema.post('remove', function(episode) {
+  logger.debug("Removed Episode " + episode._id)
   websockets.sockets.emit('episodes.' + episode._id + '.delete', episode)
+
   Topic
-    .remove({episode: episode._id})
-    .then(function(result) {
-      logger.debug("Removed all Topics from Episode " + episode._id)
+    .find({ episode: episode._id })
+    .then(function(topics) {
+      topics.forEach(function (topic) {
+        topic.remove()
+      })
     })
     .catch(function(error) {
-      logger.error(error)
-    })
+        next(error)
+    });
 })
 
 episodeSchema.pre('save', function(next) {

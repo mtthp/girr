@@ -1,5 +1,6 @@
 "use strict";
 const mongoose = require('mongoose')
+const logger = require('../logger')
 const fs = require('fs')
 const path  = require('path')
 const websockets = require('../websockets')()
@@ -49,7 +50,9 @@ mediaSchema.methods.toJSON = function() {
 
 // when a Media is removed, delete its file
 mediaSchema.post('remove', function(media) {
+  logger.debug("Removed Media " + media._id)
   websockets.sockets.emit('medias.' + media._id + '.delete', media)
+
   if (fs.existsSync(path.join(__base, media.path))) {
     fs.unlinkSync(path.join(__base, media.path))
   }

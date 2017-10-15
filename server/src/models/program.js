@@ -16,15 +16,20 @@ let programSchema = new mongoose.Schema({
 
 // when a Program is removed, delete all its Episodes
 programSchema.post('remove', function(program) {
+  logger.debug("Removed Program " + program._id)
   websockets.sockets.emit('programs.delete', program)
+
   Episode
-    .remove({program: program._id})
-    .then(function(result) {
-      logger.debug("Removed all Episodes from Program " + program._id)
+    .find({ program: program._id })
+    .then(function(episodes) {
+      episodes.forEach(function (episode) {
+        episode.remove()
+      })
     })
     .catch(function(error) {
-      logger.error(error)
-    })
+        next(error)
+    });
+
   if (program.thumbnail && fs.existsSync(path.join(__base, program.thumbnail))) {
     fs.unlinkSync(path.join(__base, program.thumbnail))
   }
