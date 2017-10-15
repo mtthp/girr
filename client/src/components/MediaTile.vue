@@ -30,6 +30,7 @@ export default {
         function (response) {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('topic.' + this.topicId + '.media.updated', response.body)
+          Event.$emit('xsplit.update', { picture: media.uri })
           Event.$emit('snackbar.message', 'Media ' + response.body.label + ' started')
         }.bind(this),
         function (response) {
@@ -60,7 +61,6 @@ export default {
       } else {
         this.startMedia(media)
       }
-      // Event.$emit('xsplit.update', { title: this.topic.title, picture: media.uri })
     }
   }
 }
@@ -74,6 +74,7 @@ img {
 }
 
 .mdc-grid-tile__icon {
+  color: var(--mdc-theme-secondary,#ff4081);
   right: 0;
   margin-right: 12px;
   background-color: white;
