@@ -11,13 +11,13 @@
           class="program-card">
           <ProgramCard :program="program"></ProgramCard>
         </router-link>
-        <button class="mdc-fab material-icons fab" aria-label="add" data-mdc-auto-init="MDCRipple" v-on:click="addProgram">
-          <span class="mdc-fab__icon">
-            add
-          </span>
-        </button>
       </div>
       <EmptyState v-else></EmptyState>
+      <button class="mdc-fab material-icons fab" aria-label="add" data-mdc-auto-init="MDCRipple" v-on:click="addProgram">
+        <span class="mdc-fab__icon">
+          add
+        </span>
+      </button>
     </main>
   </div>
 </template>
