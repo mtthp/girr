@@ -47,6 +47,11 @@ export default {
     //   console.log(flexibleExpansionRatio.toFixed(2))
     // })
   },
+  watch: {
+    title: function (newTitle) {
+      document.title = newTitle + ' - GIRR'
+    }
+  },
   methods: {
     toggleProgressBar: function (bool) {
       if (bool) {

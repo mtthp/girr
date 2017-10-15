@@ -8,7 +8,6 @@
 <script>
 import Snackbar from './components/Snackbar'
 import { autoInit } from 'material-components-web'
-import Event from './utils/EventBus.js'
 
 export default {
   name: 'app',
@@ -19,15 +18,7 @@ export default {
     }
   },
   mounted: function () {
-    Event.$on('title.change', this.changeTitle)
-    this.changeTitle(this.title)
     autoInit() // autoInit MDC
-  },
-  methods: {
-    changeTitle: function (title) {
-      this.title = title
-      document.title = this.title + ' - GIRR'
-    }
   },
   sockets: {
     connect: function () {
