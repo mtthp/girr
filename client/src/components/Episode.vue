@@ -5,7 +5,7 @@
       <div class="episode">
         <TopicDialog></TopicDialog>
         <draggable
-          v-if="topics && topics.length > 0"
+          v-if="topics.length > 0"
           element="ul"
           v-model="topics"
           :options="dragOptions"
