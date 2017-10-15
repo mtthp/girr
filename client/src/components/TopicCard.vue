@@ -57,7 +57,7 @@ export default {
     }
     if (this.topic.started !== null && this.topic.ended === null) {
       this.timePlayedHandler = window.setInterval(() => {
-        this.timePlayed = !this.topic.startedl ? 0 : (this.topic.ended ? new Date(this.topic.ended).getTime() : new Date().getTime()) - new Date(this.topic.started).getTime()
+        this.timePlayed = !this.topic.started ? 0 : (this.topic.ended ? new Date(this.topic.ended).getTime() : new Date().getTime()) - new Date(this.topic.started).getTime()
       }, 1000)
     }
   },
@@ -109,6 +109,7 @@ export default {
     start: function (event) {
       event.stopImmediatePropagation()
       this.toggle(true)
+      this.timePlayed = 0
       Event.$emit('topic.start', this.topic)
       Event.$emit('xsplit.update', { title: this.topic.title, picture: null })
     },
