@@ -61,9 +61,6 @@ export default {
     this.fetchData()
     Event.$on('topic.update', function (topic) {
       this.updateTopic(topic)
-      if (topic.started !== null && topic.ended === null) { // isPlaying
-        this.updateXsplit({ title: topic.title })
-      }
     }.bind(this))
     Event.$on('topic.delete', function (topic) {
       this.deleteTopic(topic)
@@ -74,9 +71,6 @@ export default {
     Event.$on('topic.stop', function (topic) {
       this.stopTopic(topic)
       this.updateXsplit({title: this.episode.name, picture: null})
-    }.bind(this))
-    Event.$on('xsplit.update', function (data) {
-      this.updateXsplit(data)
     }.bind(this))
     Event.$on('topic.updated', function (topic) {
       for (var i = 0; i < this.episode.topics.length; i++) {
