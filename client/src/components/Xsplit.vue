@@ -114,7 +114,9 @@ export default {
 }
 
 .xsplit .content img {
-	width: 100%;
+  width: 100%;
+	max-width: 100%;
+  max-height: 100%;
 	object-fit: contain;
 }
 
