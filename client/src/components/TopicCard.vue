@@ -22,14 +22,7 @@
       {{ topic.description ? topic.description : 'Empty in here' }}
       <div class="mdc-grid-list">
         <ul class="mdc-grid-list__tiles">
-          <li class="mdc-grid-tile" v-for="media in topic.medias">
-            <div class="mdc-grid-tile__primary">
-              <img class="mdc-grid-tile__primary-content" :src="media.uri" v-on:click="showMedia(media)" />
-            </div>
-            <span class="mdc-grid-tile__secondary">
-              <span class="mdc-grid-tile__title">{{ media.label }}</span>
-            </span>
-          </li>
+          <MediaTile v-for="media in topic.medias" :media="media" :topicId="topic._id"></MediaTile>
         </ul>
       </div>
     </div>
@@ -39,6 +32,7 @@
 <script>
 import Event from '../utils/EventBus.js'
 import { autoInit } from 'material-components-web'
+import MediaTile from './MediaTile'
 
 export default {
   props: ['topic'],
@@ -46,6 +40,9 @@ export default {
     return {
       timePlayed: !this.topic.started ? 0 : (this.topic.ended ? new Date(this.topic.ended).getTime() : new Date().getTime()) - new Date(this.topic.started).getTime()
     }
+  },
+  components: {
+    MediaTile
   },
   created () {
     this.topic.expanded = false
@@ -55,6 +52,15 @@ export default {
     this.$options.sockets['topics.' + this.topic._id] = function (data) {
       Event.$emit('topic.updated', data)
     }
+    this.$options.sockets['xsplit'] = function (data) {
+      for (var i = 0; i < this.topic.medias.length; i++) {
+        if (this.topic.medias[i].uri === data.picture) {
+          this.topic.medias[i].active = true
+        } else {
+          this.topic.medias[i].active = false
+        }
+      }
+    }.bind(this)
     if (this.topic.started !== null && this.topic.ended === null) {
       this.timePlayedHandler = window.setInterval(() => {
         this.timePlayed = !this.topic.started ? 0 : (this.topic.ended ? new Date(this.topic.ended).getTime() : new Date().getTime()) - new Date(this.topic.started).getTime()
@@ -95,6 +101,21 @@ export default {
         this.$forceUpdate()
       }
     }.bind(this))
+    Event.$on('topic.' + this.topic._id + '.media.updated', function (media) {
+      for (var i = 0; i < this.topic.medias.length; i++) {
+        if (this.topic.medias[i]._id === media._id) {
+          this.topic.medias[i] = media
+          this.$forceUpdate()
+          break
+        }
+      }
+    }.bind(this))
+    Event.$on('topic.' + this.topic._id + '.media.deleted', function (media) {
+      var index = this.topic.medias.indexOf(this.topic.medias.find(function (topicMedia) {
+        return topicMedia._id === media._id
+      }))
+      if (index > -1) this.topic.medias.splice(index, 1)
+    }.bind(this))
   },
   methods: {
     toggle: function (bool) {
@@ -124,12 +145,9 @@ export default {
       this.$http.post('/api/programs/' + this.$route.params.programId + '/episodes/' + this.$route.params.episodeId + '/topics/' + this.topic._id + '/medias/', formData).then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
-          var index = this.topic.medias.indexOf(this.topic.medias.find(function (topicMedia) {
-            return topicMedia._id === response.body._id
-          }))
-          if (index < 0) this.topic.medias.push(response.body)
+          Event.$emit('topic.' + this.topic._id + '.media.updated', response.body)
           Event.$emit('snackbar.message', 'Added ' + response.body.label)
-        },
+        }.bind(this),
         function (response) {
           Event.$emit('progressbar.toggle', false)
           console.error(response)
@@ -142,24 +160,15 @@ export default {
       this.$http.delete('/api/programs/' + this.$route.params.programId + '/episodes/' + this.$route.params.episodeId + '/topics/' + this.topic._id + '/medias/' + media._id).then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
-          var index = this.topic.medias.indexOf(this.topic.medias.find(function (topicMedia) {
-            return topicMedia._id === media._id
-          }))
-          if (index > -1) this.topic.medias.splice(index, 1)
+          Event.$emit('topic.' + this.topic._id + '.media.deleted', media)
           Event.$emit('snackbar.message', 'Media ' + media.label + ' deleted')
-        },
+        }.bind(this),
         function (response) {
           Event.$emit('progressbar.toggle', false)
           console.error(response)
           Event.$emit('snackbar.message', 'Error : ' + (response.statusText ? response.statusText : 'no connection'))
         }
       )
-    },
-    showMedia: function (media) {
-      if (this.topic.started !== null && this.topic.ended !== null) {
-        Event.$emit('topic.start', this.topic)
-      }
-      Event.$emit('xsplit.update', { title: this.topic.title, picture: media.uri })
     }
   }
 }
@@ -287,10 +296,5 @@ a.mdc-list-item {
   .mdc-grid-tile {
     --mdc-grid-list-tile-width: 96px;
   }
-}
-
-.mdc-grid-tile img {
-  object-fit: contain;
-  cursor: pointer;
 }
 </style>
