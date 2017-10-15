@@ -1,10 +1,11 @@
 "use strict";
-const express = require('express');
-const router = express.Router();
-const logger = require('../logger');
-const Topic = require('../models/topic');
-const Media = require('../models/media');
-const Episode = require('../models/episode');
+const express = require('express')
+const router = express.Router()
+const logger = require('../logger')
+const Topic = require('../models/topic')
+const Media = require('../models/media')
+const Episode = require('../models/episode')
+const XSplit = require('../models/xsplit')
 
 /**
  * @swagger
@@ -103,8 +104,10 @@ router.route('/')
    *           $ref: '#/definitions/Topic'
    */
   .post(function (req, res, next) {
-    "use strict";
-    let topic = new Topic(Object.assign(req.body, {created: Date.now(), modified: Date.now()}))
+    delete req.body.started
+    delete req.body.ended
+
+    var topic = new Topic(Object.assign(req.body, {created: Date.now(), modified: Date.now()}))
     topic.episode = req.episode._id
 
     // provide a title if the user didn't specified one
@@ -322,11 +325,42 @@ router.route('/:topicId')
  */
 router.get('/:topicId/start', function (req, res, next) {
   req.topic.started = Date.now()
+  req.topic.ended = null
   req.topic
       .save()
-      .then(function(topic) {
-        logger.debug("Started " + topic.toString())
-        res.json(topic)
+      .then(function(topicStarted) {
+        logger.debug("Started " + topicStarted.toString())
+       
+        // Topic
+        //   .find({ ended : null })
+        //   .where('_id').ne(topicStarted._id)
+        //   .where('started').ne(null)
+        //   .populate('medias')
+        //   .then(function(results) { // we end all topics that are playing
+        //     results.forEach(function (topic) {
+        //       topic.ended = Date.now()
+        //       topic.medias.forEach(function (media) {
+        //         if (media.started && !media.ended) {
+        //           media.ended = Date.now()
+        //           media.save()
+        //         }
+        //       })
+        //       topic.save()
+        //     })
+
+        //     var xsplit = new XSplit()
+        //     xsplit.title = req.topic.title
+        //     xsplit.picture = null
+        //     xsplit.save()
+        //   })
+        //   .catch(function(error) {
+        //     logger.error(error)
+        //   })
+        var xsplit = new XSplit()
+        xsplit.title = req.topic.title
+        xsplit.picture = null
+        xsplit.save()
+        res.json(topicStarted)
       })
       .catch(function(error) {
         next(error)
@@ -365,16 +399,32 @@ router.get('/:topicId/start', function (req, res, next) {
  *           $ref: '#/definitions/Topic'
  */
 router.get('/:topicId/stop', function (req, res, next) {
+  // we should probably checked if it is actually playing before stopping it
+
   req.topic.ended = Date.now()
   req.topic
       .save()
       .then(function(topic) {
+        topic.medias.forEach(function (media) {
+          // we end all medias playing
+          if (media.started && !media.ended) {
+            media.ended = Date.now()
+            media.save()
+          }
+        })
+        var xsplit = new XSplit()
+        xsplit.title = null
+        xsplit.picture = null
+        xsplit.save()
+
         logger.debug("Started " + topic.toString())
         res.json(topic)
       })
       .catch(function(error) {
         next(error)
       })
+
+  
 })
 
 /**

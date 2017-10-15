@@ -1,9 +1,10 @@
 "use strict";
-const express = require('express');
-const router = express.Router();
-const logger = require('../logger');
-const Media = require('../models/media');
-const Topic = require('../models/topic');
+const express = require('express')
+const router = express.Router()
+const logger = require('../logger')
+const Media = require('../models/media')
+const Topic = require('../models/topic')
+const XSplit = require('../models/xsplit')
 const path = require('path')
 const multer = require('multer')
 
@@ -361,36 +362,27 @@ router.route('/:mediaId')
  *           $ref: '#/definitions/Media'
  */
 router.get('/:mediaId/start', function (req, res, next) {
+  var xsplit = new XSplit()
   req.media.started = Date.now()
   req.media
       .save()
       .then(function(media) {
         logger.debug("Started " + media.toString())
         res.json(media)
+
+        xsplit.picture = req.media.uri
+        xsplit.save()
       })
       .catch(function(error) {
         next(error)
       })
 
   // we start the parent Topic if it isn't already
-  Topic
-    .find({ _id: req.media.topic })
-    .where({
-      $or : [
-        { started: null, ended: null},
-        { started: {"$ne": null}, ended: {"$ne": null}}
-      ]
-    })
-    .populate('medias')
-    .then(function (results) {
-      results.forEach(function (topic) {
-        topic.started = Date.now()
-        topic.save()
-      })
-    })
-    .catch(function(error) {
-      logger.error(error)
-    })
+  if (!(req.topic.started && !req.topic.ended)) {
+    req.topic.started = Date.now()
+    req.topic.ended = null
+    req.topic.save()
+  }
 })
 
 /**

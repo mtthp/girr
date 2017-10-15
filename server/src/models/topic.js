@@ -18,6 +18,10 @@ function stopPlayingTopics (time_value) {
     .then(function(results) { // we end all topics that are playing
       results.forEach(function (topic) {
         topic.ended = Date.now()
+        topic.medias.forEach(function (media) {
+          media.ended = Date.now()
+          media.save()
+        })
         topic.save()
       })
     })
@@ -26,11 +30,6 @@ function stopPlayingTopics (time_value) {
     })
 
   this.ended = null
-
-  var xsplit = cache.get('xsplit') !== null ? cache.get('xsplit') : { title: null, picture: null, created: Date.now(), modified: Date.now() }
-  xsplit = Object.assign(xsplit, { title: this.title, modified: Date.now() })
-  cache.put('xsplit', xsplit)
-  websockets.sockets.emit('xsplit', xsplit)
 
   return time_value // hmm, we can also return Date.now() instead ?
 }
