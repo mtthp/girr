@@ -1,7 +1,7 @@
 <template>
   <div>
     <Toolbar :title="episode.name"></Toolbar>
-    <main class="mdc-toolbar-fixed-adjust">
+    <main class="mdc-toolbar-fixed-adjust" :class="{ empty: topics.length == 0 }">
       <div class="episode">
         <TopicDialog></TopicDialog>
         <draggable
@@ -269,7 +269,7 @@ export default {
 }
 
 @media (max-width: 1280px) {
-  main {
+  main:not(.empty) {
     padding-bottom: 72px
   }
 }

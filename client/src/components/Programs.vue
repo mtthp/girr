@@ -1,7 +1,7 @@
 <template>
   <div>
     <Toolbar :title="programs.length + ' Programs'"></Toolbar>
-    <main class="mdc-toolbar-fixed-adjust">
+    <main class="mdc-toolbar-fixed-adjust" :class="{ empty: programs.length == 0 }">
       <div v-if="programs.length > 0" class="programs">
         <ProgramDialog></ProgramDialog>
         <router-link
@@ -167,7 +167,7 @@ export default {
 }
 
 @media (max-width: 1280px) {
-  main {
+  main:not(.empty) {
     padding-bottom: 72px
   }
 }

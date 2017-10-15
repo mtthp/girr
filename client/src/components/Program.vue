@@ -1,7 +1,7 @@
 <template>
   <div>
     <Toolbar :title="program.name"></Toolbar>
-    <main class="mdc-toolbar-fixed-adjust"> 
+    <main class="mdc-toolbar-fixed-adjust" :class="{ empty: episodes.length == 0 }"> 
       <div class="program">
         <EpisodeDialog></EpisodeDialog>
         <div v-if="episodes && episodes.length > 0" class="episodes">
@@ -186,7 +186,7 @@ export default {
 }
 
 @media (max-width: 1280px) {
-  main {
+  main:not(.empty) {
     padding-bottom: 72px
   }
 }
