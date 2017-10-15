@@ -77,7 +77,6 @@ router.route('/')
         .find({ topic: req.topic._id })
         .sort({ 'position': 1 })
         .then(function(medias) {
-            logger.debug("Found " + (medias.length ? medias.toString() : 0 + " medias"))
             res.json(medias)
         })
         .catch(function(error) {
@@ -169,7 +168,6 @@ router.param('mediaId', function (req, res, next, value, name) {
     .findOne({_id: value, topic: req.topic._id})
     .then(function(media) {
       if (media !== null) {
-        logger.debug("Found " + media.toString())
         req.media = media
         next()
       } else {
@@ -382,6 +380,9 @@ router.get('/:mediaId/start', function (req, res, next) {
     req.topic.started = Date.now()
     req.topic.ended = null
     req.topic.save()
+
+    xsplit.title = req.topic.title
+    xsplit.save()
   }
 })
 
@@ -426,7 +427,10 @@ router.get('/:mediaId/stop', function (req, res, next) {
   req.media
       .save()
       .then(function(media) {
-        logger.debug("Started " + media.toString())
+        logger.debug("Stopped " + media.toString())
+        var xsplit = new XSplit()
+        xsplit.picture = null
+        xsplit.save()
         res.json(media)
       })
       .catch(function(error) {

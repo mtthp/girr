@@ -48,10 +48,9 @@ router.route('/')
   .get(function(req, res, next) {
     Episode
         .find({ program: req.program._id })
-        .populate({ path: 'program', select: 'name' })
+        // .populate({ path: 'program', select: 'name' })
         .sort({ 'number': -1 })
         .then(function(episodes) {
-            logger.debug("Found " + (episodes.length ? episodes.toString() : 0 + " episodes"))
             res.json(episodes)
         })
         .catch(function(error) {
@@ -126,19 +125,18 @@ router.route('/')
 router.param('episodeId', function (req, res, next, value, name) {
   Episode
     .findOne({_id: value, program: req.program._id})
-    .populate({ 
-      path: 'topics',
-      // options: {
-      //   sort: { position: 1 }
-      // },
-      populate: {
-        path: 'medias',
-        model: 'Media'
-      } 
-    })
+    // .populate({ 
+    //   path: 'topics',
+    //   // options: {
+    //   //   sort: { position: 1 }
+    //   // },
+    //   populate: {
+    //     path: 'medias',
+    //     model: 'Media'
+    //   } 
+    // })
     .then(function(episode) {
       if (episode !== null) {
-        logger.debug("Found " + episode.toString())
         req.episode = episode
         next()
       } else {

@@ -91,10 +91,9 @@ router.route('/')
 router.param('programId', function (req, res, next, value, name) {
   Program
     .findOne({_id: value})
-    .populate('episodes')
+    // .populate('episodes')
     .then(function(program) {
       if (program !== null) {
-        logger.debug("Found " + program.toString())
         req.program = program
         next()
       } else {

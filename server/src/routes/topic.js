@@ -64,7 +64,6 @@ router.route('/')
         .find({ episode: req.episode._id })
         .sort({ 'position': 1 })
         .then(function(topics) {
-            logger.debug("Found " + (topics.length ? topics.toString() : 0 + " topics"))
             res.json(topics)
         })
         .catch(function(error) {
@@ -144,12 +143,14 @@ router.route('/')
 
 // Middleware : we check if the topic exists in the specified program before going further
 router.param('topicId', function (req, res, next, value, name) {
+  delete req.body.started
+  delete req.body.ended
+
   Topic
     .findOne({_id: value, episode: req.episode._id})
-    .populate('medias')
+    // .populate('medias')
     .then(function(topic) {
       if (topic !== null) {
-        logger.debug("Found " + topic.toString())
         req.topic = topic
         next()
       } else {
@@ -234,8 +235,6 @@ router.route('/:topicId')
    *           $ref: '#/definitions/Topic'
    */
   .put(function (req, res, next) {
-    delete req.body.started
-    delete req.body.ended
     req.topic = Object.assign(req.topic, req.body, {modified: Date.now()})
     req.topic
       .save()
@@ -405,13 +404,18 @@ router.get('/:topicId/stop', function (req, res, next) {
   req.topic
       .save()
       .then(function(topic) {
-        topic.medias.forEach(function (media) {
-          // we end all medias playing
-          if (media.started && !media.ended) {
-            media.ended = Date.now()
-            media.save()
-          }
-        })
+        Media
+          .find({ topic: req.topic._id, ended: null })
+          .where('started').ne(null)
+          .then(function(results) { // we end all medias that are playing
+            results.forEach(function (media) {
+              media.ended = Date.now()
+              media.save()
+            })
+          })
+          .catch(function(error) {
+            logger.error(error)
+          })
         var xsplit = new XSplit()
         xsplit.title = null
         xsplit.picture = null
