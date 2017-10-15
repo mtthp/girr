@@ -44,6 +44,15 @@ export default {
   },
   created () {
     this.getPrograms()
+    this.$options.sockets['programs.add'] = function (program) {
+      Event.$emit('program.added', program)
+    }
+    Event.$on('program.added', function (program) {
+      var index = this.programs.indexOf(this.programs.find(function (listProgram) {
+        return listProgram._id === program._id
+      }))
+      if (index < 0) this.programs.push(program)
+    }.bind(this))
     Event.$on('program.update', function (program, file) {
       this.updateProgram(program, file)
     }.bind(this))
@@ -63,9 +72,7 @@ export default {
       var index = this.programs.indexOf(this.programs.find(function (listProgram) {
         return listProgram._id === program._id
       }))
-      if (index > -1) {
-        this.programs.splice(index, 1)
-      }
+      if (index > -1) this.programs.splice(index, 1)
     }.bind(this))
   },
   watch: {
@@ -73,16 +80,13 @@ export default {
     '$route': 'getPrograms'
   },
   methods: {
-    addProgram: function () {
+    getPrograms: function () {
       Event.$emit('progressbar.toggle', true)
-      this.$http.post('/api/programs').then(
+      this.$http.get('/api/programs').then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
-          var index = this.programs.indexOf(this.programs.find(function (listProgram) {
-            return listProgram._id === response.body._id
-          }))
-          if (index < 0) this.programs.push(response.body)
-          Event.$emit('snackbar.message', 'Added ' + response.body.name)
+          this.programs = response.body
+          Event.$emit('title.change', this.programs.length + ' Programs')
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
@@ -91,13 +95,13 @@ export default {
         }
       )
     },
-    getPrograms: function () {
+    addProgram: function () {
       Event.$emit('progressbar.toggle', true)
-      this.$http.get('/api/programs').then(
+      this.$http.post('/api/programs').then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
-          this.programs = response.body
-          Event.$emit('title.change', this.programs.length + ' Programs')
+          Event.$emit('program.added', response.body)
+          Event.$emit('snackbar.message', 'Added ' + response.body.name)
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
@@ -136,7 +140,7 @@ export default {
       this.$http.delete('/api/programs/' + program._id).then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
-          Event.$emit('program.deleted', response.body)
+          Event.$emit('program.deleted', program)
           Event.$emit('snackbar.message', 'Program ' + program.name + ' deleted')
         },
         function (response) {
@@ -163,7 +167,7 @@ export default {
 }
 
 @media (max-width: 1280px) {
-  .programs {
+  main {
     padding-bottom: 72px
   }
 }

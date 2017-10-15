@@ -48,27 +48,40 @@ export default {
   },
   created () {
     this.fetchData()
+    this.$options.sockets['episodes.add'] = function (episode) {
+      if (episode.program === this.program._id) {
+        Event.$emit('episode.added', episode)
+      }
+    }.bind(this)
     Event.$on('episode.update', function (episode) {
       this.updateEpisode(episode)
     }.bind(this))
     Event.$on('episode.delete', function (episode) {
       this.deleteEpisode(episode)
     }.bind(this))
+    Event.$on('episode.added', function (episode) {
+      var index = this.episodes.indexOf(this.episodes.find(function (programEpisode) {
+        return programEpisode._id === episode._id
+      }))
+      if (index < 0) {
+        this.episodes.unshift(episode)
+      }
+    }.bind(this))
     Event.$on('episode.updated', function (episode) {
-      for (var i = 0; i < this.program.episodes.length; i++) {
-        if (this.program.episodes[i]._id === episode._id) {
-          this.program.episodes[i] = episode
+      for (var i = 0; i < this.episodes.length; i++) {
+        if (this.episodes[i]._id === episode._id) {
+          this.episodes[i] = episode
           this.$forceUpdate()
           break
         }
       }
     }.bind(this))
     Event.$on('episode.deleted', function (episode) {
-      var index = this.program.episodes.indexOf(this.program.episodes.find(function (programEpisode) {
+      var index = this.episodes.indexOf(this.episodes.find(function (programEpisode) {
         return programEpisode._id === episode._id
       }))
       if (index > -1) {
-        this.program.episodes.splice(index, 1)
+        this.episodes.splice(index, 1)
       }
     }.bind(this))
   },
@@ -116,12 +129,7 @@ export default {
       this.$http.post('/api/programs/' + this.$route.params.programId + '/episodes/').then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
-          var index = this.episodes.indexOf(this.episodes.find(function (programEpisode) {
-            return programEpisode._id === response.body._id
-          }))
-          if (index < 0) {
-            this.episodes.push(response.body)
-          }
+          Event.$emit('episode.added', response.body)
           Event.$emit('snackbar.message', 'Added a new episode')
         },
         function (response) {
@@ -178,7 +186,7 @@ export default {
 }
 
 @media (max-width: 1280px) {
-  .episodes {
+  main {
     padding-bottom: 72px
   }
 }

@@ -60,6 +60,11 @@ export default {
   },
   created () {
     this.fetchData()
+    this.$options.sockets['topics.add'] = function (topic) {
+      if (topic.episode === this.episode._id) {
+        Event.$emit('topic.added', topic)
+      }
+    }.bind(this)
     Event.$on('topic.update', function (topic) {
       this.updateTopic(topic)
     }.bind(this))
@@ -72,6 +77,14 @@ export default {
     Event.$on('topic.stop', function (topic) {
       this.stopTopic(topic)
       this.updateXsplit({title: this.episode.name, picture: null})
+    }.bind(this))
+    Event.$on('topic.added', function (topic) {
+      var index = this.topics.indexOf(this.topics.find(function (episodeTopic) {
+        return episodeTopic._id === topic._id
+      }))
+      if (index < 0) {
+        this.topics.push(topic)
+      }
     }.bind(this))
     Event.$on('topic.updated', function (topic) {
       for (var i = 0; i < this.topics.length; i++) {
@@ -135,12 +148,7 @@ export default {
       this.$http.post('/api/programs/' + this.$route.params.programId + '/episodes/' + this.$route.params.episodeId + '/topics/').then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
-          var index = this.topics.indexOf(this.topics.find(function (episodeTopic) {
-            return episodeTopic._id === response.body._id
-          }))
-          if (index < 0) {
-            this.topics.push(response.body)
-          }
+          Event.$emit('topic.added', response.body)
           Event.$emit('snackbar.message', 'Added a new topic')
         },
         function (response) {
@@ -261,7 +269,7 @@ export default {
 }
 
 @media (max-width: 1280px) {
-  .topics {
+  main {
     padding-bottom: 72px
   }
 }
