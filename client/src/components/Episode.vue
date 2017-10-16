@@ -60,31 +60,31 @@ export default {
   },
   created () {
     this.fetchData()
-    this.$options.sockets['topics.add'] = function (topic) {
+    this.$options.sockets['topics.add'] = (topic) => {
       if (topic.episode === this.episode._id) {
         Event.$emit('topic.added', topic)
       }
-    }.bind(this)
-    Event.$on('topic.update', function (topic, medias) {
+    }
+    Event.$on('topic.update', (topic, medias) => {
       this.updateTopic(topic)
-    }.bind(this))
-    Event.$on('topic.delete', function (topic) {
+    })
+    Event.$on('topic.delete', (topic) => {
       this.deleteTopic(topic)
-    }.bind(this))
-    Event.$on('topic.start', function (topic) {
+    })
+    Event.$on('topic.start', (topic) => {
       this.startTopic(topic)
-    }.bind(this))
-    Event.$on('topic.stop', function (topic) {
+    })
+    Event.$on('topic.stop', (topic) => {
       this.stopTopic(topic)
       this.updateXsplit({title: this.episode.name, picture: null})
-    }.bind(this))
-    Event.$on('topic.added', function (topic) {
+    })
+    Event.$on('topic.added', (topic) => {
       const index = this.topics.indexOf(this.topics.find(function (episodeTopic) {
         return episodeTopic._id === topic._id
       }))
       if (index < 0) this.topics.push(topic)
-    }.bind(this))
-    Event.$on('topic.updated', function (topic) {
+    })
+    Event.$on('topic.updated', (topic) => {
       for (let i = 0; i < this.topics.length; i++) {
         if (this.topics[i]._id === topic._id) {
           topic.expanded = this.topics[i].expanded // to keep expanded topics, well... expanded
@@ -96,13 +96,13 @@ export default {
           break
         }
       }
-    }.bind(this))
-    Event.$on('topic.deleted', function (topic) {
+    })
+    Event.$on('topic.deleted', (topic) => {
       const index = this.topics.indexOf(this.topics.find(function (episodeTopic) {
         return episodeTopic._id === topic._id
       }))
       if (index > -1) this.topics.splice(index, 1)
-    }.bind(this))
+    })
   },
   watch: {
     // call again the method if the route changes
@@ -113,12 +113,12 @@ export default {
       this.episode = {} // reset the episode
       Event.$emit('progressbar.toggle', true)
       this.$http.get('/api/programs/' + this.$route.params.programId + '/episodes/' + this.$route.params.episodeId).then(
-        function (response) {
+        (response) => {
           Event.$emit('progressbar.toggle', false)
           this.episode = response.body
-          this.$options.sockets['episodes.' + this.episode._id] = function (data) {
+          this.$options.sockets['episodes.' + this.episode._id] = (data) => {
             this.episode = data
-          }.bind(this)
+          }
           this.fetchTopics()
         },
         function (response) {
@@ -131,7 +131,7 @@ export default {
     fetchTopics: function () {
       Event.$emit('progressbar.toggle', true)
       this.$http.get('/api/programs/' + this.$route.params.programId + '/episodes/' + this.$route.params.episodeId + '/topics').then(
-        function (response) {
+        (response) => {
           Event.$emit('progressbar.toggle', false)
           this.topics = response.body
         },

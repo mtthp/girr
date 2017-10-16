@@ -16,10 +16,10 @@ import Event from '../utils/EventBus.js'
 export default {
   props: ['media', 'topicId'],
   created () {
-    this.$options.sockets['medias.' + this.media._id + '.delete'] = function (data) {
+    this.$options.sockets['medias.' + this.media._id + '.delete'] = (data) => {
       Event.$emit('topic.' + this.topicId + '.media.deleted', data)
     }
-    this.$options.sockets['medias.' + this.media._id] = function (data) {
+    this.$options.sockets['medias.' + this.media._id] = (data) => {
       Event.$emit('topic.' + this.topicId + '.media.updated', data)
     }
   },
@@ -27,11 +27,11 @@ export default {
     startMedia: function (media) {
       Event.$emit('progressbar.toggle', true)
       this.$http.get('/api/programs/' + this.$route.params.programId + '/episodes/' + this.$route.params.episodeId + '/topics/' + this.topicId + '/medias/' + media._id + '/start').then(
-        function (response) {
+        (response) => {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('topic.' + this.topicId + '.media.updated', response.body)
           Event.$emit('snackbar.message', 'Media ' + response.body.label + ' started')
-        }.bind(this),
+        },
         function (response) {
           Event.$emit('progressbar.toggle', false)
           console.error(response)
@@ -42,11 +42,11 @@ export default {
     stopMedia: function (media) {
       Event.$emit('progressbar.toggle', true)
       this.$http.get('/api/programs/' + this.$route.params.programId + '/episodes/' + this.$route.params.episodeId + '/topics/' + this.topicId + '/medias/' + media._id + '/stop').then(
-        function (response) {
+        (response) => {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('topic.' + this.topicId + '.media.updated', response.body)
           Event.$emit('snackbar.message', 'Media ' + response.body.label + ' stopped')
-        }.bind(this),
+        },
         function (response) {
           Event.$emit('progressbar.toggle', false)
           console.error(response)

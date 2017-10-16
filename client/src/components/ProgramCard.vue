@@ -30,10 +30,10 @@ export default {
   mounted () {
     this.menu = new menu.MDCSimpleMenu(this.$el.querySelector('.mdc-simple-menu'))
     // Add event listener to some button to toggle the menu on and off.
-    this.$el.querySelector('.toggle-menu').addEventListener('click', function (event) {
+    this.$el.querySelector('.toggle-menu').addEventListener('click', (event) => {
       event.preventDefault()
       this.menu.open = !this.menu.open
-    }.bind(this))
+    })
   },
   methods: {
     editProgram: function (event) {

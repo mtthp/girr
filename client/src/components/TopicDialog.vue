@@ -92,10 +92,9 @@ export default {
     fileChange: function (name, files) {
       if (files.length > 0) {
         let FR = new FileReader()
-        FR.addEventListener('load', function (e) {
+        FR.addEventListener('load', (e) => {
           this.medias.push({uri: e.target.result, label: files[0].name, file: files[0]})
-          console.log(this.medias)
-        }.bind(this))
+        })
         FR.readAsDataURL(files[0])
       }
     },

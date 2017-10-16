@@ -21,14 +21,14 @@ export default {
     this.fetchData()
     // malheureusement, je n'ai pas trouvé d'autre moyen pour observer un event contenant un '.' - @Matthieu Petit
     // si jamais on en a besoin, je laisse ça ici
-    this.$options.sockets['xsplit'] = function (data) {
+    this.$options.sockets['xsplit'] = (data) => {
       this.xsplit = data
-    }.bind(this)
+    }
   },
   methods: {
     fetchData: function () {
       this.$http.get('/api/xsplit/').then(
-        function (response) {
+        (response) => {
           this.xsplit = response.body
         },
         function (response) {

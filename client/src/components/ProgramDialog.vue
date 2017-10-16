@@ -71,9 +71,9 @@ export default {
     fileChange: function (name, files) {
       if (files.length > 0) {
         let FR = new FileReader()
-        FR.addEventListener('load', function (e) {
+        FR.addEventListener('load', (e) => {
           this.$el.querySelector('img').src = e.target.result
-        }.bind(this))
+        })
         FR.readAsDataURL(files[0])
       }
     },

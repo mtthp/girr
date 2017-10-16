@@ -53,11 +53,11 @@ export default {
     this.$options.sockets['topics.' + this.topic._id] = function (data) {
       Event.$emit('topic.updated', data)
     }
-    this.$options.sockets['medias.add'] = function (media) {
+    this.$options.sockets['medias.add'] = (media) => {
       if (media.topic === this.topic._id) {
         Event.$emit('topic.' + this.topic._id + '.media.added', media)
       }
-    }.bind(this)
+    }
     if (this.topic.started !== null && this.topic.ended === null) {
       this.timePlayedHandler = window.setInterval(() => {
         this.timePlayed = !this.topic.started ? 0 : (this.topic.ended ? new Date(this.topic.ended).getTime() : new Date().getTime()) - new Date(this.topic.started).getTime()
@@ -82,7 +82,7 @@ export default {
   mounted () {
     // code here executes once the component is rendered
     autoInit(this.$el) // reapply MDCRipple to all mdc-list-item
-    Event.$on('topic.update', function (dialogTopic, dialogMedias) {
+    Event.$on('topic.update', (dialogTopic, dialogMedias) => {
       if (dialogTopic._id === this.topic._id) {
         // parcours des Topic's medias pour savoir lesquels sont à supprimer
         topicMediasLoop:
@@ -96,27 +96,27 @@ export default {
         }
 
         // parcours des Dialog's medias pour savoir lesquels sont à ajouter
-        dialogMedias.forEach(function (dialogMedia) {
+        dialogMedias.forEach((dialogMedia) => {
           if (!dialogMedia._id && dialogMedia.file) {
             this.addMedia(dialogMedia.file)
           }
-        }.bind(this))
+        })
       }
-    }.bind(this))
+    })
     // remove this to expand multiple topics at the same time
-    Event.$on('topic.toggle', function (topic) {
+    Event.$on('topic.toggle', (topic) => {
       if (this.topic !== topic) {
         this.topic.expanded = false
         this.$forceUpdate()
       }
-    }.bind(this))
-    Event.$on('topic.' + this.topic._id + '.media.added', function (media) {
+    })
+    Event.$on('topic.' + this.topic._id + '.media.added', (media) => {
       const index = this.medias.indexOf(this.medias.find(function (topicMedia) {
         return topicMedia._id === media._id
       }))
       if (index < 0) this.medias.push(media)
-    }.bind(this))
-    Event.$on('topic.' + this.topic._id + '.media.updated', function (media) {
+    })
+    Event.$on('topic.' + this.topic._id + '.media.updated', (media) => {
       for (let i = 0; i < this.medias.length; i++) {
         if (this.medias[i]._id === media._id) {
           this.medias[i] = media
@@ -124,19 +124,19 @@ export default {
           break
         }
       }
-    }.bind(this))
-    Event.$on('topic.' + this.topic._id + '.media.deleted', function (media) {
+    })
+    Event.$on('topic.' + this.topic._id + '.media.deleted', (media) => {
       const index = this.medias.indexOf(this.medias.find(function (topicMedia) {
         return topicMedia._id === media._id
       }))
       if (index > -1) this.medias.splice(index, 1)
-    }.bind(this))
+    })
   },
   methods: {
     fetchMedias: function () {
       Event.$emit('progressbar.toggle', true)
       this.$http.get('/api/programs/' + this.$route.params.programId + '/episodes/' + this.$route.params.episodeId + '/topics/' + this.topic._id + '/medias').then(
-        function (response) {
+        (response) => {
           Event.$emit('progressbar.toggle', false)
           this.medias = response.body
         },
@@ -172,12 +172,12 @@ export default {
       formData.append('file', file)
       Event.$emit('progressbar.toggle', true)
       this.$http.post('/api/programs/' + this.$route.params.programId + '/episodes/' + this.$route.params.episodeId + '/topics/' + this.topic._id + '/medias/', formData).then(
-        function (response) {
+        (response) => {
           Event.$emit('progressbar.toggle', false)
           // Event.$emit('topic.' + this.topic._id + '.media.updated', response.body)
           Event.$emit('topic.' + this.topic._id + '.media.added', response.body)
           Event.$emit('snackbar.message', 'Added ' + response.body.label)
-        }.bind(this),
+        },
         function (response) {
           Event.$emit('progressbar.toggle', false)
           console.error(response)
@@ -188,11 +188,11 @@ export default {
     deleteMedia: function (media) {
       Event.$emit('progressbar.toggle', true)
       this.$http.delete('/api/programs/' + this.$route.params.programId + '/episodes/' + this.$route.params.episodeId + '/topics/' + this.topic._id + '/medias/' + media._id).then(
-        function (response) {
+        (response) => {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('topic.' + this.topic._id + '.media.deleted', media)
           Event.$emit('snackbar.message', 'Media ' + media.label + ' deleted')
-        }.bind(this),
+        },
         function (response) {
           Event.$emit('progressbar.toggle', false)
           console.error(response)

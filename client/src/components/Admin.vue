@@ -39,9 +39,9 @@ export default {
   },
   created () {
     this.getXsplit()
-    this.$options.sockets['xsplit'] = function (data) {
+    this.$options.sockets['xsplit'] = (data) => {
       this.xsplit = data
-    }.bind(this)
+    }
   },
   mounted () {
     this.$el.querySelectorAll('.mdc-textfield').forEach(function (mdlTextfield) {

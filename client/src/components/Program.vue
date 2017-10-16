@@ -48,24 +48,24 @@ export default {
   },
   created () {
     this.fetchData()
-    this.$options.sockets['episodes.add'] = function (episode) {
+    this.$options.sockets['episodes.add'] = (episode) => {
       if (episode.program === this.program._id) {
         Event.$emit('episode.added', episode)
       }
-    }.bind(this)
-    Event.$on('episode.update', function (episode) {
+    }
+    Event.$on('episode.update', (episode) => {
       this.updateEpisode(episode)
-    }.bind(this))
-    Event.$on('episode.delete', function (episode) {
+    })
+    Event.$on('episode.delete', (episode) => {
       this.deleteEpisode(episode)
-    }.bind(this))
-    Event.$on('episode.added', function (episode) {
+    })
+    Event.$on('episode.added', (episode) => {
       const index = this.episodes.indexOf(this.episodes.find(function (programEpisode) {
         return programEpisode._id === episode._id
       }))
       if (index < 0) this.episodes.unshift(episode)
-    }.bind(this))
-    Event.$on('episode.updated', function (episode) {
+    })
+    Event.$on('episode.updated', (episode) => {
       for (let i = 0; i < this.episodes.length; i++) {
         if (this.episodes[i]._id === episode._id) {
           this.episodes[i] = episode
@@ -73,13 +73,13 @@ export default {
           break
         }
       }
-    }.bind(this))
-    Event.$on('episode.deleted', function (episode) {
+    })
+    Event.$on('episode.deleted', (episode) => {
       const index = this.episodes.indexOf(this.episodes.find(function (programEpisode) {
         return programEpisode._id === episode._id
       }))
       if (index > -1) this.episodes.splice(index, 1)
-    }.bind(this))
+    })
   },
   watch: {
     // call again the method if the route changes
@@ -90,12 +90,12 @@ export default {
       this.program = {} // reset the program
       Event.$emit('progressbar.toggle', true)
       this.$http.get('/api/programs/' + this.$route.params.programId).then(
-        function (response) {
+        (response) => {
           Event.$emit('progressbar.toggle', false)
           this.program = response.body
-          this.$options.sockets['programs.' + this.program._id] = function (data) {
+          this.$options.sockets['programs.' + this.program._id] = (data) => {
             this.program = data
-          }.bind(this)
+          }
           this.fetchEpisodes()
           Event.$emit('title.change', this.program.name)
         },
@@ -109,7 +109,7 @@ export default {
     fetchEpisodes: function () {
       Event.$emit('progressbar.toggle', true)
       this.$http.get('/api/programs/' + this.$route.params.programId + '/episodes').then(
-        function (response) {
+        (response) => {
           Event.$emit('progressbar.toggle', false)
           this.episodes = response.body
         },

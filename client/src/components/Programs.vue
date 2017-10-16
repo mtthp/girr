@@ -47,19 +47,19 @@ export default {
     this.$options.sockets['programs.add'] = function (program) {
       Event.$emit('program.added', program)
     }
-    Event.$on('program.added', function (program) {
+    Event.$on('program.added', (program) => {
       const index = this.programs.indexOf(this.programs.find(function (listProgram) {
         return listProgram._id === program._id
       }))
       if (index < 0) this.programs.push(program)
-    }.bind(this))
-    Event.$on('program.update', function (program, file) {
+    })
+    Event.$on('program.update', (program, file) => {
       this.updateProgram(program, file)
-    }.bind(this))
-    Event.$on('program.delete', function (program) {
+    })
+    Event.$on('program.delete', (program) => {
       this.deleteProgram(program)
-    }.bind(this))
-    Event.$on('program.updated', function (program) {
+    })
+    Event.$on('program.updated', (program) => {
       for (let i = 0; i < this.programs.length; i++) {
         if (this.programs[i]._id === program._id) {
           this.programs[i] = program
@@ -67,13 +67,13 @@ export default {
           break
         }
       }
-    }.bind(this))
-    Event.$on('program.deleted', function (program) {
+    })
+    Event.$on('program.deleted', (program) => {
       const index = this.programs.indexOf(this.programs.find(function (listProgram) {
         return listProgram._id === program._id
       }))
       if (index > -1) this.programs.splice(index, 1)
-    }.bind(this))
+    })
   },
   watch: {
     // call again the method if the route changes
@@ -83,7 +83,7 @@ export default {
     getPrograms: function () {
       Event.$emit('progressbar.toggle', true)
       this.$http.get('/api/programs').then(
-        function (response) {
+        (response) => {
           Event.$emit('progressbar.toggle', false)
           this.programs = response.body
           Event.$emit('title.change', this.programs.length + ' Programs')
@@ -111,11 +111,11 @@ export default {
       )
     },
     updateProgram: function (program, file) {
-      var data = program
+      let data = program
       if (typeof file !== 'undefined') {
         data = new FormData()
         data.append('thumbnail', file)
-        for (var key in program) {
+        for (let key in program) {
           if (!(program[key] instanceof Object)) {
             data.append(key, program[key])
           }
