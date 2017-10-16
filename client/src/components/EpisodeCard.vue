@@ -84,6 +84,12 @@ export default {
   color: white;
 }
 
+@media screen and (min-width: 840px) {
+  .episode:not(:hover) .toggle-menu {
+    display: none;
+  }
+}
+
 .episode .mdc-simple-menu {
   bottom: 0;
   right: 0;

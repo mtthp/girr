@@ -11,7 +11,7 @@
         <span class="mdc-list-item__text__secondary">{{ topic.description }}</span>
       </span>
       <span class="mdc-list-item__end-detail">
-        <i v-if="topic.expanded" class="mdc-icon-toggle material-icons" arial-label="Edit" v-on:click="editTopic">edit</i>
+        <i class="mdc-icon-toggle material-icons edit-button" arial-label="Edit" v-on:click="editTopic">edit</i>
         <time v-if="topic.started">{{ timePlayed | formatTime }}</time>
         <i v-if="topic.started !== null && topic.ended === null" class="mdc-icon-toggle material-icons" arial-label="Stop" v-on:click="stop">stop</i>
         <i v-else class="mdc-icon-toggle material-icons" arial-label="Playing" v-on:click="start">play_arrow</i>
@@ -269,6 +269,10 @@ export default {
 
 .topic.expanded + .topic .mdc-list-divider {
   display: inherit;
+}
+
+.topic:not(.expanded) .edit-button {
+  display: none;
 }
 
 .mdc-list-item .mdc-list-item__text {

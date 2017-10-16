@@ -84,6 +84,12 @@ export default {
   color: white;
 }
 
+@media screen and (min-width: 840px) {
+  .program:not(:hover) .toggle-menu {
+    display: none;
+  }
+}
+
 .program .mdc-simple-menu {
   bottom: 0;
   right: 0;
