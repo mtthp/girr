@@ -60,15 +60,13 @@ export default {
       this.deleteEpisode(episode)
     }.bind(this))
     Event.$on('episode.added', function (episode) {
-      var index = this.episodes.indexOf(this.episodes.find(function (programEpisode) {
+      const index = this.episodes.indexOf(this.episodes.find(function (programEpisode) {
         return programEpisode._id === episode._id
       }))
-      if (index < 0) {
-        this.episodes.unshift(episode)
-      }
+      if (index < 0) this.episodes.unshift(episode)
     }.bind(this))
     Event.$on('episode.updated', function (episode) {
-      for (var i = 0; i < this.episodes.length; i++) {
+      for (let i = 0; i < this.episodes.length; i++) {
         if (this.episodes[i]._id === episode._id) {
           this.episodes[i] = episode
           this.$forceUpdate()
@@ -77,12 +75,10 @@ export default {
       }
     }.bind(this))
     Event.$on('episode.deleted', function (episode) {
-      var index = this.episodes.indexOf(this.episodes.find(function (programEpisode) {
+      const index = this.episodes.indexOf(this.episodes.find(function (programEpisode) {
         return programEpisode._id === episode._id
       }))
-      if (index > -1) {
-        this.episodes.splice(index, 1)
-      }
+      if (index > -1) this.episodes.splice(index, 1)
     }.bind(this))
   },
   watch: {

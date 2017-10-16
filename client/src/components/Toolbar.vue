@@ -40,7 +40,7 @@ export default {
     this.tb = toolbar.MDCToolbar.attachTo(this.$el)
     this.tb.fixedAdjustElement = document.querySelector('.mdc-toolbar-fixed-adjust')
     // this.tb.listen('MDCToolbar:change', function (evt) {
-    //   var flexibleExpansionRatio = evt.detail.flexibleExpansionRatio
+    //   let flexibleExpansionRatio = evt.detail.flexibleExpansionRatio
     //   console.log(flexibleExpansionRatio.toFixed(2))
     // })
   },

@@ -70,7 +70,7 @@ export default {
     },
     fileChange: function (name, files) {
       if (files.length > 0) {
-        var FR = new FileReader()
+        let FR = new FileReader()
         FR.addEventListener('load', function (e) {
           this.$el.querySelector('img').src = e.target.result
         }.bind(this))

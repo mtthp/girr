@@ -91,7 +91,7 @@ export default {
     },
     fileChange: function (name, files) {
       if (files.length > 0) {
-        var FR = new FileReader()
+        let FR = new FileReader()
         FR.addEventListener('load', function (e) {
           this.medias.push({uri: e.target.result, label: files[0].name, file: files[0]})
           console.log(this.medias)
@@ -100,11 +100,10 @@ export default {
       }
     },
     deleteMedia: function (media) {
-      var index = this.medias.indexOf(this.medias.find(function (dialogMedia) {
+      const index = this.medias.indexOf(this.medias.find(function (dialogMedia) {
         return dialogMedia === media
       }))
       if (index > -1) this.medias.splice(index, 1)
-      // Event.$emit('topic.medias.delete', this.topic, media)
     }
   }
 }

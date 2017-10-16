@@ -48,7 +48,7 @@ export default {
       Event.$emit('program.added', program)
     }
     Event.$on('program.added', function (program) {
-      var index = this.programs.indexOf(this.programs.find(function (listProgram) {
+      const index = this.programs.indexOf(this.programs.find(function (listProgram) {
         return listProgram._id === program._id
       }))
       if (index < 0) this.programs.push(program)
@@ -60,7 +60,7 @@ export default {
       this.deleteProgram(program)
     }.bind(this))
     Event.$on('program.updated', function (program) {
-      for (var i = 0; i < this.programs.length; i++) {
+      for (let i = 0; i < this.programs.length; i++) {
         if (this.programs[i]._id === program._id) {
           this.programs[i] = program
           this.$forceUpdate()
@@ -69,7 +69,7 @@ export default {
       }
     }.bind(this))
     Event.$on('program.deleted', function (program) {
-      var index = this.programs.indexOf(this.programs.find(function (listProgram) {
+      const index = this.programs.indexOf(this.programs.find(function (listProgram) {
         return listProgram._id === program._id
       }))
       if (index > -1) this.programs.splice(index, 1)

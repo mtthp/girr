@@ -79,15 +79,13 @@ export default {
       this.updateXsplit({title: this.episode.name, picture: null})
     }.bind(this))
     Event.$on('topic.added', function (topic) {
-      var index = this.topics.indexOf(this.topics.find(function (episodeTopic) {
+      const index = this.topics.indexOf(this.topics.find(function (episodeTopic) {
         return episodeTopic._id === topic._id
       }))
-      if (index < 0) {
-        this.topics.push(topic)
-      }
+      if (index < 0) this.topics.push(topic)
     }.bind(this))
     Event.$on('topic.updated', function (topic) {
-      for (var i = 0; i < this.topics.length; i++) {
+      for (let i = 0; i < this.topics.length; i++) {
         if (this.topics[i]._id === topic._id) {
           topic.expanded = this.topics[i].expanded // to keep expanded topics, well... expanded
           this.topics[i] = topic
@@ -100,12 +98,10 @@ export default {
       }
     }.bind(this))
     Event.$on('topic.deleted', function (topic) {
-      var index = this.topics.indexOf(this.topics.find(function (episodeTopic) {
+      const index = this.topics.indexOf(this.topics.find(function (episodeTopic) {
         return episodeTopic._id === topic._id
       }))
-      if (index > -1) {
-        this.topics.splice(index, 1)
-      }
+      if (index > -1) this.topics.splice(index, 1)
     }.bind(this))
   },
   watch: {

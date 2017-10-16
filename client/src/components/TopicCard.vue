@@ -86,8 +86,8 @@ export default {
       if (dialogTopic._id === this.topic._id) {
         // parcours des Topic's medias pour savoir lesquels sont à supprimer
         topicMediasLoop:
-        for (var i = 0; i < this.medias.length; i++) {
-          for (var j = 0; j < dialogMedias.length; j++) {
+        for (let i = 0; i < this.medias.length; i++) {
+          for (let j = 0; j < dialogMedias.length; j++) {
             if (this.medias[i]._id === dialogMedias[j]._id) {
               continue topicMediasLoop
             }
@@ -111,13 +111,13 @@ export default {
       }
     }.bind(this))
     Event.$on('topic.' + this.topic._id + '.media.added', function (media) {
-      var index = this.medias.indexOf(this.medias.find(function (topicMedia) {
+      const index = this.medias.indexOf(this.medias.find(function (topicMedia) {
         return topicMedia._id === media._id
       }))
       if (index < 0) this.medias.push(media)
     }.bind(this))
     Event.$on('topic.' + this.topic._id + '.media.updated', function (media) {
-      for (var i = 0; i < this.medias.length; i++) {
+      for (let i = 0; i < this.medias.length; i++) {
         if (this.medias[i]._id === media._id) {
           this.medias[i] = media
           this.$forceUpdate()
@@ -126,7 +126,7 @@ export default {
       }
     }.bind(this))
     Event.$on('topic.' + this.topic._id + '.media.deleted', function (media) {
-      var index = this.medias.indexOf(this.medias.find(function (topicMedia) {
+      const index = this.medias.indexOf(this.medias.find(function (topicMedia) {
         return topicMedia._id === media._id
       }))
       if (index > -1) this.medias.splice(index, 1)
@@ -168,7 +168,7 @@ export default {
       Event.$emit('topic.stop', this.topic)
     },
     addMedia: function (file) {
-      var formData = new FormData()
+      let formData = new FormData()
       formData.append('file', file)
       Event.$emit('progressbar.toggle', true)
       this.$http.post('/api/programs/' + this.$route.params.programId + '/episodes/' + this.$route.params.episodeId + '/topics/' + this.topic._id + '/medias/', formData).then(
