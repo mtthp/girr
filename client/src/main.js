@@ -24,14 +24,14 @@ Vue.filter('formatTime', function (millisecondsTimestamp) {
   // multiplied by 1000 so that the argument is in milliseconds, not seconds.
   var date = new Date(millisecondsTimestamp)
   // Hours part from the timestamp
-  // var hours = date.getUTCHours()
+  var hours = date.getUTCHours()
   // Minutes part from the timestamp
   var minutes = '0' + date.getUTCMinutes()
   // Seconds part from the timestamp
   var seconds = '0' + date.getUTCSeconds()
 
-  // Will display time in 30:23 format
-  return minutes.substr(-2) + ':' + seconds.substr(-2)
+  // Will display time in 30:23 or 02:30:23 format
+  return (hours > 0 ? hours + ':' : '') + minutes.substr(-2) + ':' + seconds.substr(-2)
 })
 
 /* eslint-disable no-new */
