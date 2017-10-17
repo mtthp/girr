@@ -387,7 +387,7 @@ router.get('/:episodeId/stop', function (req, res, next) {
           next(error)
         })
   } else {
-    next({message:"Episode " + req.params.episodeId + " cannot be stopped if it isn't started", status: 417})
+    next({message:"Episode " + req.params.episodeId + " cannot be stopped if it isn't playing", status: 417})
   }
 })
 
