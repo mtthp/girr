@@ -47,6 +47,9 @@ export default {
     this.$options.sockets['programs.add'] = function (program) {
       Event.$emit('program.added', program)
     }
+    this.$options.sockets['programs.delete'] = function (program) {
+      Event.$emit('program.deleted', program)
+    }
     Event.$on('program.added', (program) => {
       const index = this.programs.indexOf(this.programs.find(function (listProgram) {
         return listProgram._id === program._id

@@ -1,7 +1,12 @@
 <template>
   <div>
-    <Toolbar :title="program.name"></Toolbar>
-    <main class="mdc-toolbar-fixed-adjust" :class="{ empty: episodes.length == 0 }"> 
+    <Toolbar :title="program.name">
+      <section class="mdc-toolbar__section mdc-toolbar__section--align-end" slot="headerActions">
+        <i class="mdc-icon-toggle material-icons" arial-label="Edit" v-on:click="editProgram">edit</i>
+      </section>
+    </Toolbar>
+    <main class="mdc-toolbar-fixed-adjust" :class="{ empty: episodes.length == 0 }">
+      <ProgramDialog></ProgramDialog>
       <div class="program">
         <EpisodeDialog></EpisodeDialog>
         <div v-if="episodes && episodes.length > 0" class="episodes">
@@ -26,6 +31,7 @@
 
 <script>
 import Event from '../utils/EventBus.js'
+import ProgramDialog from './ProgramDialog'
 import EpisodeCard from './EpisodeCard'
 import EpisodeDialog from './EpisodeDialog'
 // import { menu } from 'material-components-web'
@@ -35,6 +41,7 @@ import EmptyState from './EmptyState'
 export default {
   name: 'program',
   components: {
+    ProgramDialog,
     EpisodeCard,
     EpisodeDialog,
     Toolbar,
@@ -48,6 +55,12 @@ export default {
   },
   created () {
     this.fetchData()
+    Event.$on('program.update', (program, file) => {
+      this.updateProgram(program, file)
+    })
+    Event.$on('program.delete', (program) => {
+      this.deleteProgram(program)
+    })
     this.$options.sockets['episodes.add'] = (episode) => {
       if (episode.program === this.program._id) {
         Event.$emit('episode.added', episode)
@@ -98,6 +111,46 @@ export default {
           }
           this.fetchEpisodes()
           Event.$emit('title.change', this.program.name)
+        },
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          console.error(response)
+          Event.$emit('snackbar.message', 'Error : ' + (response.statusText ? response.statusText : 'no connection'))
+        }
+      )
+    },
+    updateProgram: function (program, file) {
+      let data = program
+      if (typeof file !== 'undefined') {
+        data = new FormData()
+        data.append('thumbnail', file)
+        for (let key in program) {
+          if (!(program[key] instanceof Object)) {
+            data.append(key, program[key])
+          }
+        }
+      }
+      Event.$emit('progressbar.toggle', true)
+      this.$http.put('/api/programs/' + program._id, data).then(
+        (response) => {
+          Event.$emit('progressbar.toggle', false)
+          this.program = response.body
+          Event.$emit('snackbar.message', 'Program ' + response.body.name + ' updated')
+        },
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          console.error(response)
+          Event.$emit('snackbar.message', 'Error : ' + (response.statusText ? response.statusText : 'no connection'))
+        }
+      )
+    },
+    deleteProgram: function (program) {
+      Event.$emit('progressbar.toggle', true)
+      this.$http.delete('/api/programs/' + program._id).then(
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          window.location = this.$router.resolve({name: 'Programs'}).href
+          Event.$emit('snackbar.message', 'Program ' + program.name + ' deleted')
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
@@ -164,6 +217,11 @@ export default {
           Event.$emit('snackbar.message', 'Error : ' + (response.statusText ? response.statusText : 'no connection'))
         }
       )
+    },
+    editProgram: function (event) {
+      event.preventDefault()
+      event.stopPropagation()
+      Event.$emit('programDialog.show', this.program)
     }
   }
 }
