@@ -331,44 +331,26 @@ router.get('/:topicId/start', function (req, res, next) {
   req.topic.started = Date.now()
   req.topic.ended = null
   req.topic
-      .save()
-      .then(function(topicStarted) {
-        logger.debug("Started " + topicStarted.toString())
-       
-        // Topic
-        //   .find({ ended : null })
-        //   .where('_id').ne(topicStarted._id)
-        //   .where('started').ne(null)
-        //   .populate('medias')
-        //   .then(function(results) { // we end all topics that are playing
-        //     results.forEach(function (topic) {
-        //       topic.ended = Date.now()
-        //       topic.medias.forEach(function (media) {
-        //         if (media.started && !media.ended) {
-        //           media.ended = Date.now()
-        //           media.save()
-        //         }
-        //       })
-        //       topic.save()
-        //     })
+    .save()
+    .then(function(topicStarted) {
+      logger.debug("Started " + topicStarted.toString())
 
-        //     var xsplit = new XSplit()
-        //     xsplit.title = req.topic.title
-        //     xsplit.picture = null
-        //     xsplit.save()
-        //   })
-        //   .catch(function(error) {
-        //     logger.error(error)
-        //   })
-        var xsplit = new XSplit()
-        xsplit.title = req.topic.title
-        xsplit.picture = null
-        xsplit.save()
-        res.json(topicStarted)
-      })
-      .catch(function(error) {
-        next(error)
-      })
+      let xsplit = new XSplit()
+      xsplit.title = req.topic.title
+      xsplit.picture = null
+      xsplit.save()
+      res.json(topicStarted)
+    })
+    .catch(function(error) {
+      next(error)
+    })
+
+  // we start the parent Episode if it isn't already
+  if (!(req.episode.started && !req.episode.ended)) {
+    req.episode.started = Date.now()
+    req.episode.ended = null
+    req.episode.save()
+  }
 })
 
 /**
