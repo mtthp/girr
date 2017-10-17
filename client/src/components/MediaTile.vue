@@ -1,10 +1,9 @@
 <template>
-  <li class="mdc-grid-tile" v-on:click="toggleMedia(media)">
+  <li class="mdc-grid-tile" :class="{ playing : media.started && !media.ended }" v-on:click="toggleMedia(media)">
     <div class="mdc-grid-tile__primary">
       <img class="mdc-grid-tile__primary-content" :src="media.uri" />
     </div>
     <span class="mdc-grid-tile__secondary">
-      <i v-if="media.started && !media.ended" class="mdc-grid-tile__icon material-icons">check_circle</i>
       <span class="mdc-grid-tile__title">{{ media.label }}</span>
     </span>
   </li>
@@ -78,5 +77,9 @@ img {
   margin-right: 12px;
   background-color: white;
   border-radius: 50%;
+}
+
+.mdc-grid-tile.playing .mdc-grid-tile__secondary {
+  background-color: var(--mdc-theme-secondary,#ff4081);
 }
 </style>
