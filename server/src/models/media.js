@@ -4,7 +4,6 @@ const logger = require('../logger')
 const fs = require('fs')
 const path  = require('path')
 const websockets = require('../websockets')()
-const cache = require('memory-cache')
 
 /*
  * The purpose of this setter is to end all playing medias

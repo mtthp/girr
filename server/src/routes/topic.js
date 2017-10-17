@@ -419,7 +419,7 @@ router.get('/:topicId/stop', function (req, res, next) {
             logger.error(error)
           })
         var xsplit = new XSplit()
-        xsplit.title = null
+        xsplit.title = req.episode.name
         xsplit.picture = null
         xsplit.save()
 

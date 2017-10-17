@@ -3,6 +3,7 @@ const router = express.Router();
 const logger = require('../logger');
 const Episode = require('../models/episode')
 const Topics = require('../models/topic')
+const XSplit = require('../models/xsplit')
 
 /**
  * @swagger
@@ -263,6 +264,98 @@ router.route('/:episodeId')
         next(error)
       })
   })
+
+/**
+ * @swagger
+ * /programs/{programId}/episodes/{episodeId}/start:
+ *   get:
+ *     tags:
+ *       - Episodes
+ *     description: Start playing episode
+ *     summary: Start a episode
+ *     produces: application/json
+ *     parameters:
+ *       - name: programId
+ *         description: Program's id
+ *         in: path
+ *         required: true
+ *         type: uuid
+ *       - name: episodeId
+ *         description: Episode's id
+ *         in: path
+ *         required: true
+ *         type: uuid
+ *     responses:
+ *       200:
+ *         description: Episode started
+ *         schema:
+ *           $ref: '#/definitions/Episode'
+ */
+router.get('/:episodeId/start', function (req, res, next) {
+  req.episode.started = Date.now()
+  req.episode
+      .save()
+      .then(function(episode) {
+        logger.debug("Started " + episode.toString())
+        res.json(episode)
+
+        let xsplit = new XSplit()
+        xsplit.title = episode.name
+        xsplit.picture = null
+        xsplit.save()
+      })
+      .catch(function(error) {
+        next(error)
+      })
+})
+
+/**
+ * @swagger
+ * /programs/{programId}/episodes/{episodeId}/stop:
+ *   get:
+ *     tags:
+ *       - Episodes
+ *     description: Stop playing episode
+ *     summary: Stop a episode
+ *     produces: application/json
+ *     parameters:
+ *       - name: programId
+ *         description: Program's id
+ *         in: path
+ *         required: true
+ *         type: uuid
+ *       - name: episodeId
+ *         description: Episode's id
+ *         in: path
+ *         required: true
+ *         type: uuid
+ *     responses:
+ *       200:
+ *         description: Episode stooped
+ *         schema:
+ *           $ref: '#/definitions/Episode'
+ */
+router.get('/:episodeId/stop', function (req, res, next) {
+  if (req.episode.stared && !req.episode.ended) {
+    req.episode.ended = Date.now()
+    req.episode
+        .save()
+        .then(function(episode) {
+          logger.debug("Stopped " + episode.toString())
+          res.json(episode)
+
+          let xsplit = new XSplit()
+          xsplit.title = null
+          xsplit.picture = null
+          xsplit.save()
+        })
+        .catch(function(error) {
+          next(error)
+        })
+  } else {
+    next({message:"Episode " + req.params.episodeId + " cannot be stopped if it isn't started", status: 417})
+  }
+})
 
 /* legacy endpoint */
 router.get('/:episode/full', (req, res) => {

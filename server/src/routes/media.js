@@ -361,7 +361,7 @@ router.route('/:mediaId')
  *           $ref: '#/definitions/Media'
  */
 router.get('/:mediaId/start', function (req, res, next) {
-  var xsplit = new XSplit()
+  let xsplit = new XSplit()
   req.media.started = Date.now()
   req.media
       .save()
@@ -384,6 +384,13 @@ router.get('/:mediaId/start', function (req, res, next) {
 
     xsplit.title = req.topic.title
     xsplit.save()
+  }
+
+  // we start the parent Episode if it isn't already
+  if (!(req.episode.started && !req.episode.ended)) {
+    req.episode.started = Date.now()
+    req.episode.ended = null
+    req.episode.save()
   }
 })
 
