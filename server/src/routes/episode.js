@@ -361,7 +361,7 @@ router.get('/:episodeId/stop', function (req, res, next) {
                       .find({ topic: stoppedTopic._id, ended: null })
                       .where('started').ne(null)
                       .then(function(medias) { // we end all medias that are playing
-                        results.forEach(function (playingMedia) {
+                        medias.forEach(function (playingMedia) {
                           playingMedia.ended = Date.now()
                           playingMedia.save()
                         })
