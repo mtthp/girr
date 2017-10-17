@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 const logger = require('../logger');
 const Episode = require('../models/episode')
-const Topics = require('../models/topic')
+const Topic = require('../models/topic')
+const Media = require('../models/media')
 const XSplit = require('../models/xsplit')
 
 /**
@@ -341,6 +342,33 @@ router.get('/:episodeId/stop', function (req, res, next) {
     req.episode
         .save()
         .then(function(episode) {
+          Topic
+            .find({ episode: req.episode._id, ended: null })
+            .where('started').ne(null)
+            .then(function(topics) { // we end all topics that are playing
+              topics.forEach(function (playingTopic) {
+                playingTopic.ended = Date.now()
+                playingTopic
+                  .save()
+                  .then(function(stoppedTopic) {
+                     Media
+                      .find({ topic: stoppedTopic._id, ended: null })
+                      .where('started').ne(null)
+                      .then(function(medias) { // we end all medias that are playing
+                        results.forEach(function (playingMedia) {
+                          playingMedia.ended = Date.now()
+                          playingMedia.save()
+                        })
+                      })
+                      .catch(function(error) {
+                        logger.error(error)
+                      })
+                  })
+              })
+            })
+            .catch(function(error) {
+              logger.error(error)
+            })
           logger.debug("Stopped " + episode.toString())
           res.json(episode)
 
@@ -372,7 +400,7 @@ router.get('/:episode/full', (req, res) => {
     //             ]
     //         },
 
-    Topics.find({
+    Topic.find({
         episode: req.episode._id
     }, { '_id': 0, 'number': 1, 'title': 1, 'notes': 1, 'medias': 1 }, { 'sort': { 'number': 1 } }).lean().exec((err, news) => {
         let nameCapitalFirst = req.program.name.charAt(0).toUpperCase() + req.program.name.slice(1);
