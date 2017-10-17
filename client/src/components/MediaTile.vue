@@ -15,41 +15,41 @@ import Event from '../utils/EventBus.js'
 export default {
   props: ['media', 'topicId'],
   created () {
-    this.$options.sockets['medias.' + this.media._id + '.delete'] = (data) => {
-      Event.$emit('topic.' + this.topicId + '.media.deleted', data)
+    this.$options.sockets[`medias.${this.media._id}.delete`] = (data) => {
+      Event.$emit(`topics.${this.topicId}.media.deleted`, data)
     }
-    this.$options.sockets['medias.' + this.media._id] = (data) => {
-      Event.$emit('topic.' + this.topicId + '.media.updated', data)
+    this.$options.sockets[`medias.${this.media._id}`] = (data) => {
+      Event.$emit(`topics.${this.topicId}.media.updated`, data)
     }
   },
   methods: {
     startMedia: function (media) {
       Event.$emit('progressbar.toggle', true)
-      this.$http.get('/api/programs/' + this.$route.params.programId + '/episodes/' + this.$route.params.episodeId + '/topics/' + this.topicId + '/medias/' + media._id + '/start').then(
+      this.$http.get(`/api/programs/${this.$route.params.programId}/episodes/${this.$route.params.episodeId}/topics/${this.topicId}/medias/${media._id}/start`).then(
         (response) => {
           Event.$emit('progressbar.toggle', false)
-          Event.$emit('topic.' + this.topicId + '.media.updated', response.body)
-          Event.$emit('snackbar.message', 'Media ' + response.body.label + ' started')
+          Event.$emit(`topics.${this.topicId}.media.updated`, response.body)
+          Event.$emit('snackbar.message', `Media ${response.body.label} started`)
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
           console.error(response)
-          Event.$emit('snackbar.message', 'Error : ' + (response.statusText ? response.statusText : 'no connection'))
+          Event.$emit('snackbar.message', `Error : ${response.statusText ? response.statusText : 'no connection'}`)
         }
       )
     },
     stopMedia: function (media) {
       Event.$emit('progressbar.toggle', true)
-      this.$http.get('/api/programs/' + this.$route.params.programId + '/episodes/' + this.$route.params.episodeId + '/topics/' + this.topicId + '/medias/' + media._id + '/stop').then(
+      this.$http.get(`/api/programs/${this.$route.params.programId}/episodes/${this.$route.params.episodeId}/topics/${this.topicId}/medias/${media._id}/stop`).then(
         (response) => {
           Event.$emit('progressbar.toggle', false)
-          Event.$emit('topic.' + this.topicId + '.media.updated', response.body)
-          Event.$emit('snackbar.message', 'Media ' + response.body.label + ' stopped')
+          Event.$emit(`topics.${this.topicId}.media.updated`, response.body)
+          Event.$emit('snackbar.message', `Media ${response.body.label} stopped`)
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
           console.error(response)
-          Event.$emit('snackbar.message', 'Error : ' + (response.statusText ? response.statusText : 'no connection'))
+          Event.$emit('snackbar.message', `Error : ${response.statusText ? response.statusText : 'no connection'}`)
         }
       )
     },

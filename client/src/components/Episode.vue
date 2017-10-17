@@ -130,11 +130,11 @@ export default {
     fetchData: function () {
       this.episode = {} // reset the episode
       Event.$emit('progressbar.toggle', true)
-      this.$http.get('/api/programs/' + this.$route.params.programId + '/episodes/' + this.$route.params.episodeId).then(
+      this.$http.get(`/api/programs/${this.$route.params.programId}/episodes/${this.$route.params.episodeId}`).then(
         (response) => {
           Event.$emit('progressbar.toggle', false)
           this.episode = response.body
-          this.$options.sockets['episodes.' + this.episode._id] = (data) => {
+          this.$options.sockets[`episodes.${this.episode._id}`] = (data) => {
             this.episode = data
           }
           this.fetchTopics()
@@ -142,43 +142,43 @@ export default {
         function (response) {
           Event.$emit('progressbar.toggle', false)
           console.error(response)
-          Event.$emit('snackbar.message', 'Error : ' + (response.statusText ? response.statusText : 'no connection'))
+          Event.$emit('snackbar.message', `Error : ${response.statusText ? response.statusText : 'no connection'}`)
         }
       )
     },
     startEpisode: function (episode) {
       Event.$emit('progressbar.toggle', true)
-      this.$http.get('/api/programs/' + this.$route.params.programId + '/episodes/' + this.$route.params.episodeId + '/start').then(
+      this.$http.get(`/api/programs/${this.$route.params.programId}/episodes/${this.$route.params.episodeId}/start`).then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('episode.updated', response.body)
-          Event.$emit('snackbar.message', 'Episode ' + response.body.name + ' started')
+          Event.$emit('snackbar.message', `Episode ${response.body.name} started`)
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
           console.error(response)
-          Event.$emit('snackbar.message', 'Error : ' + (response.statusText ? response.statusText : 'no connection'))
+          Event.$emit('snackbar.message', `Error : ${response.statusText ? response.statusText : 'no connection'}`)
         }
       )
     },
     stopEpisode: function (episode) {
       Event.$emit('progressbar.toggle', true)
-      this.$http.get('/api/programs/' + this.$route.params.programId + '/episodes/' + this.$route.params.episodeId + '/stop').then(
+      this.$http.get(`/api/programs/${this.$route.params.programId}/episodes/${this.$route.params.episodeId}/stop`).then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('episode.updated', response.body)
-          Event.$emit('snackbar.message', 'Episode ' + response.body.name + ' stopped')
+          Event.$emit('snackbar.message', `Episode ${response.body.name} stopped`)
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
           console.error(response)
-          Event.$emit('snackbar.message', 'Error : ' + (response.statusText ? response.statusText : 'no connection'))
+          Event.$emit('snackbar.message', `Error : ${response.statusText ? response.statusText : 'no connection'}`)
         }
       )
     },
     fetchTopics: function () {
       Event.$emit('progressbar.toggle', true)
-      this.$http.get('/api/programs/' + this.$route.params.programId + '/episodes/' + this.$route.params.episodeId + '/topics').then(
+      this.$http.get(`/api/programs/${this.$route.params.programId}/episodes/${this.$route.params.episodeId}/topics`).then(
         (response) => {
           Event.$emit('progressbar.toggle', false)
           this.topics = response.body
@@ -186,13 +186,13 @@ export default {
         function (response) {
           Event.$emit('progressbar.toggle', false)
           console.error(response)
-          Event.$emit('snackbar.message', 'Error : ' + (response.statusText ? response.statusText : 'no connection'))
+          Event.$emit('snackbar.message', `Error : ${response.statusText ? response.statusText : 'no connection'}`)
         }
       )
     },
     addTopic: function () {
       Event.$emit('progressbar.toggle', true)
-      this.$http.post('/api/programs/' + this.$route.params.programId + '/episodes/' + this.$route.params.episodeId + '/topics/').then(
+      this.$http.post(`/api/programs/${this.$route.params.programId}/episodes/${this.$route.params.episodeId}/topics/`).then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('topic.added', response.body)
@@ -201,73 +201,73 @@ export default {
         function (response) {
           Event.$emit('progressbar.toggle', false)
           console.error(response)
-          Event.$emit('snackbar.message', 'Error : ' + (response.statusText ? response.statusText : 'no connection'))
+          Event.$emit('snackbar.message', `Error : ${response.statusText ? response.statusText : 'no connection'}`)
         }
       )
     },
     updateTopic: function (topic) {
       Event.$emit('progressbar.toggle', true)
-      this.$http.put('/api/programs/' + this.$route.params.programId + '/episodes/' + this.$route.params.episodeId + '/topics/' + topic._id, topic).then(
+      this.$http.put(`/api/programs/${this.$route.params.programId}/episodes/${this.$route.params.episodeId}/topics/${topic._id}`, topic).then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('topic.updated', response.body)
-          Event.$emit('snackbar.message', 'Topic ' + response.body.title + ' updated')
+          Event.$emit('snackbar.message', `Topic ${response.body.title} updated`)
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
           console.error(response)
-          Event.$emit('snackbar.message', 'Error : ' + (response.statusText ? response.statusText : 'no connection'))
+          Event.$emit('snackbar.message', `Error : ${response.statusText ? response.statusText : 'no connection'}`)
         }
       )
     },
     deleteTopic: function (topic) {
       Event.$emit('progressbar.toggle', true)
-      this.$http.delete('/api/programs/' + this.$route.params.programId + '/episodes/' + this.$route.params.episodeId + '/topics/' + topic._id).then(
+      this.$http.delete(`/api/programs/${this.$route.params.programId}/episodes/${this.$route.params.episodeId}/topics/${topic._id}`).then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('topic.deleted', topic)
-          Event.$emit('snackbar.message', 'Topic ' + topic.title + ' deleted')
+          Event.$emit('snackbar.message', `Topic ${topic.title} deleted`)
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
           console.error(response)
-          Event.$emit('snackbar.message', 'Error : ' + (response.statusText ? response.statusText : 'no connection'))
+          Event.$emit('snackbar.message', `Error : ${response.statusText ? response.statusText : 'no connection'}`)
         }
       )
     },
     startTopic: function (topic) {
       Event.$emit('progressbar.toggle', true)
-      this.$http.get('/api/programs/' + this.$route.params.programId + '/episodes/' + this.$route.params.episodeId + '/topics/' + topic._id + '/start').then(
+      this.$http.get(`/api/programs/${this.$route.params.programId}/episodes/${this.$route.params.episodeId}/topics/${topic._id}/start`).then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('topic.updated', response.body)
-          Event.$emit('snackbar.message', 'Topic ' + response.body.title + ' started')
+          Event.$emit('snackbar.message', `Topic ${response.body.title} started`)
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
           console.error(response)
-          Event.$emit('snackbar.message', 'Error : ' + (response.statusText ? response.statusText : 'no connection'))
+          Event.$emit('snackbar.message', `Error : ${response.statusText ? response.statusText : 'no connection'}`)
         }
       )
     },
     stopTopic: function (topic) {
       Event.$emit('progressbar.toggle', true)
-      this.$http.get('/api/programs/' + this.$route.params.programId + '/episodes/' + this.$route.params.episodeId + '/topics/' + topic._id + '/stop').then(
+      this.$http.get(`/api/programs/${this.$route.params.programId}/episodes/${this.$route.params.episodeId}/topics/${topic._id}/stop`).then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('topic.updated', response.body)
-          Event.$emit('snackbar.message', 'Topic ' + response.body.title + ' stopped')
+          Event.$emit('snackbar.message', `Topic ${response.body.title} stopped`)
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
           console.error(response)
-          Event.$emit('snackbar.message', 'Error : ' + (response.statusText ? response.statusText : 'no connection'))
+          Event.$emit('snackbar.message', `Error : ${response.statusText ? response.statusText : 'no connection'}`)
         }
       )
     },
     moveTopic: function (topic, newPosition) {
       Event.$emit('progressbar.toggle', true)
-      this.$http.get('/api/programs/' + this.$route.params.programId + '/episodes/' + this.$route.params.episodeId + '/topics/' + topic._id + '/move',
+      this.$http.get(`/api/programs/${this.$route.params.programId}/episodes/${this.$route.params.episodeId}/topics/${topic._id}/move`,
         {
           params: {
             position: newPosition
@@ -280,7 +280,7 @@ export default {
         function (response) {
           Event.$emit('progressbar.toggle', false)
           console.error(response)
-          Event.$emit('snackbar.message', 'Error : ' + (response.statusText ? response.statusText : 'no connection'))
+          Event.$emit('snackbar.message', `Error : ${response.statusText ? response.statusText : 'no connection'}`)
         }
       )
     },

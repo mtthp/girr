@@ -94,7 +94,7 @@ export default {
         function (response) {
           Event.$emit('progressbar.toggle', false)
           console.error(response)
-          Event.$emit('snackbar.message', 'Error : ' + (response.statusText ? response.statusText : 'no connection'))
+          Event.$emit('snackbar.message', `Error : ${response.statusText ? response.statusText : 'no connection'}`)
         }
       )
     },
@@ -104,12 +104,12 @@ export default {
         function (response) {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('program.added', response.body)
-          Event.$emit('snackbar.message', 'Added ' + response.body.name)
+          Event.$emit('snackbar.message', `Added ${response.body.name}`)
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
           console.error(response)
-          Event.$emit('snackbar.message', 'Error : ' + (response.statusText ? response.statusText : 'no connection'))
+          Event.$emit('snackbar.message', `Error : ${response.statusText ? response.statusText : 'no connection'}`)
         }
       )
     },
@@ -125,22 +125,22 @@ export default {
         }
       }
       Event.$emit('progressbar.toggle', true)
-      this.$http.put('/api/programs/' + program._id, data).then(
+      this.$http.put(`/api/programs/${program._id}`, data).then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('program.updated', response.body)
-          Event.$emit('snackbar.message', 'Program ' + response.body.name + ' updated')
+          Event.$emit('snackbar.message', `Program ${response.body.name} updated`)
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
           console.error(response)
-          Event.$emit('snackbar.message', 'Error : ' + (response.statusText ? response.statusText : 'no connection'))
+          Event.$emit('snackbar.message', `Error : ${response.statusText ? response.statusText : 'no connection'}`)
         }
       )
     },
     deleteProgram: function (program) {
       Event.$emit('progressbar.toggle', true)
-      this.$http.delete('/api/programs/' + program._id).then(
+      this.$http.delete(`/api/programs/${program._id}`).then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('program.deleted', program)
@@ -149,7 +149,7 @@ export default {
         function (response) {
           Event.$emit('progressbar.toggle', false)
           console.error(response)
-          Event.$emit('snackbar.message', 'Error : ' + (response.statusText ? response.statusText : 'no connection'))
+          Event.$emit('snackbar.message', `Error : ${response.statusText ? response.statusText : 'no connection'}`)
         }
       )
     }

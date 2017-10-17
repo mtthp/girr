@@ -47,7 +47,7 @@ export default {
   },
   watch: {
     title: function (newTitle) {
-      document.title = newTitle + ' - GIRR'
+      document.title = `${newTitle} - GIRR`
     }
   },
   methods: {

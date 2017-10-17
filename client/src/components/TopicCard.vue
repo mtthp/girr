@@ -47,15 +47,15 @@ export default {
   },
   created () {
     this.topic.expanded = false
-    this.$options.sockets['topics.' + this.topic._id + '.delete'] = function (data) {
+    this.$options.sockets[`topics.${this.topic._id}.delete`] = function (data) {
       Event.$emit('topic.deleted', data)
     }
-    this.$options.sockets['topics.' + this.topic._id] = function (data) {
+    this.$options.sockets[`topics.${this.topic._id}`] = function (data) {
       Event.$emit('topic.updated', data)
     }
     this.$options.sockets['medias.add'] = (media) => {
       if (media.topic === this.topic._id) {
-        Event.$emit('topic.' + this.topic._id + '.media.added', media)
+        Event.$emit(`topics.${this.topic._id}.media.added`, media)
       }
     }
     if (this.topic.started !== null && this.topic.ended === null) {
@@ -111,13 +111,13 @@ export default {
         this.$forceUpdate()
       }
     })
-    Event.$on('topic.' + this.topic._id + '.media.added', (media) => {
+    Event.$on(`topics.${this.topic._id}.media.added`, (media) => {
       const index = this.medias.indexOf(this.medias.find(function (topicMedia) {
         return topicMedia._id === media._id
       }))
       if (index < 0) this.medias.push(media)
     })
-    Event.$on('topic.' + this.topic._id + '.media.updated', (media) => {
+    Event.$on(`topics.${this.topic._id}.media.updated`, (media) => {
       for (let i = 0; i < this.medias.length; i++) {
         if (this.medias[i]._id === media._id) {
           this.medias[i] = media
@@ -126,7 +126,7 @@ export default {
         }
       }
     })
-    Event.$on('topic.' + this.topic._id + '.media.deleted', (media) => {
+    Event.$on(`topics.${this.topic._id}.media.deleted`, (media) => {
       const index = this.medias.indexOf(this.medias.find(function (topicMedia) {
         return topicMedia._id === media._id
       }))
@@ -136,7 +136,7 @@ export default {
   methods: {
     fetchMedias: function () {
       Event.$emit('progressbar.toggle', true)
-      this.$http.get('/api/programs/' + this.$route.params.programId + '/episodes/' + this.$route.params.episodeId + '/topics/' + this.topic._id + '/medias').then(
+      this.$http.get(`/api/programs/${this.$route.params.programId}/episodes/${this.$route.params.episodeId}/topics/${this.topic._id}/medias`).then(
         (response) => {
           Event.$emit('progressbar.toggle', false)
           this.medias = response.body
@@ -144,7 +144,7 @@ export default {
         function (response) {
           Event.$emit('progressbar.toggle', false)
           console.error(response)
-          Event.$emit('snackbar.message', 'Error : ' + (response.statusText ? response.statusText : 'no connection'))
+          Event.$emit('snackbar.message', `Error : ${response.statusText ? response.statusText : 'no connection'}`)
         }
       )
     },
@@ -172,32 +172,31 @@ export default {
       let formData = new FormData()
       formData.append('file', file)
       Event.$emit('progressbar.toggle', true)
-      this.$http.post('/api/programs/' + this.$route.params.programId + '/episodes/' + this.$route.params.episodeId + '/topics/' + this.topic._id + '/medias/', formData).then(
+      this.$http.post(`/api/programs/${this.$route.params.programId}/episodes/${this.$route.params.episodeId}/topics/${this.topic._id}/medias/`, formData).then(
         (response) => {
           Event.$emit('progressbar.toggle', false)
-          // Event.$emit('topic.' + this.topic._id + '.media.updated', response.body)
-          Event.$emit('topic.' + this.topic._id + '.media.added', response.body)
-          Event.$emit('snackbar.message', 'Added ' + response.body.label)
+          Event.$emit(`topic.${this.topic._id}.media.added`, response.body)
+          Event.$emit('snackbar.message', `Added ${response.body.label}`)
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
           console.error(response)
-          Event.$emit('snackbar.message', 'Error : ' + (response.statusText ? response.statusText : 'no connection'))
+          Event.$emit('snackbar.message', `Error : ${response.statusText ? response.statusText : 'no connection'}`)
         }
       )
     },
     deleteMedia: function (media) {
       Event.$emit('progressbar.toggle', true)
-      this.$http.delete('/api/programs/' + this.$route.params.programId + '/episodes/' + this.$route.params.episodeId + '/topics/' + this.topic._id + '/medias/' + media._id).then(
+      this.$http.delete(`/api/programs/${this.$route.params.programId}/episodes/${this.$route.params.episodeId}/topics/${this.topic._id}/medias/${media._id}`).then(
         (response) => {
           Event.$emit('progressbar.toggle', false)
-          Event.$emit('topic.' + this.topic._id + '.media.deleted', media)
-          Event.$emit('snackbar.message', 'Media ' + media.label + ' deleted')
+          Event.$emit(`topic.${this.topic._id}.media.deleted`, media)
+          Event.$emit('snackbar.message', `Media ${media.label} deleted`)
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
           console.error(response)
-          Event.$emit('snackbar.message', 'Error : ' + (response.statusText ? response.statusText : 'no connection'))
+          Event.$emit('snackbar.message', `Error : ${response.statusText ? response.statusText : 'no connection'}`)
         }
       )
     }

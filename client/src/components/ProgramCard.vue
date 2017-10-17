@@ -20,10 +20,10 @@ import { menu } from 'material-components-web'
 export default {
   props: ['program'],
   created () {
-    this.$options.sockets['programs.' + this.program._id + '.delete'] = function (data) {
+    this.$options.sockets[`programs.${this.program._id}.delete`] = function (data) {
       Event.$emit('program.deleted', data)
     }
-    this.$options.sockets['programs.' + this.program._id] = function (data) {
+    this.$options.sockets[`programs.${this.program._id}`] = function (data) {
       Event.$emit('program.updated', data)
     }
   },
