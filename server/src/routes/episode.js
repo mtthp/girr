@@ -336,7 +336,7 @@ router.get('/:episodeId/start', function (req, res, next) {
  *           $ref: '#/definitions/Episode'
  */
 router.get('/:episodeId/stop', function (req, res, next) {
-  if (req.episode.stared && !req.episode.ended) {
+  if (req.episode.started && !req.episode.ended) {
     req.episode.ended = Date.now()
     req.episode
         .save()
