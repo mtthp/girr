@@ -71,6 +71,7 @@ export default {
         this.timePlayedHandler = window.setInterval(() => {
           this.timePlayed = !this.topic.started ? 0 : (this.topic.ended ? new Date(this.topic.ended).getTime() : new Date().getTime()) - new Date(this.topic.started).getTime()
         }, 1000)
+        this.timePlayed = !this.topic.started ? 0 : (this.topic.ended ? new Date(this.topic.ended).getTime() : new Date().getTime()) - new Date(this.topic.started).getTime()
       }
     },
     'topic.ended' (value) {

@@ -5,6 +5,7 @@
         <a class="material-icons mdc-toolbar__icon--menu mdc-ripple-surface menu" aria-label="Menu" alt="Menu" data-mdc-auto-init="MDCRipple">menu</a>
         <span class="mdc-toolbar__title">{{ title }}</span>
       </section>
+      <slot name="headerActions"></slot>
     </div>
     <div role="progressbar" class="mdc-linear-progress">
       <div class="mdc-linear-progress__buffering-dots"></div>
@@ -74,5 +75,17 @@ export default {
   background-image: url("../assets/geekinc-logo_512.png");
   background-size: cover;
   background-position: center;
+}
+
+.mdc-toolbar__section.mdc-toolbar__section--align-end {
+  margin-right: 10px;
+}
+
+.mdc-toolbar__section.mdc-toolbar__section--align-end .mdc-icon-toggle::before,
+.mdc-toolbar__section.mdc-toolbar__section--align-end .mdc-icon-toggle::after {
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
 }
 </style>

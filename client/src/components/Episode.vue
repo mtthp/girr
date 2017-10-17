@@ -1,6 +1,12 @@
 <template>
   <div>
-    <Toolbar :title="episode.name"></Toolbar>
+    <Toolbar :title="episode.name">
+      <section class="mdc-toolbar__section mdc-toolbar__section--align-end" slot="headerActions">
+        <time v-if="episode.started">{{ timePlayed | formatTime }}</time>
+        <i v-if="episode.started !== null && episode.ended === null" class="mdc-icon-toggle material-icons" arial-label="Stop" v-on:click="stopEpisode(episode)">stop</i>
+        <i v-else class="mdc-icon-toggle material-icons" arial-label="Playing" v-on:click="startEpisode(episode)">play_arrow</i>
+      </section>
+    </Toolbar>
     <main class="mdc-toolbar-fixed-adjust" :class="{ empty: topics.length == 0 }">
       <div class="episode">
         <TopicDialog></TopicDialog>
@@ -55,7 +61,8 @@ export default {
   data () {
     return {
       episode: {},
-      topics: []
+      topics: [],
+      timePlayed: !this.episode || !this.episode.started ? 0 : (this.episode.ended ? new Date(this.episode.ended).getTime() : new Date().getTime()) - new Date(this.episode.started).getTime()
     }
   },
   created () {
@@ -105,8 +112,20 @@ export default {
     })
   },
   watch: {
-    // call again the method if the route changes
-    '$route': 'fetchData'
+    '$route': 'fetchData',
+    'episode.started' (value) {
+      if (value !== null && this.episode.ended === null) {
+        this.timePlayedHandler = window.setInterval(() => {
+          this.timePlayed = !this.episode.started ? 0 : (this.episode.ended ? new Date(this.episode.ended).getTime() : new Date().getTime()) - new Date(this.episode.started).getTime()
+        }, 1000)
+      }
+      this.timePlayed = !this.episode.started ? 0 : (this.episode.ended ? new Date(this.episode.ended).getTime() : new Date().getTime()) - new Date(this.episode.started).getTime()
+    },
+    'episode.ended' (value) {
+      if (value !== null && this.episode.started !== null) {
+        window.clearInterval(this.timePlayedHandler)
+      }
+    }
   },
   methods: {
     fetchData: function () {
@@ -120,6 +139,36 @@ export default {
             this.episode = data
           }
           this.fetchTopics()
+        },
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          console.error(response)
+          Event.$emit('snackbar.message', 'Error : ' + (response.statusText ? response.statusText : 'no connection'))
+        }
+      )
+    },
+    startEpisode: function (episode) {
+      Event.$emit('progressbar.toggle', true)
+      this.$http.get('/api/programs/' + this.$route.params.programId + '/episodes/' + this.$route.params.episodeId + '/start').then(
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          Event.$emit('episode.updated', response.body)
+          Event.$emit('snackbar.message', 'Episode ' + response.body.name + ' started')
+        },
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          console.error(response)
+          Event.$emit('snackbar.message', 'Error : ' + (response.statusText ? response.statusText : 'no connection'))
+        }
+      )
+    },
+    stopEpisode: function (episode) {
+      Event.$emit('progressbar.toggle', true)
+      this.$http.get('/api/programs/' + this.$route.params.programId + '/episodes/' + this.$route.params.episodeId + '/stop').then(
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          Event.$emit('episode.updated', response.body)
+          Event.$emit('snackbar.message', 'Episode ' + response.body.name + ' stopped')
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
@@ -291,5 +340,9 @@ export default {
 }
 .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
   opacity: 0
+}
+
+.mdc-toolbar__section.mdc-toolbar__section--align-end time {
+  margin: auto 0;
 }
 </style>
