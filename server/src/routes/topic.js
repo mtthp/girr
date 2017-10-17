@@ -237,6 +237,9 @@ router.route('/:topicId')
    *           $ref: '#/definitions/Topic'
    */
   .put(function (req, res, next) {
+    delete req.body.started
+    delete req.body.ended
+    
     req.topic = Object.assign(req.topic, req.body, {modified: Date.now()})
     req.topic
       .save()

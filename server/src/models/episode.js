@@ -5,7 +5,7 @@ const logger = require('../logger')
 const websockets = require('../websockets')()
 
 /*
- * The purpose of this setter is to end all playing medias
+ * The purpose of this setter is to end all playing episodes
  * because there can be only one to rule them all
  */
 function stopPlayingEpisodes (time_value) {

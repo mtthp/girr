@@ -88,6 +88,9 @@ router.route('/')
    */
   .post(async function (req, res, next) {
     "use strict";
+    delete req.body.started
+    delete req.body.ended
+
     let episode = new Episode(Object.assign(req.body, {created: Date.now(), modified: Date.now()}))
     episode.program = req.program._id
     
@@ -215,6 +218,9 @@ router.route('/:episodeId')
    *           $ref: '#/definitions/Episode'
    */
   .put(function (req, res, next) {
+    delete req.body.started
+    delete req.body.ended
+    
     req.episode = Object.assign(req.episode, req.body, {modified: Date.now()})
     req.episode
       .save()

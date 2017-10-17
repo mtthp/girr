@@ -263,6 +263,9 @@ router.route('/:mediaId')
    *           $ref: '#/definitions/Media'
    */
   .put(function (req, res, next) {
+    delete req.body.started
+    delete req.body.ended
+    
     req.media = Object.assign(req.media, req.body, {modified: Date.now()})
     req.media
       .save()
