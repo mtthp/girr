@@ -83,7 +83,6 @@ export default {
     })
     Event.$on('topic.stop', (topic) => {
       this.stopTopic(topic)
-      this.updateXsplit({title: this.episode.name, picture: null})
     })
     Event.$on('topic.added', (topic) => {
       const index = this.topics.indexOf(this.topics.find(function (episodeTopic) {
@@ -275,19 +274,6 @@ export default {
           }
         }
       ).then(
-        function (response) {
-          Event.$emit('progressbar.toggle', false)
-        },
-        function (response) {
-          Event.$emit('progressbar.toggle', false)
-          console.error(response)
-          Event.$emit('snackbar.message', 'Error : ' + (response.statusText ? response.statusText : 'no connection'))
-        }
-      )
-    },
-    updateXsplit: function (data) {
-      Event.$emit('progressbar.toggle', true)
-      this.$http.put('/api/xsplit/', data).then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
         },
