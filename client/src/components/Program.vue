@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Toolbar :title="program.name">
+    <Toolbar :title="program.name" :classes="'mdc-toolbar--flexible mdc-toolbar--flexible-default-behavior'" :backgroundImage="program.thumbnail">
       <section class="mdc-toolbar__section mdc-toolbar__section--align-end" slot="headerActions">
         <i class="mdc-icon-toggle material-icons" arial-label="Edit" v-on:click="editProgram">edit</i>
       </section>
@@ -109,6 +109,8 @@ export default {
           this.$options.sockets[`programs.${this.program._id}`] = (data) => {
             this.program = data
           }
+          var styleElem = this.$el.querySelector('.mdc-toolbar--flexible .mdc-toolbar__row').appendChild(document.createElement('style'))
+          styleElem.innerHTML = '.mdc-toolbar--flexible .mdc-toolbar__row:first-child::after { background-image: url(' + (this.program.thumbnail ? this.program.thumbnail : require('../assets/geekinc-logo_512.png')) + '); }'
           this.fetchEpisodes()
         },
         function (response) {
@@ -238,16 +240,20 @@ export default {
       flex-flow: row wrap;
 }
 
+main.empty .empty-state {
+  max-height: calc(100vh - (5 * 72px)); /* --mdc-toolbar-ratio-to-extend-flexible * 72px */
+}
+
 @media (max-width: 1280px) {
   main:not(.empty) {
-    padding-bottom: 72px
+    padding-bottom: 72px; 
   }
 }
 
 .episodes .episode-card {
   margin: 15px;
   width: calc(100%/3 - 30px);
-  height: 21.875rem;
+  height: 12.875rem;
 }
 
 @media screen and (max-width: 991px) {
@@ -286,5 +292,17 @@ a.episode-card {
 }
 .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
   opacity: 0
+}
+</style>
+
+
+<style>
+.mdc-toolbar--flexible {
+  --mdc-toolbar-ratio-to-extend-flexible: 5;
+}
+
+.mdc-toolbar--flexible .mdc-toolbar__row:first-child::after {
+  background-size: cover;
+  background-position: center;
 }
 </style>

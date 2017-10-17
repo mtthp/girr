@@ -1,5 +1,5 @@
 <template>
-  <header class="mdc-toolbar mdc-toolbar--fixed mdc-toolbar--waterfall">
+  <header class="mdc-toolbar mdc-toolbar--fixed mdc-toolbar--waterfall" :class="classes">
     <div class="mdc-toolbar__row">
       <section class="mdc-toolbar__section mdc-toolbar__section--align-start">
         <a class="material-icons mdc-toolbar__icon--menu mdc-ripple-surface menu" aria-label="Menu" alt="Menu" data-mdc-auto-init="MDCRipple">menu</a>
@@ -30,7 +30,7 @@ import { toolbar } from 'material-components-web'
 
 export default {
   name: 'Toolbar',
-  props: ['title'],
+  props: ['title', 'classes', 'backgroundImage'],
   components: { Drawer },
   mounted: function () {
     Event.$on('progressbar.toggle', this.toggleProgressBar)
@@ -65,16 +65,6 @@ export default {
 <style scoped>
 .mdc-toolbar__title:hover {
   cursor: pointer;
-}
-
-.mdc-toolbar--flexible {
-  --mdc-toolbar-ratio-to-extend-flexible: 3;
-}
-
-.mdc-toolbar__row:first-child::after {
-  background-image: url("../assets/geekinc-logo_512.png");
-  background-size: cover;
-  background-position: center;
 }
 
 .mdc-toolbar__section.mdc-toolbar__section--align-end {
