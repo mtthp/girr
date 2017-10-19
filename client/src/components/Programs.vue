@@ -171,7 +171,7 @@ export default {
 
 @media (max-width: 1280px) {
   main:not(.empty) {
-    padding-bottom: 72px
+    padding-bottom: 72px;
   }
 }
 

@@ -79,20 +79,20 @@ export default {
 }
 
 @media (min-width: 481px) and (max-width: 840px) {
-   .xsplit .title {
+  .xsplit .title {
     margin: 0.5 0.5em;
     max-width: calc(100% - 1em);
   }
 }
 
 @media (max-width: 480px) {
-   .xsplit .title {
+  .xsplit .title {
     margin: 0;
     max-width: calc(100%);
   }
 }
 
-.xsplit .title:not(.hidden) {
+.xsplit .title {
   /* en mode apparition, on veut que le texte apparaisse vers la fin de l'animation */
   transition: transform 1s, color 2s ease-in-out;
   transform-origin: left;
@@ -169,4 +169,5 @@ export default {
   background-position: center center;
   background-image: url('../assets/error.gif');
 }
+
 </style>
