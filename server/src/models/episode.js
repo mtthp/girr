@@ -31,7 +31,6 @@ function stopPlayingEpisodes (time_value) {
 let episodeSchema = new mongoose.Schema({
     number: { type: Number, required: true, index: true },
     name: { type: String },
-    date: { type: Date, default: Date.now },
     started: { type: Date, set: stopPlayingEpisodes },
     ended: { type: Date },
     created: { type: Date, required: true },
