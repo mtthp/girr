@@ -109,7 +109,7 @@ export default {
           this.$options.sockets[`programs.${this.program._id}`] = (data) => {
             this.program = data
           }
-          var styleElem = this.$el.querySelector('.mdc-toolbar--flexible .mdc-toolbar__row').appendChild(document.createElement('style'))
+          var styleElem = this.$el.querySelector('.mdc-toolbar--flexible .mdc-toolbar__row:first-child style') ? this.$el.querySelector('.mdc-toolbar--flexible .mdc-toolbar__row:first-child style') : this.$el.querySelector('.mdc-toolbar--flexible .mdc-toolbar__row:first-child').appendChild(document.createElement('style'))
           styleElem.innerHTML = '.mdc-toolbar--flexible .mdc-toolbar__row:first-child::after { background-image: url(' + (this.program.thumbnail ? this.program.thumbnail : require('../assets/geekinc-logo_512.png')) + '); }'
           this.fetchEpisodes()
         },
@@ -292,17 +292,5 @@ a.episode-card {
 }
 .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
   opacity: 0
-}
-</style>
-
-
-<style>
-.mdc-toolbar--flexible {
-  --mdc-toolbar-ratio-to-extend-flexible: 5;
-}
-
-.mdc-toolbar--flexible .mdc-toolbar__row:first-child::after {
-  background-size: cover;
-  background-position: center;
 }
 </style>

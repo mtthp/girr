@@ -40,10 +40,15 @@ export default {
 
     this.tb = toolbar.MDCToolbar.attachTo(this.$el)
     this.tb.fixedAdjustElement = document.querySelector('.mdc-toolbar-fixed-adjust')
-    // this.tb.listen('MDCToolbar:change', function (evt) {
-    //   let flexibleExpansionRatio = evt.detail.flexibleExpansionRatio
-    //   console.log(flexibleExpansionRatio.toFixed(2))
-    // })
+    this.tb.listen('MDCToolbar:change', (evt) => {
+      let flexibleExpansionRatio = evt.detail.flexibleExpansionRatio
+      console.log(flexibleExpansionRatio.toFixed(2))
+      if (flexibleExpansionRatio > 0) {
+        this.$el.querySelector('.mdc-toolbar__row:first-child').classList.add('flex')
+      } else {
+        this.$el.querySelector('.mdc-toolbar__row:first-child').classList.remove('flex')
+      }
+    })
   },
   watch: {
     title: function (newTitle) {
@@ -63,10 +68,6 @@ export default {
 </script>
 
 <style scoped>
-.mdc-toolbar__title:hover {
-  cursor: pointer;
-}
-
 .mdc-toolbar__section.mdc-toolbar__section--align-end {
   margin-right: 10px;
 }
@@ -77,5 +78,22 @@ export default {
   height: 100%;
   top: 0;
   left: 0;
+}
+
+.mdc-toolbar--flexible {
+  --mdc-toolbar-ratio-to-extend-flexible: 5;
+}
+
+.mdc-toolbar--flexible .mdc-toolbar__row:first-child::after {
+  background-size: cover;
+  background-position: center;
+}
+
+.mdc-toolbar--flexible .mdc-toolbar__row:first-child:not(.flex) .mdc-toolbar__section {
+  align-items: center;
+}
+
+.mdc-toolbar--flexible .mdc-toolbar__row:first-child.flex .mdc-toolbar__title {
+  text-shadow: 1px 1px #000000;
 }
 </style>
