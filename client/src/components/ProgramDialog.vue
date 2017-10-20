@@ -98,6 +98,7 @@ export default {
 .mdc-dialog__body .thumbnail {
   position: relative;
   cursor: pointer;
+  text-align: center;
 }
 
 .mdc-dialog__body .thumbnail .material-icons {
@@ -114,7 +115,7 @@ export default {
 .mdc-dialog__body .thumbnail img {
   object-fit: contain;
   min-height: 100px;
-  width: 100%;
+  max-width: 100%;
   background: transparent;
   background-repeat: no-repeat;
   background-position: center center;
