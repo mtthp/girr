@@ -8,6 +8,9 @@ const XSplit = require('../models/xsplit')
 const path = require('path')
 const multer = require('multer')
 const uuidv4 = require('uuid/v4')
+const fs = require('fs')
+const request = require('request-promise')
+const mime = require('mime')
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -125,7 +128,7 @@ router.route('/')
    *         schema:
    *           $ref: '#/definitions/Media'
    */
-  .post(upload.single('file'), function (req, res, next) {
+  .post(upload.single('file'), async function (req, res, next) {
     "use strict";
     let media = new Media(Object.assign(req.body, {created: Date.now(), modified: Date.now()}))
     media.topic = req.topic._id
@@ -140,10 +143,15 @@ router.route('/')
       media.path = req.file.path
       media.uri = '/' + media.path // should be calculate automatically from the path instead
       media.mimeType = req.file.mimetype
-    // } else if (media.uri) { // otherwise, tries to download the file and place it under the data directory
-    //   if (typeof media.label === "undefined") {
-    //     media.label = "untitled"
-    //   }
+    } else if (media.uri) { // otherwise, tries to download the file and place it under the data directory
+      let body = await request({uri: media.uri, encoding: 'binary'})
+      let filepath = 'data/uploads/' + path.basename(media.uri, path.extname(media.uri)).replace(/\s/g, "_") + '-' + uuidv4() + path.extname(media.uri)
+      fs.writeFileSync(path.resolve(filepath), body, 'binary')
+
+      if (typeof media.label === "undefined") media.label = path.basename(media.uri)
+      media.path = filepath
+      media.uri = '/' + media.path // should be calculate automatically from the path instead
+      media.mimeType = mime.getType(media.path)
     } else {
       next({message:"No media file or URI was provided", status: 417})
     }
@@ -448,109 +456,5 @@ router.get('/:mediaId/stop', function (req, res, next) {
         next(error)
       })
 })
-
-
-
-
-
-
-
-
-/* legacy code below this line */
-
-
-const request = require('request');
-
-router.get('/', (req, res) => {
-    return res.send(req.topic.medias);
-});
-
-router.get('/:incrust', (req, res, next) => {
-    Incrust.findOne({ _id: req.params.incrust }, (err, incrust) => {
-        if (err) return next(err);
-        if (incrust) {
-            res.contentType = incrust.contentType;
-            res.setHeader('content-type', incrust.contentType);
-            return res.send(incrust.data);
-        }
-        return res.sendStatus(404);
-    });
-
-    // Incrust.find({ news: req.news._id }, (err, incrusts) => {
-    //     if(err) return next(err);
-
-    //     if (req.params.incrust < incrusts.length) {
-    //         let incrust = incrusts[req.params.incrust];
-    //         res.contentType = incrust.contentType;
-    //         res.setHeader('content-type', incrust.contentType);
-    //         return res.send(incrust.data);
-    //     }
-    //     return res.sendStatus(404);
-    // });
-});
-
-// router.use(fileUpload());
-
-router.post('/', (req, res, next) => {
-    // soit on envoie des fichiers directements, soit des urls en texte
-    if (!req.files) {
-        // on recoit directement des url
-        let uri = req.body.uri;
-        console.log(uri);
-
-
-        request({ url: uri, encoding: null }, (error, response, body) => {
-            let incrust = new Incrust({
-                news: req.news._id,
-                data: body,
-                contentType: response.headers['content-type']
-            });
-            incrust.save(err => {
-                if (err) return next(err);
-                req.news.incrusts.push(incrust);
-                req.news.save(err => {
-                    if (err) return next(err);
-                    res.setHeader('location', path.join(req.originalUrl, incrust._id.toString()));
-                    return res.sendStatus(201);
-                });
-            });
-        });
-    } else {
-        // .incrust est le nom du form
-        // let incrustFile = req.files.incrust;
-        // incrustFile.mv(path.join(req.localPathToIncrusts, req.files.incrust.name), err => {
-        //     if (err)
-        //         return res.status(500).send(err);
-        //     res.send('File uploaded!');
-        // });
-        return res.send(req.news.incrusts);
-    }
-});
-
-router.delete('/:incrust', (req, res, next) => {
-    Incrust.findOneAndRemove({
-        _id: req.params.incrust
-    }, (err, incrust) => {
-        if (err) return next(err);
-
-        Media.findOne({ _id: incrust.news }, (err, news) => {
-            if (err) return next(err);
-            if (news) {
-                let indexIncrustToRemove = news.incrusts.indexOf(incrust._id);
-                if (indexIncrustToRemove !== -1) {
-                    news.incrusts.splice(indexIncrustToRemove, 1);
-                    news.save(err => {
-                        if (err) return next(err);
-                        return res.sendStatus(204);
-                    });
-                } else {
-                    return res.sendStatus(204);
-                }
-            } else {
-                return res.sendStatus(204);
-            }
-        });
-    });
-});
 
 module.exports = router;
