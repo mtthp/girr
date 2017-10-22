@@ -25,8 +25,20 @@
                 <img class="mdc-grid-tile__primary-content" :src="media.uri" />
                 <i class="material-icons" v-on:click="deleteMedia(media)">cancel</i>
               </div>
-              <span class="mdc-grid-tile__secondary">
+              <span class="mdc-grid-tile__secondary" v-if="media.label">
                 <span class="mdc-grid-tile__title">{{ media.label }}</span>
+              </span>
+            </li>
+            <li class="mdc-grid-tile add-tile">
+              <div class="mdc-grid-tile__primary">
+                <input type="file" name="file" accept="image/*" class="input-file" v-on:change="fileChange($event.target.name, $event.target.files);" style="display: none;">
+                <img class="mdc-grid-tile__primary-content" v-on:click="$event.currentTarget.parentNode.querySelector('input').click()"/>
+              </div>
+              <span class="mdc-grid-tile__secondary">
+                <span class="mdc-grid-tile__title mdc-textfield">
+                  <input type="text" id="uri" class="mdc-textfield__input" v-on:change="uriChange($event)">
+                  <label for="uri" class="mdc-textfield__label">URL</label>
+                </span>
               </span>
             </li>
           </ul>
@@ -37,11 +49,6 @@
           <button type="button" class="mdc-button mdc-dialog__footer__button delete" v-on:click="deleteTopic">
             <i class="material-icons mdc-button__icon">delete</i>
             Delete
-          </button>
-          <button type="button" class="mdc-button mdc-dialog__footer__button upload" v-on:click="$event.currentTarget.querySelector('input').click()">
-            <input type="file" name="file" accept="image/*" class="input-file" v-on:change="fileChange($event.target.name, $event.target.files);" style="display: none;">
-            <i class="material-icons mdc-button__icon">file_upload</i>
-            Upload
           </button>
         </div>
         <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--cancel">Cancel</button>
@@ -56,6 +63,7 @@
 import Event from '../utils/EventBus.js'
 import { dialog, textfield } from 'material-components-web'
 import assign from 'object-assign'
+import validUrl from 'valid-url'
 
 export default {
   name: 'TopicDialog',
@@ -69,6 +77,7 @@ export default {
   mounted () {
     this.dialog = new dialog.MDCDialog(this.$el)
     textfield.MDCTextfield.attachTo(this.$el.querySelector('.mdc-textfield'))
+    this.addTileTextfield = new textfield.MDCTextfield(this.$el.querySelector('.add-tile .mdc-textfield'))
     Event.$on('topicDialog.show', this.show)
     Event.$on('topicDialog.close', this.close)
   },
@@ -96,6 +105,15 @@ export default {
           this.medias.push({uri: e.target.result, label: files[0].name, file: files[0]})
         })
         FR.readAsDataURL(files[0])
+      }
+    },
+    uriChange: function (event) {
+      if (validUrl.isUri(event.target.value)) {
+        this.medias.push({uri: event.target.value})
+        event.target.value = ''
+        this.addTileTextfield.valid = true
+      } else {
+        this.addTileTextfield.valid = false
       }
     },
     deleteMedia: function (media) {
@@ -145,5 +163,38 @@ button.delete {
   right: 0;
   z-index: 3;
   cursor: pointer;
+}
+
+.add-tile img {
+  cursor: pointer;
+  background: transparent;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-image: url("\
+  data:image/svg+xml;utf8, \
+    <svg xmlns='http://www.w3.org/2000/svg' version='1.1' width='170px' height='50px'> \
+      <text x='85' y='28' \
+        style='text-anchor: middle' font-size='16'> \
+        Click here to upload \
+      </text> \
+    </svg>\
+  ");
+}
+
+.add-tile .mdc-grid-tile__secondary {
+  padding: 0 16px;
+  height: inherit;
+}
+
+.add-tile .mdc-grid-tile__secondary .mdc-textfield:not(.mdc-textfield--invalid) label {
+  color: white;
+}
+
+.add-tile .mdc-grid-tile__secondary .mdc-textfield:not(.mdc-textfield--invalid) input {
+  border-color: white;
+}
+
+.add-tile .mdc-grid-tile__secondary .mdc-textfield input {
+  color: white;
 }
 </style>
