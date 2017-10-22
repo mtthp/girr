@@ -2,10 +2,10 @@
   <div>
     <Toolbar :title="episode.name">
       <section class="mdc-toolbar__section mdc-toolbar__section--align-end" slot="headerActions">
-        <i class="mdc-icon-toggle material-icons" arial-label="Edit" v-on:click="editEpisode">edit</i>
-        <time v-if="episode.started">{{ timePlayed | formatTime }}</time>
-        <i v-if="episode.started !== null && episode.ended === null" class="mdc-icon-toggle material-icons" arial-label="Stop" v-on:click="stopEpisode(episode)">stop</i>
-        <i v-else class="mdc-icon-toggle material-icons" arial-label="Playing" v-on:click="startEpisode(episode)">play_arrow</i>
+        <button class="material-icons mdc-toolbar__icon mdc-ripple-surface" arial-label="Edit" v-on:click="editEpisode">edit</button>
+        <time v-if="episode.started" :style="{ }">{{ timePlayed | formatTime }}</time>
+        <button v-if="episode.started !== null && episode.ended === null" class="material-icons mdc-toolbar__icon mdc-ripple-surface" arial-label="Stop" v-on:click="stopEpisode(episode)">stop</button>
+        <button v-else class="material-icons mdc-toolbar__icon mdc-ripple-surface" arial-label="Playing" v-on:click="startEpisode(episode)">play_arrow</button>
       </section>
     </Toolbar>
     <main class="mdc-toolbar-fixed-adjust" :class="{ empty: topics.length == 0 }">

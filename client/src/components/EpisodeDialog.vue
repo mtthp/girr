@@ -24,13 +24,13 @@
       </section>
       <footer class="mdc-dialog__footer">
         <div style="margin-right: auto;">
-          <button type="button" class="mdc-button mdc-dialog__footer__button delete" v-on:click="deleteEpisode">
+          <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--delete" v-on:click="deleteEpisode">
             <i class="material-icons mdc-button__icon">delete</i>
-            Delete
+            <span>Delete</span>
           </button>
         </div>
-        <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--cancel">Cancel</button>
-        <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--accept" v-on:click="confirm">Update</button>
+        <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--cancel"><i class="material-icons mdc-button__icon">clear</i><span>Cancel</span></button>
+        <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--accept mdc-button--raised" v-on:click="confirm"><i class="material-icons mdc-button__icon">check</i><span>Update</span></button>
       </footer>
     </div>
     <div class="mdc-dialog__backdrop"></div>
@@ -87,10 +87,6 @@ export default {
   max-height: calc(80vh - 56px - 52px); /* main - header - footer */
 }
 
-button.delete {
-  color: red;
-}
-
 .mdc-grid-list {
   margin: 0 auto;
 }
@@ -118,5 +114,24 @@ button.delete {
 /* fix mdc-textfield--fullwidth padding */
 .mdc-textfield--fullwidth:not(.mdc-textfield--textarea) .mdc-textfield__input {
   padding: 10px 0;
+}
+
+.mdc-button .mdc-button__icon {
+  line-height: 32px;
+}
+
+@media screen and (max-width: 480px) {
+  .mdc-button span {
+    display: none;
+  }
+}
+@media screen and (min-width: 481px) {
+  .mdc-button .mdc-button__icon {
+    display: none;
+  }
+}
+
+.mdc-dialog__footer__button--delete {
+  color: red;
 }
 </style>

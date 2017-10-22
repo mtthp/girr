@@ -95,4 +95,8 @@ export default {
 .mdc-toolbar--flexible .mdc-toolbar__row:first-child.flex .mdc-toolbar__title {
   text-shadow: 1px 1px #000000;
 }
+
+.mdc-toolbar--flexible .mdc-toolbar__row:first-child.flex .material-icons {
+  color: var(--mdc-theme-text-secondary-on-light,rgba(0,0,0,.54));
+}
 </style>

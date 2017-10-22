@@ -2,7 +2,7 @@
   <div>
     <Toolbar :title="program.name" :classes="'mdc-toolbar--flexible mdc-toolbar--flexible-default-behavior'" :backgroundImage="program.thumbnail">
       <section class="mdc-toolbar__section mdc-toolbar__section--align-end" slot="headerActions">
-        <i class="mdc-icon-toggle material-icons" arial-label="Edit" v-on:click="editProgram">edit</i>
+        <button class="material-icons mdc-toolbar__icon mdc-ripple-surface" arial-label="Edit" v-on:click="editProgram">edit</button>
       </section>
     </Toolbar>
     <main class="mdc-toolbar-fixed-adjust" :class="{ empty: episodes.length == 0 }">
