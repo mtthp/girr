@@ -42,7 +42,6 @@ export default {
     this.tb.fixedAdjustElement = document.querySelector('.mdc-toolbar-fixed-adjust')
     this.tb.listen('MDCToolbar:change', (evt) => {
       let flexibleExpansionRatio = evt.detail.flexibleExpansionRatio
-      console.log(flexibleExpansionRatio.toFixed(2))
       if (flexibleExpansionRatio > 0) {
         this.$el.querySelector('.mdc-toolbar__row:first-child').classList.add('flex')
       } else {

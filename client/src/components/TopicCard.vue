@@ -315,20 +315,4 @@ a.mdc-list-item {
   color: inherit;
   text-decoration: none;
 }
-
-.mdc-grid-tile {
-  --mdc-grid-list-tile-width: 192px;
-  margin: 2px auto;
-}
-
-@media screen and (max-width: 991px) {
-  .mdc-grid-tile {
-    --mdc-grid-list-tile-width: 144px;
-  }
-}
-@media screen and (max-width: 767px) {
-  .mdc-grid-tile {
-    --mdc-grid-list-tile-width: 96px;
-  }
-}
 </style>
