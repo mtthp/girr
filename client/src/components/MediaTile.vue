@@ -92,18 +92,18 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .mdc-grid-tile {
-  --mdc-grid-list-tile-width: 192px;
+  --mdc-grid-list-tile-width: 256px;
   margin: 2px auto;
 }
 
 @media screen and (max-width: 991px) {
   .mdc-grid-tile {
-    --mdc-grid-list-tile-width: 144px;
+    --mdc-grid-list-tile-width: 192px;
   }
 }
 @media screen and (max-width: 767px) {
   .mdc-grid-tile {
-    --mdc-grid-list-tile-width: 96px;
+    --mdc-grid-list-tile-width: 144px;
   }
 }
 
