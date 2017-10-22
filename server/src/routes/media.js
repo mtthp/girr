@@ -156,6 +156,20 @@ router.route('/')
       next({message:"No media file or URI was provided", status: 417})
     }
 
+    // provide a position if the user didn't specified one
+    if (typeof media.position === "undefined") {
+      var topicMedias = await Media.find({ topic: req.topic._id }).exec()
+
+      // Max media position + 1 - inspired by https://stackoverflow.com/a/4020842
+      var maxMediaPosition = topicMedias.length > 0 ? Math.max.apply(
+          Math,
+          topicMedias.map(function(m){
+              return m.position;
+          })
+      ) : 0;
+      media.position = 1 + maxMediaPosition;
+    }
+
     media
       .save()
       .then(function(media) {
@@ -455,6 +469,78 @@ router.get('/:mediaId/stop', function (req, res, next) {
       .catch(function(error) {
         next(error)
       })
+})
+
+/**
+ * @swagger
+ * /programs/{programId}/episodes/{episodeId}/topics/{topicId}/medias/{mediaId}/move:
+ *   get:
+ *     tags:
+ *       - Media
+ *     description: Move a media to a new position and reindex the whole list
+ *     summary: Move a media
+ *     produces: application/json
+ *     parameters:
+ *       - name: programId
+ *         description: Program's id
+ *         in: path
+ *         required: true
+ *         type: uuid
+ *       - name: episodeId
+ *         description: Episode's id
+ *         in: path
+ *         required: true
+ *         type: uuid
+ *       - name: topicId
+ *         description: Topic's id
+ *         in: path
+ *         required: true
+ *         type: uuid
+ *       - name: mediaId
+ *         description: Media's id
+ *         in: path
+ *         required: true
+ *         type: uuid
+ *       - name: position
+ *         description: New Media's position
+ *         in: query
+ *         required: true
+ *         type: integer
+ *     responses:
+ *       200:
+ *         description: All Topic's Medias
+ *         schema:
+ *           type: array
+ *           items:
+ *             $ref: '#/definitions/Media'
+ */
+router.get('/:mediaId/move', async function (req, res, next) {
+  if (!req.query.position) {
+    next({message:"A new position is needed to perform a move", status: 417, example: '/move?position=10'})
+  }
+
+  var newPosition = parseInt(req.query.position)
+
+  var topicMedias = await Media.find({ topic: req.topic._id }).sort({ 'position': 1 }).exec()
+  for (var i = 0; i < topicMedias.length; i++) {
+    if (topicMedias[i]._id.equals(req.media._id)) {
+      var mediaToMove = topicMedias[i]
+      topicMedias.splice(i, 1)
+      topicMedias.splice(newPosition, 0, mediaToMove)
+      break
+    }
+  }
+
+  if (mediaToMove) {
+    for (var i = 0; i < topicMedias.length; i++) {
+      topicMedias[i].position = i
+      topicMedias[i].save()
+    }
+
+    res.json(topicMedias)
+  } else {
+    next({message:"Couldn't move the Media at the new position " + newPosition, status: 500})
+  }
 })
 
 module.exports = router;

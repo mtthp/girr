@@ -2,7 +2,7 @@
   <div class="topic" v-bind:class="{ expanded : topic.expanded, playing : topic.started !== null && topic.ended === null }">
     <li role="separator" class="mdc-list-divider"></li>
     <li class="mdc-list-item" data-mdc-auto-init="MDCRipple" v-on:click="toggle(!topic.expanded)">
-      <img v-if="medias.length > 0" class="mdc-list-item__start-detail" :src="medias[0].uri" width="56" height="56" alt="medias[0].label">
+      <img v-if="medias.length > 0" class="mdc-list-item__start-detail" :src="medias[0].uri" width="56" height="56" :alt="medias[0].label">
       <span v-else class="mdc-list-item__start-detail" role="presentation">
         <i class="material-icons" aria-hidden="true">comment</i>
       </span>
@@ -21,9 +21,15 @@
     <div class="content">
       {{ topic.description ? topic.description : 'Empty in here' }}
       <div class="mdc-grid-list">
-        <ul class="mdc-grid-list__tiles">
+        <draggable
+          v-if="medias.length > 0"
+          element="ul"
+          v-model="medias"
+          :options="dragOptions"
+          @change="itemMoved"
+          class="mdc-grid-list__tiles">
           <MediaTile v-for="media in medias" :key="media._id" :media="media" :topicId="topic._id"></MediaTile>
-        </ul>
+        </draggable>
       </div>
     </div>
   </div> 
@@ -33,6 +39,7 @@
 import Event from '../utils/EventBus.js'
 import { autoInit } from 'material-components-web'
 import MediaTile from './MediaTile'
+import draggable from 'vuedraggable'
 
 export default {
   props: ['topic'],
@@ -43,7 +50,17 @@ export default {
     }
   },
   components: {
-    MediaTile
+    MediaTile,
+    draggable
+  },
+  computed: {
+    dragOptions () {
+      return {
+        animation: 0,
+        handle: 'img',
+        delay: 0
+      }
+    }
   },
   created () {
     this.topic.expanded = false
@@ -121,6 +138,9 @@ export default {
       for (let i = 0; i < this.medias.length; i++) {
         if (this.medias[i]._id === media._id) {
           this.medias[i] = media
+          this.medias.sort(function (m1, m2) {
+            return m1.position === m2.position ? 0 : (m1.position < m2.position ? -1 : 1)
+          })
           this.$forceUpdate()
           break
         }
@@ -199,6 +219,30 @@ export default {
           Event.$emit('snackbar.message', `Error : ${response.statusText ? response.statusText : 'no connection'}`)
         }
       )
+    },
+    moveMedia: function (media, newPosition) {
+      Event.$emit('progressbar.toggle', true)
+      this.$http.get(`/api/programs/${this.$route.params.programId}/episodes/${this.$route.params.episodeId}/topics/${this.topic._id}/medias/${media._id}/move`,
+        {
+          params: {
+            position: newPosition
+          }
+        }
+      ).then(
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+        },
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          console.error(response)
+          Event.$emit('snackbar.message', `Error : ${response.statusText ? response.statusText : 'no connection'}`)
+        }
+      )
+    },
+    itemMoved: function (event) {
+      if (event.moved.element) {
+        this.moveMedia(event.moved.element, event.moved.newIndex)
+      }
     }
   }
 }

@@ -34,6 +34,7 @@ let mediaSchema = new mongoose.Schema({
   uri: { type: String, required: true},
   mimeType: { type: String, required: true},
   path: { type: String }, // in the case of a local file
+  position: { type: Number },
   started: { type: Date, set: stopPlayingMedias },
   ended: { type: Date },
   created: { type: Date, required: true },
