@@ -3,8 +3,8 @@
     <Toolbar :title="episode.name">
       <section class="mdc-toolbar__section mdc-toolbar__section--align-end" slot="headerActions">
         <button class="material-icons mdc-toolbar__icon mdc-ripple-surface" arial-label="Edit" v-on:click="editEpisode">edit</button>
-        <time v-if="episode.started" :style="{ }">{{ timePlayed | formatTime }}</time>
-        <button v-if="episode.started !== null && episode.ended === null" class="material-icons mdc-toolbar__icon mdc-ripple-surface" arial-label="Stop" v-on:click="stopEpisode(episode)">stop</button>
+        <time v-if="episode.started">{{ timePlayed | formatTime }}</time>
+        <button v-if="episode.started && !episode.ended" class="material-icons mdc-toolbar__icon mdc-ripple-surface" arial-label="Stop" v-on:click="stopEpisode(episode)">stop</button>
         <button v-else class="material-icons mdc-toolbar__icon mdc-ripple-surface" arial-label="Playing" v-on:click="startEpisode(episode)">play_arrow</button>
       </section>
     </Toolbar>
@@ -81,6 +81,9 @@ export default {
     })
     Event.$on('episode.delete', (episode) => {
       this.deleteEpisode(episode)
+    })
+    Event.$on('episode.updated', (episode) => {
+      this.episode = episode
     })
     Event.$on('topic.update', (topic, medias) => {
       this.updateTopic(topic)
