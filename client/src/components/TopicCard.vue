@@ -116,7 +116,7 @@ export default {
         // parcours des Dialog's medias pour savoir lesquels sont à ajouter
         dialogMedias.forEach((dialogMedia) => {
           if (!dialogMedia._id && (dialogMedia.file || dialogMedia.uri)) {
-            this.addMedia(dialogMedia.file, dialogMedia.uri)
+            this.addMedia(dialogMedia)
           }
         })
       }
@@ -188,10 +188,11 @@ export default {
       event.stopImmediatePropagation()
       Event.$emit('topic.stop', this.topic)
     },
-    addMedia: function (file, uri) {
+    addMedia: function (media) {
       let formData = new FormData()
-      if (file) formData.append('file', file)
-      if (uri) formData.append('uri', uri)
+      for (var propertyName in media) {
+        formData.append(propertyName, media[propertyName])
+      }
       Event.$emit('progressbar.toggle', true)
       this.$http.post(`/api/programs/${this.$route.params.programId}/episodes/${this.$route.params.episodeId}/topics/${this.topic._id}/medias/`, formData).then(
         (response) => {
