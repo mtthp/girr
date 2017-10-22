@@ -220,8 +220,6 @@ export default {
       )
     },
     editProgram: function (event) {
-      event.preventDefault()
-      event.stopPropagation()
       Event.$emit('programDialog.show', this.program)
     }
   }

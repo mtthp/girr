@@ -2,12 +2,14 @@
   <div>
     <Toolbar :title="episode.name">
       <section class="mdc-toolbar__section mdc-toolbar__section--align-end" slot="headerActions">
+        <i class="mdc-icon-toggle material-icons" arial-label="Edit" v-on:click="editEpisode">edit</i>
         <time v-if="episode.started">{{ timePlayed | formatTime }}</time>
         <i v-if="episode.started !== null && episode.ended === null" class="mdc-icon-toggle material-icons" arial-label="Stop" v-on:click="stopEpisode(episode)">stop</i>
         <i v-else class="mdc-icon-toggle material-icons" arial-label="Playing" v-on:click="startEpisode(episode)">play_arrow</i>
       </section>
     </Toolbar>
     <main class="mdc-toolbar-fixed-adjust" :class="{ empty: topics.length == 0 }">
+      <EpisodeDialog></EpisodeDialog>
       <div class="episode">
         <TopicDialog></TopicDialog>
         <draggable
@@ -34,6 +36,7 @@
 
 <script>
 import Event from '../utils/EventBus.js'
+import EpisodeDialog from './EpisodeDialog'
 import draggable from 'vuedraggable'
 import TopicCard from './TopicCard'
 import TopicDialog from './TopicDialog'
@@ -43,6 +46,7 @@ import EmptyState from './EmptyState'
 export default {
   name: 'episode',
   components: {
+    EpisodeDialog,
     draggable,
     TopicCard,
     TopicDialog,
@@ -72,6 +76,12 @@ export default {
         Event.$emit('topic.added', topic)
       }
     }
+    Event.$on('episode.update', (episode) => {
+      this.updateEpisode(episode)
+    })
+    Event.$on('episode.delete', (episode) => {
+      this.deleteEpisode(episode)
+    })
     Event.$on('topic.update', (topic, medias) => {
       this.updateTopic(topic)
     })
@@ -138,6 +148,39 @@ export default {
             this.episode = data
           }
           this.fetchTopics()
+        },
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          console.error(response)
+          Event.$emit('snackbar.message', `Error : ${response.statusText ? response.statusText : 'no connection'}`)
+        }
+      )
+    },
+    editEpisode: function (event) {
+      Event.$emit('episodeDialog.show', this.episode)
+    },
+    updateEpisode: function (episode) {
+      Event.$emit('progressbar.toggle', true)
+      this.$http.put(`/api/programs/${this.$route.params.programId}/episodes/${episode._id}`, episode).then(
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          Event.$emit('episode.updated', response.body)
+          Event.$emit('snackbar.message', `Episode ${response.body.name} updated`)
+        },
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          console.error(response)
+          Event.$emit('snackbar.message', `Error : ${response.statusText ? response.statusText : 'no connection'}`)
+        }
+      )
+    },
+    deleteEpisode: function (episode) {
+      Event.$emit('progressbar.toggle', true)
+      this.$http.delete(`/api/programs/${this.$route.params.programId}/episodes/${episode._id}`).then(
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          window.location = this.$router.resolve({name: 'Program', params: { programId: this.$route.params.programId }}).href
+          Event.$emit('snackbar.message', `Episode ${episode.name} deleted`)
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
