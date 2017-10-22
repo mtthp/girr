@@ -58,7 +58,7 @@ export default {
       return {
         animation: 0,
         handle: 'img',
-        delay: 0
+        delay: 100
       }
     }
   },
