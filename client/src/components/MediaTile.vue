@@ -3,8 +3,8 @@
     <div class="mdc-grid-tile__primary">
       <img class="mdc-grid-tile__primary-content" :src="media.uri" />
     </div>
-    <span class="mdc-grid-tile__secondary">
-      <span class="mdc-grid-tile__title">{{ media.label }}</span>
+    <span v-if="media.started && !media.ended" class="mdc-grid-tile__secondary">
+      <span class="mdc-grid-tile__title">{{ timePlayed | formatTime }}</span>
     </span>
   </li>
 </template>
@@ -14,12 +14,37 @@ import Event from '../utils/EventBus.js'
 
 export default {
   props: ['media', 'topicId'],
+  data () {
+    return {
+      timePlayed: !this.media.started ? 0 : (this.media.ended ? new Date(this.media.ended).getTime() : new Date().getTime()) - new Date(this.media.started).getTime()
+    }
+  },
   created () {
     this.$options.sockets[`medias.${this.media._id}.delete`] = (data) => {
       Event.$emit(`topics.${this.topicId}.media.deleted`, data)
     }
     this.$options.sockets[`medias.${this.media._id}`] = (data) => {
       Event.$emit(`topics.${this.topicId}.media.updated`, data)
+    }
+    if (this.media.started !== null && this.media.ended === null) {
+      this.timePlayedHandler = window.setInterval(() => {
+        this.timePlayed = !this.media.started ? 0 : (this.media.ended ? new Date(this.media.ended).getTime() : new Date().getTime()) - new Date(this.media.started).getTime()
+      }, 1000)
+    }
+  },
+  watch: {
+    'media.started' (value) {
+      if (value !== null && this.media.ended === null) {
+        this.timePlayedHandler = window.setInterval(() => {
+          this.timePlayed = !this.media.started ? 0 : (this.media.ended ? new Date(this.media.ended).getTime() : new Date().getTime()) - new Date(this.media.started).getTime()
+        }, 1000)
+        this.timePlayed = !this.media.started ? 0 : (this.media.ended ? new Date(this.media.ended).getTime() : new Date().getTime()) - new Date(this.media.started).getTime()
+      }
+    },
+    'media.ended' (value) {
+      if (value !== null && this.media.started !== null) {
+        window.clearInterval(this.timePlayedHandler)
+      }
     }
   },
   methods: {
@@ -93,6 +118,10 @@ img {
   margin-right: 12px;
   background-color: white;
   border-radius: 50%;
+}
+
+.mdc-grid-tile .mdc-grid-tile__secondary {
+  text-align: right;
 }
 
 .mdc-grid-tile.playing .mdc-grid-tile__secondary {
