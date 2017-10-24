@@ -276,6 +276,7 @@ a.episode-card {
   position: fixed;
   bottom: 1rem;
   right: 1rem;
+  z-index: 1; /* to be above the snackbar */
 }
 
 @media(min-width: 1024px) {
