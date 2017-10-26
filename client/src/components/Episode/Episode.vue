@@ -3,7 +3,7 @@
     <Toolbar :title="episode.name">
       <section class="mdc-toolbar__section mdc-toolbar__section--align-end" slot="headerActions">
         <button class="material-icons mdc-toolbar__icon mdc-ripple-surface" arial-label="Edit" v-on:click="editEpisode">edit</button>
-        <time v-if="episode.started">{{ timePlayed | formatTime }}</time>
+        <time v-if="episode.started" v-bind:class="{ 'mdc-theme--secondary' : episode.started && !episode.ended }">{{ timePlayed | formatTime }}</time>
         <button v-if="episode.started && !episode.ended" class="material-icons mdc-toolbar__icon mdc-ripple-surface" arial-label="Stop" v-on:click="stopEpisode(episode)">stop</button>
         <button v-else class="material-icons mdc-toolbar__icon mdc-ripple-surface" arial-label="Playing" v-on:click="startEpisode(episode)">play_arrow</button>
       </section>
