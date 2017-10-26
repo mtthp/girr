@@ -60,6 +60,9 @@ typings/
 # all data files
 data
 
+# all productions files
+dist
+
 # MacOS files
 .DS_Store
 
