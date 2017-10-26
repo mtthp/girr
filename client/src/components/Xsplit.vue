@@ -1,5 +1,5 @@
 <template>
-  <main class="xsplit" :style="{ 'background-image': xsplit.picture ? 'url(' + (xsplit.background ? xsplit.background : require('../assets/brick-wall.jpg')) + ')' : null }">
+  <main class="xsplit" :style="{ 'background-image': background }">
     <div class="title">{{ xsplit.title }}</div>
     <div class="content">
       <img :src="xsplit.picture" v-bind:class="{ loading: xsplit.picture }" v-on:load="loaded($event)" v-on:error="failed($event)">
@@ -21,6 +21,14 @@ export default {
     this.fetchData()
     this.$options.sockets['xsplit'] = (data) => {
       this.xsplit = data
+    }
+  },
+  computed: {
+    background () {
+      if (this.xsplit.picture) {
+        return 'url(' + (this.xsplit.background ? this.xsplit.background : require('../assets/brick-wall.jpg')) + ')'
+      }
+      return null
     }
   },
   methods: {
