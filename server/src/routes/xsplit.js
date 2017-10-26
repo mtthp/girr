@@ -1,9 +1,7 @@
 "use strict";
 const express = require('express')
 const router = express.Router()
-const logger = require('../logger')
-const cache = require('memory-cache')
-const websockets = require('../websockets')()
+const XSplit = require('../models/xsplit')
 
 /**
  * @swagger
@@ -16,6 +14,9 @@ const websockets = require('../websockets')()
  *       picture:
  *         type: string
  *         description: picture uri
+ *       background:
+ *         type: string
+ *         description: background image uri
  */
 
 router.route('/')
@@ -35,14 +36,8 @@ router.route('/')
    *           $ref: '#/definitions/Xsplit'
    */
   .get(function (req, res, next) {
-    if (cache.get('xsplit') !== null) {
-      res.json(cache.get('xsplit'))
-    } else {
-      var xsplit = cache.get('xsplit') !== null ? cache.get('xsplit') : { title: null, picture: null, created: Date.now(), modified: Date.now() }
-      cache.put('xsplit', xsplit)
-      websockets.sockets.emit('xsplit', xsplit) // on avertit quand même le reste du monde
-      res.json(xsplit)
-    }
+    var xsplit = new XSplit()
+    res.json(xsplit)
   })
   /**
    * @swagger
@@ -67,14 +62,10 @@ router.route('/')
    *           $ref: '#/definitions/Xsplit'
    */
   .put(function (req, res, next) {
-    var xsplit = cache.get('xsplit') !== null ? cache.get('xsplit') : { title: null, picture: null, created: Date.now() }
-    var data = {}
-    if (typeof req.body.title !== "undefined") data.title = req.body.title
-    if (typeof req.body.picture !== "undefined") data.picture = req.body.picture
-    cache.put('xsplit', Object.assign(xsplit, data, {modified: Date.now()}))
-    websockets.sockets.emit('xsplit', cache.get('xsplit'))
-    res.json(cache.get('xsplit'))
+    let xsplit = new XSplit()
+    xsplit = Object.assign(xsplit, req.body, { modified: Date.now() })
+    xsplit.save()
+    res.json(xsplit)
   });
-
 
 module.exports = router;

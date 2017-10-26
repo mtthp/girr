@@ -1,5 +1,5 @@
 <template>
-  <main class="xsplit" :style="{ 'background-image': xsplit.picture ? 'url(' + require('../assets/brick-wall.jpg') + ')' : null }">
+  <main class="xsplit" :style="{ 'background-image': xsplit.picture ? 'url(' + (xsplit.background ? xsplit.background : require('../assets/brick-wall.jpg')) + ')' : null }">
     <div class="title">{{ xsplit.title }}</div>
     <div class="content">
       <img :src="xsplit.picture" v-bind:class="{ loading: xsplit.picture }" v-on:load="loaded($event)" v-on:error="failed($event)">
@@ -19,8 +19,6 @@ export default {
   },
   created () {
     this.fetchData()
-    // malheureusement, je n'ai pas trouvé d'autre moyen pour observer un event contenant un '.' - @Matthieu Petit
-    // si jamais on en a besoin, je laisse ça ici
     this.$options.sockets['xsplit'] = (data) => {
       this.xsplit = data
     }

@@ -12,6 +12,11 @@
         <input type="text" id="picture" class="mdc-textfield__input" :value="xsplit.picture" v-model.lazy="xsplit.picture" v-on:change="updateXsplit({picture: $event.target.value})">
         <label for="picture" class="mdc-textfield__label" v-bind:class="{ 'mdc-textfield__label--float-above' : xsplit.picture }">Picture</label>
       </div>
+      <div class="mdc-textfield mdc-textfield--fullwidth mdc-textfield--with-trailing-icon" v-bind:class="{ 'mdc-textfield--upgraded' : xsplit.background }">
+        <i class="material-icons mdc-textfield__icon" tabindex="0">photo_size_select_large</i>
+        <input type="text" id="background" class="mdc-textfield__input" :value="xsplit.background" v-model.lazy="xsplit.background" v-on:change="updateXsplit({background: $event.target.value})">
+        <label for="background" class="mdc-textfield__label" v-bind:class="{ 'mdc-textfield__label--float-above' : xsplit.background }">Background</label>
+      </div>
       <iframe :src="xsplitPath"/>
     </main>
   </div>
@@ -56,7 +61,7 @@ export default {
     getXsplit: function () {
       Event.$emit('progressbar.toggle', true)
       this.$http.get('/api/xsplit/').then(
-        function (response) {
+        (response) => {
           Event.$emit('progressbar.toggle', false)
           this.xsplit = response.body
         },
