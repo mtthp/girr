@@ -13,9 +13,24 @@ function stopPlayingEpisodes (time_value) {
     .find({ ended : null })
     .where('_id').ne(this._id)
     .where('started').ne(null)
+    .populate({ 
+      path: 'topics',
+      populate: {
+        path: 'medias',
+        model: 'Media'
+      } 
+    })
     .then(function(results) { // we end all other episodes that are playing
       results.forEach(function (episode) {
         episode.ended = Date.now()
+        episode.topics.forEach(function (topic) {
+          topic.ended = Date.now()
+          topic.medias.forEach(function (media) {
+            media.ended = Date.now()
+            media.save()
+          })
+          topic.save()
+        })
         episode.save()
       })
     })
