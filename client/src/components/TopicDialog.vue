@@ -202,6 +202,7 @@ export default {
 
 .mdc-button .mdc-button__icon {
   line-height: 32px;
+  vertical-align: initial
 }
 
 @media screen and (max-width: 480px) {
