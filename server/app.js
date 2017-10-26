@@ -15,7 +15,6 @@ const app = express();
 const io = require("./src/websockets")()
 const mongoose = require('mongoose');
 const basicAuth = require('express-basic-auth');
-const WebSockets = require("./src/websockets");
 const logger = require("./src/logger");
 const path = require('path')
 const fs = require('fs')
@@ -55,7 +54,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 })
 // Indique que le dossier /dist contient des fichiers statiques (middleware chargé de base)
 .use(express.static('./dist'))
-.use('/data', express.static('./data'))
+.use('/data', express.static(process.env.DATA_PATH))
  // swagger.json
 .use('/', require('./src/swagger'))
  // swagger UI
