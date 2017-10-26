@@ -68,6 +68,7 @@ export default {
     },
     confirm: function () {
       Event.$emit('episode.update', this.episode)
+      this.close()
     },
     deleteEpisode: function () {
       Event.$emit('episode.delete', this.episode)

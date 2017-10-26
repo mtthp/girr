@@ -76,6 +76,9 @@ export default {
       for (let i = 0; i < this.episodes.length; i++) {
         if (this.episodes[i]._id === episode._id) {
           this.episodes[i] = episode
+          this.episodes.sort(function (e1, e2) {
+            return e1.number === e2.number ? 0 : (e1.number > e2.number ? -1 : 1)
+          })
           this.$forceUpdate()
           break
         }
