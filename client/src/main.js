@@ -14,7 +14,7 @@ Vue.config.productionTip = false
 Vue.filter('formatDate', function (value) {
   if (value) {
     var date = new Date(String(value))
-    return date.toLocaleDateString() + ' at ' + date.toLocaleTimeString()
+    return isNaN(date) ? value : date.toLocaleDateString() + ' at ' + date.toLocaleTimeString()
   }
 })
 
