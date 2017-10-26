@@ -144,14 +144,15 @@ router.route('/')
       media.uri = '/' + media.path // should be calculate automatically from the path instead
       media.mimeType = req.file.mimetype
     } else if (media.uri) { // otherwise, tries to download the file and place it under the data directory
-      let body = await request({uri: media.uri, encoding: 'binary'})
-      let filepath = 'data/uploads/' + path.basename(media.uri, path.extname(media.uri)).replace(/\s/g, "_") + '-' + uuidv4() + path.extname(media.uri)
-      fs.writeFileSync(path.resolve(filepath), body, 'binary')
+      let response = await request({uri: media.uri, encoding: 'binary', resolveWithFullResponse: true})
+      let mimeType = response.headers['content-type']
+      let filepath = 'data/uploads/' + path.basename(media.uri.split('?')[0], path.extname(media.uri)).replace(/\s/g, "_") + '-' + uuidv4() + '.' + mime.getExtension(mimeType)
+      fs.writeFileSync(path.resolve(filepath), response.body, 'binary')
 
       if (typeof media.label === "undefined") media.label = path.basename(media.uri)
       media.path = filepath
       media.uri = '/' + media.path // should be calculate automatically from the path instead
-      media.mimeType = mime.getType(media.path)
+      media.mimeType = mimeType
     } else {
       next({message:"No media file or URI was provided", status: 417})
     }
