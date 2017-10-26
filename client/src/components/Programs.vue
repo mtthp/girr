@@ -56,12 +56,6 @@ export default {
       }))
       if (index < 0) this.programs.push(program)
     })
-    Event.$on('program.update', (program, file) => {
-      this.updateProgram(program, file)
-    })
-    Event.$on('program.delete', (program) => {
-      this.deleteProgram(program)
-    })
     Event.$on('program.updated', (program) => {
       for (let i = 0; i < this.programs.length; i++) {
         if (this.programs[i]._id === program._id) {
@@ -105,46 +99,6 @@ export default {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('program.added', response.body)
           Event.$emit('snackbar.message', `Added ${response.body.name}`)
-        },
-        function (response) {
-          Event.$emit('progressbar.toggle', false)
-          console.error(response)
-          Event.$emit('snackbar.message', `Error : ${response.statusText ? response.statusText : 'no connection'}`)
-        }
-      )
-    },
-    updateProgram: function (program, file) {
-      let data = program
-      if (typeof file !== 'undefined') {
-        data = new FormData()
-        data.append('thumbnail', file)
-        for (let key in program) {
-          if (!(program[key] instanceof Object)) {
-            data.append(key, program[key])
-          }
-        }
-      }
-      Event.$emit('progressbar.toggle', true)
-      this.$http.put(`/api/programs/${program._id}`, data).then(
-        function (response) {
-          Event.$emit('progressbar.toggle', false)
-          Event.$emit('program.updated', response.body)
-          Event.$emit('snackbar.message', `Program ${response.body.name} updated`)
-        },
-        function (response) {
-          Event.$emit('progressbar.toggle', false)
-          console.error(response)
-          Event.$emit('snackbar.message', `Error : ${response.statusText ? response.statusText : 'no connection'}`)
-        }
-      )
-    },
-    deleteProgram: function (program) {
-      Event.$emit('progressbar.toggle', true)
-      this.$http.delete(`/api/programs/${program._id}`).then(
-        function (response) {
-          Event.$emit('progressbar.toggle', false)
-          Event.$emit('program.deleted', program)
-          Event.$emit('snackbar.message', 'Program ' + program.name + ' deleted')
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)

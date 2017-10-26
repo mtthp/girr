@@ -85,18 +85,6 @@ export default {
     Event.$on('episode.updated', (episode) => {
       this.episode = episode
     })
-    Event.$on('topic.update', (topic, medias) => {
-      this.updateTopic(topic)
-    })
-    Event.$on('topic.delete', (topic) => {
-      this.deleteTopic(topic)
-    })
-    Event.$on('topic.start', (topic) => {
-      this.startTopic(topic)
-    })
-    Event.$on('topic.stop', (topic) => {
-      this.stopTopic(topic)
-    })
     Event.$on('topic.added', (topic) => {
       const index = this.topics.indexOf(this.topics.find(function (episodeTopic) {
         return episodeTopic._id === topic._id
@@ -243,66 +231,6 @@ export default {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('topic.added', response.body)
           Event.$emit('snackbar.message', 'Added a new topic')
-        },
-        function (response) {
-          Event.$emit('progressbar.toggle', false)
-          console.error(response)
-          Event.$emit('snackbar.message', `Error : ${response.statusText ? response.statusText : 'no connection'}`)
-        }
-      )
-    },
-    updateTopic: function (topic) {
-      Event.$emit('progressbar.toggle', true)
-      this.$http.put(`/api/programs/${this.$route.params.programId}/episodes/${this.$route.params.episodeId}/topics/${topic._id}`, topic).then(
-        function (response) {
-          Event.$emit('progressbar.toggle', false)
-          Event.$emit('topic.updated', response.body)
-          Event.$emit('snackbar.message', `Topic ${response.body.title} updated`)
-        },
-        function (response) {
-          Event.$emit('progressbar.toggle', false)
-          console.error(response)
-          Event.$emit('snackbar.message', `Error : ${response.statusText ? response.statusText : 'no connection'}`)
-        }
-      )
-    },
-    deleteTopic: function (topic) {
-      Event.$emit('progressbar.toggle', true)
-      this.$http.delete(`/api/programs/${this.$route.params.programId}/episodes/${this.$route.params.episodeId}/topics/${topic._id}`).then(
-        function (response) {
-          Event.$emit('progressbar.toggle', false)
-          Event.$emit('topic.deleted', topic)
-          Event.$emit('snackbar.message', `Topic ${topic.title} deleted`)
-        },
-        function (response) {
-          Event.$emit('progressbar.toggle', false)
-          console.error(response)
-          Event.$emit('snackbar.message', `Error : ${response.statusText ? response.statusText : 'no connection'}`)
-        }
-      )
-    },
-    startTopic: function (topic) {
-      Event.$emit('progressbar.toggle', true)
-      this.$http.get(`/api/programs/${this.$route.params.programId}/episodes/${this.$route.params.episodeId}/topics/${topic._id}/start`).then(
-        function (response) {
-          Event.$emit('progressbar.toggle', false)
-          Event.$emit('topic.updated', response.body)
-          Event.$emit('snackbar.message', `Topic ${response.body.title} started`)
-        },
-        function (response) {
-          Event.$emit('progressbar.toggle', false)
-          console.error(response)
-          Event.$emit('snackbar.message', `Error : ${response.statusText ? response.statusText : 'no connection'}`)
-        }
-      )
-    },
-    stopTopic: function (topic) {
-      Event.$emit('progressbar.toggle', true)
-      this.$http.get(`/api/programs/${this.$route.params.programId}/episodes/${this.$route.params.episodeId}/topics/${topic._id}/stop`).then(
-        function (response) {
-          Event.$emit('progressbar.toggle', false)
-          Event.$emit('topic.updated', response.body)
-          Event.$emit('snackbar.message', `Topic ${response.body.title} stopped`)
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)

@@ -119,6 +119,22 @@ export default {
             this.addMedia(dialogMedia)
           }
         })
+        this.updateTopic(dialogTopic)
+      }
+    })
+    Event.$on('topic.delete', (dialogTopic) => {
+      if (dialogTopic._id === this.topic._id) {
+        this.deleteTopic(dialogTopic)
+      }
+    })
+    Event.$on('topic.start', (topic) => {
+      if (topic._id === this.topic._id) {
+        this.startTopic(topic)
+      }
+    })
+    Event.$on('topic.stop', (topic) => {
+      if (topic._id === this.topic._id) {
+        this.stopTopic(topic)
       }
     })
     // remove this to expand multiple topics at the same time
@@ -154,6 +170,66 @@ export default {
     })
   },
   methods: {
+    updateTopic: function (topic) {
+      Event.$emit('progressbar.toggle', true)
+      this.$http.put(`/api/programs/${this.$route.params.programId}/episodes/${this.$route.params.episodeId}/topics/${topic._id}`, topic).then(
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          Event.$emit('topic.updated', response.body)
+          Event.$emit('snackbar.message', `Topic ${response.body.title} updated`)
+        },
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          console.error(response)
+          Event.$emit('snackbar.message', `Error : ${response.statusText ? response.statusText : 'no connection'}`)
+        }
+      )
+    },
+    deleteTopic: function (topic) {
+      Event.$emit('progressbar.toggle', true)
+      this.$http.delete(`/api/programs/${this.$route.params.programId}/episodes/${this.$route.params.episodeId}/topics/${topic._id}`).then(
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          Event.$emit('topic.deleted', topic)
+          Event.$emit('snackbar.message', `Topic ${topic.title} deleted`)
+        },
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          console.error(response)
+          Event.$emit('snackbar.message', `Error : ${response.statusText ? response.statusText : 'no connection'}`)
+        }
+      )
+    },
+    startTopic: function (topic) {
+      Event.$emit('progressbar.toggle', true)
+      this.$http.get(`/api/programs/${this.$route.params.programId}/episodes/${this.$route.params.episodeId}/topics/${topic._id}/start`).then(
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          Event.$emit('topic.updated', response.body)
+          Event.$emit('snackbar.message', `Topic ${response.body.title} started`)
+        },
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          console.error(response)
+          Event.$emit('snackbar.message', `Error : ${response.statusText ? response.statusText : 'no connection'}`)
+        }
+      )
+    },
+    stopTopic: function (topic) {
+      Event.$emit('progressbar.toggle', true)
+      this.$http.get(`/api/programs/${this.$route.params.programId}/episodes/${this.$route.params.episodeId}/topics/${topic._id}/stop`).then(
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          Event.$emit('topic.updated', response.body)
+          Event.$emit('snackbar.message', `Topic ${response.body.title} stopped`)
+        },
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          console.error(response)
+          Event.$emit('snackbar.message', `Error : ${response.statusText ? response.statusText : 'no connection'}`)
+        }
+      )
+    },
     fetchMedias: function () {
       Event.$emit('progressbar.toggle', true)
       this.$http.get(`/api/programs/${this.$route.params.programId}/episodes/${this.$route.params.episodeId}/topics/${this.topic._id}/medias`).then(

@@ -66,12 +66,6 @@ export default {
         Event.$emit('episode.added', episode)
       }
     }
-    Event.$on('episode.update', (episode) => {
-      this.updateEpisode(episode)
-    })
-    Event.$on('episode.delete', (episode) => {
-      this.deleteEpisode(episode)
-    })
     Event.$on('episode.added', (episode) => {
       const index = this.episodes.indexOf(this.episodes.find(function (programEpisode) {
         return programEpisode._id === episode._id
@@ -96,7 +90,12 @@ export default {
   },
   watch: {
     // call again the method if the route changes
-    '$route': 'fetchData'
+    '$route': 'fetchData',
+    program: function (value) {
+      // change the Toolbar's first row background image
+      var styleElem = this.$el.querySelector('.mdc-toolbar--flexible .mdc-toolbar__row:first-child style') ? this.$el.querySelector('.mdc-toolbar--flexible .mdc-toolbar__row:first-child style') : this.$el.querySelector('.mdc-toolbar--flexible .mdc-toolbar__row:first-child').appendChild(document.createElement('style'))
+      styleElem.innerHTML = '.mdc-toolbar--flexible .mdc-toolbar__row:first-child::after { background-image: url(' + (value.thumbnail ? value.thumbnail : require('../assets/geekinc-logo_512.png')) + '); }'
+    }
   },
   methods: {
     fetchData: function () {
@@ -109,8 +108,6 @@ export default {
           this.$options.sockets[`programs.${this.program._id}`] = (data) => {
             this.program = data
           }
-          var styleElem = this.$el.querySelector('.mdc-toolbar--flexible .mdc-toolbar__row:first-child style') ? this.$el.querySelector('.mdc-toolbar--flexible .mdc-toolbar__row:first-child style') : this.$el.querySelector('.mdc-toolbar--flexible .mdc-toolbar__row:first-child').appendChild(document.createElement('style'))
-          styleElem.innerHTML = '.mdc-toolbar--flexible .mdc-toolbar__row:first-child::after { background-image: url(' + (this.program.thumbnail ? this.program.thumbnail : require('../assets/geekinc-logo_512.png')) + '); }'
           this.fetchEpisodes()
         },
         function (response) {
@@ -181,36 +178,6 @@ export default {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('episode.added', response.body)
           Event.$emit('snackbar.message', 'Added a new episode')
-        },
-        function (response) {
-          Event.$emit('progressbar.toggle', false)
-          console.error(response)
-          Event.$emit('snackbar.message', `Error : ${response.statusText ? response.statusText : 'no connection'}`)
-        }
-      )
-    },
-    updateEpisode: function (episode) {
-      Event.$emit('progressbar.toggle', true)
-      this.$http.put(`/api/programs/${this.$route.params.programId}/episodes/${episode._id}`, episode).then(
-        function (response) {
-          Event.$emit('progressbar.toggle', false)
-          Event.$emit('episode.updated', response.body)
-          Event.$emit('snackbar.message', `Episode ${response.body.name} updated`)
-        },
-        function (response) {
-          Event.$emit('progressbar.toggle', false)
-          console.error(response)
-          Event.$emit('snackbar.message', `Error : ${response.statusText ? response.statusText : 'no connection'}`)
-        }
-      )
-    },
-    deleteEpisode: function (episode) {
-      Event.$emit('progressbar.toggle', true)
-      this.$http.delete(`/api/programs/${this.$route.params.programId}/episodes/${episode._id}`).then(
-        function (response) {
-          Event.$emit('progressbar.toggle', false)
-          Event.$emit('episode.deleted', episode)
-          Event.$emit('snackbar.message', `Episode ${episode.name} deleted`)
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
