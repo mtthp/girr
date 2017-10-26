@@ -96,9 +96,7 @@ export default {
         if (this.topics[i]._id === topic._id) {
           topic.expanded = this.topics[i].expanded // to keep expanded topics, well... expanded
           this.topics[i] = topic
-          this.topics.sort(function (t1, t2) {
-            return t1.position === t2.position ? 0 : (t1.position < t2.position ? -1 : 1)
-          })
+          this.topics.sort(function (t1, t2) { return t1.position - t2.position })
           this.$forceUpdate()
           break
         }

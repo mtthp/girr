@@ -154,9 +154,7 @@ export default {
       for (let i = 0; i < this.medias.length; i++) {
         if (this.medias[i]._id === media._id) {
           this.medias[i] = media
-          this.medias.sort(function (m1, m2) {
-            return m1.position === m2.position ? 0 : (m1.position < m2.position ? -1 : 1)
-          })
+          this.medias.sort(function (m1, m2) { return m1.position - m2.position })
           this.$forceUpdate()
           break
         }
