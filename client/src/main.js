@@ -22,6 +22,7 @@ Vue.filter('formatDate', function (value) {
 Vue.filter('formatTime', function (millisecondsTimestamp) {
   // Create a new JavaScript Date object based on the timestamp
   // multiplied by 1000 so that the argument is in milliseconds, not seconds.
+  if (millisecondsTimestamp < 0) millisecondsTimestamp = 0
   var date = new Date(millisecondsTimestamp)
   // Hours part from the timestamp
   var hours = date.getUTCHours()
