@@ -14,7 +14,9 @@ const mime = require('mime')
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'data/uploads')
+    let uploadsPath = process.env.DATA_PATH + '/uploads'
+    if (!fs.existsSync(uploadsPath)) fs.mkdirSync(uploadsPath)
+    cb(null, uploadsPath)
   },
   filename: function (req, file, cb) {
     cb(null, path.basename(file.originalname, path.extname(file.originalname)).replace(/\s/g, "_") + '-' + uuidv4() + path.extname(file.originalname))
@@ -146,7 +148,9 @@ router.route('/')
     } else if (media.uri) { // otherwise, tries to download the file and place it under the data directory
       let response = await request({uri: media.uri, encoding: 'binary', resolveWithFullResponse: true})
       let mimeType = response.headers['content-type']
-      let filepath = 'data/uploads/' + path.basename(media.uri.split('?')[0], path.extname(media.uri)).replace(/\s/g, "_") + '-' + uuidv4() + '.' + mime.getExtension(mimeType)
+      let uploadsPath = process.env.DATA_PATH + '/uploads'
+      if (!fs.existsSync(uploadsPath)) fs.mkdirSync(uploadsPath)
+      let filepath = uploadsPath + '/' + path.basename(media.uri.split('?')[0], path.extname(media.uri)).replace(/\s/g, "_") + '-' + uuidv4() + '.' + mime.getExtension(mimeType)
       fs.writeFileSync(path.resolve(filepath), response.body, 'binary')
 
       if (typeof media.label === "undefined") media.label = path.basename(media.uri)

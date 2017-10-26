@@ -1,4 +1,0 @@
-{
-  "port": 8080,
-  "mongo_endpoint": "mongodb://localhost/girr"
-}

@@ -1,21 +1,29 @@
 "use strict"; // https://stackoverflow.com/a/33001437
+// set all config variables as env variables
+require('dotenv-extended').load({
+    path: __dirname + '/config/.env',
+    defaults: __dirname + '/config/.env.defaults',
+    errorOnMissing: false,
+    errorOnExtra: false,
+    assignToProcessEnv: true,
+    overrideProcessEnv: false
+});
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
 const io = require("./src/websockets")()
 const mongoose = require('mongoose');
 const basicAuth = require('express-basic-auth');
-const config = require("./config/server");
 const WebSockets = require("./src/websockets");
 const logger = require("./src/logger");
 const path = require('path')
-
-mongoose.Promise = Promise;
+const fs = require('fs')
 
 // to retrieve the absolute project path without doing some magic (ie. '../../..')
 global.__base = __dirname + '/';
 
-let password = process.env.GIRR_PASSWORD || config.password;
+let password = process.env.GIRR_PASSWORD;
 if(password) {
   app.use(basicAuth({
     users: { girr: password },
@@ -23,6 +31,9 @@ if(password) {
     realm: 'g1RR'
   }));
 }
+
+let dataPath = process.env.DATA_PATH
+if (!fs.existsSync(dataPath)) fs.mkdirSync(dataPath)
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -42,8 +53,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
   next() // make sure we go to the next routes and don't stop here
 })
-// Indique que le dossier /public contient des fichiers statiques
-// (middleware chargé de base)
+// Indique que le dossier /dist contient des fichiers statiques (middleware chargé de base)
 .use(express.static('./dist'))
 .use('/data', express.static('./data'))
  // swagger.json
@@ -61,14 +71,13 @@ app.use(bodyParser.urlencoded({ extended: false }))
   res.status(err.status ? err.status : 500).send(err);
 });
 
-
-mongoose.connect(config.mongo_endpoint, { useMongoClient: true })
+mongoose.Promise = Promise;
+mongoose.connect(process.env.MONGO_ENDPOINT, { useMongoClient: true })
 mongoose.connection.on('error', console.error.bind(console, 'connection error:'))
 mongoose.connection.on('open', () => {
   io.listen(
-    app.listen(config.port, () => {
-      console.log(`http://localhost:${config.port}/admin.html`);
-      console.log(`http://localhost:${config.port}/xsplit.html`);
+    app.listen(process.env.PORT, () => {
+      console.log(`Server started at http://localhost:${process.env.PORT}/`);
     })
   );
 });
