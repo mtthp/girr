@@ -1,8 +1,8 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Programs from '@/components/Programs'
-import Program from '@/components/Program'
-import Episode from '@/components/Episode'
+import Programs from '@/components/Program/Programs'
+import Program from '@/components/Program/Program'
+import Episode from '@/components/Episode/Episode'
 import Xsplit from '@/components/Xsplit'
 import Admin from '@/components/Admin'
 

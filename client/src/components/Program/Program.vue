@@ -30,13 +30,13 @@
 </template>
 
 <script>
-import Event from '../utils/EventBus.js'
+import Event from '../../utils/EventBus.js'
 import ProgramDialog from './ProgramDialog'
-import EpisodeCard from './EpisodeCard'
-import EpisodeDialog from './EpisodeDialog'
+import EpisodeCard from '../Episode/EpisodeCard'
+import EpisodeDialog from '../Episode/EpisodeDialog'
 // import { menu } from 'material-components-web'
-import Toolbar from './Toolbar'
-import EmptyState from './EmptyState'
+import Toolbar from '../Toolbar'
+import EmptyState from '../EmptyState'
 
 export default {
   name: 'program',
@@ -94,7 +94,7 @@ export default {
     program: function (value) {
       // change the Toolbar's first row background image
       var styleElem = this.$el.querySelector('.mdc-toolbar--flexible .mdc-toolbar__row:first-child style') ? this.$el.querySelector('.mdc-toolbar--flexible .mdc-toolbar__row:first-child style') : this.$el.querySelector('.mdc-toolbar--flexible .mdc-toolbar__row:first-child').appendChild(document.createElement('style'))
-      styleElem.innerHTML = '.mdc-toolbar--flexible .mdc-toolbar__row:first-child::after { background-image: url(' + (value.thumbnail ? value.thumbnail : require('../assets/geekinc-logo_512.png')) + '); }'
+      styleElem.innerHTML = '.mdc-toolbar--flexible .mdc-toolbar__row:first-child::after { background-image: url(' + (value.thumbnail ? value.thumbnail : require('../../assets/geekinc-logo_512.png')) + '); }'
     }
   },
   methods: {

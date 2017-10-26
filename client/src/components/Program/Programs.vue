@@ -23,11 +23,11 @@
 </template>
 
 <script>
-import Event from '../utils/EventBus.js'
+import Event from '../../utils/EventBus.js'
 import ProgramCard from './ProgramCard'
 import ProgramDialog from './ProgramDialog'
-import Toolbar from './Toolbar'
-import EmptyState from './EmptyState'
+import Toolbar from '../Toolbar'
+import EmptyState from '../EmptyState'
 
 export default {
   name: 'programs',

@@ -60,7 +60,7 @@
 </template>
 
 <script>
-import Event from '../utils/EventBus.js'
+import Event from '../../utils/EventBus.js'
 import { dialog, textfield } from 'material-components-web'
 import assign from 'object-assign'
 import validUrl from 'valid-url'

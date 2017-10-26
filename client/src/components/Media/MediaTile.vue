@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import Event from '../utils/EventBus.js'
+import Event from '../../utils/EventBus.js'
 
 export default {
   props: ['media', 'topicId'],

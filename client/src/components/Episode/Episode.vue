@@ -35,13 +35,13 @@
 </template>
 
 <script>
-import Event from '../utils/EventBus.js'
+import Event from '../../utils/EventBus.js'
 import EpisodeDialog from './EpisodeDialog'
 import draggable from 'vuedraggable'
-import TopicCard from './TopicCard'
-import TopicDialog from './TopicDialog'
-import Toolbar from './Toolbar'
-import EmptyState from './EmptyState'
+import TopicCard from '../Topic/TopicCard'
+import TopicDialog from '../Topic/TopicDialog'
+import Toolbar from '../Toolbar'
+import EmptyState from '../EmptyState'
 
 export default {
   name: 'episode',

@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import Event from '../utils/EventBus.js'
+import Event from '../../utils/EventBus.js'
 import { menu } from 'material-components-web'
 
 export default {
@@ -87,7 +87,7 @@ export default {
   position: relative;
   width: 100%;
   height: 100%;
-  background-image: url("../assets/geekinc-logo_512.png");
+  background-image: url("../../assets/geekinc-logo_512.png");
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;

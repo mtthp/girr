@@ -36,9 +36,9 @@
 </template>
 
 <script>
-import Event from '../utils/EventBus.js'
+import Event from '../../utils/EventBus.js'
 import { autoInit } from 'material-components-web'
-import MediaTile from './MediaTile'
+import MediaTile from '../Media/MediaTile'
 import draggable from 'vuedraggable'
 
 export default {
