@@ -11,7 +11,7 @@
         </h2>
       </header>
       <section id="my-mdc-dialog-description" class="mdc-dialog__body mdc-dialog__body--scrollable">
-        <div class="mdc-textfield" v-bind:class="{ 'mdc-textfield--upgraded' : topic.title }">
+        <div class="mdc-textfield mdc-textfield--fullwidth" v-bind:class="{ 'mdc-textfield--upgraded' : topic.title }">
           <input type="text" id="title" class="mdc-textfield__input" :value="topic.title" v-model.lazy="topic.title">
           <label for="title" class="mdc-textfield__label" v-bind:class="{ 'mdc-textfield__label--float-above' : topic.title }">Title</label>
         </div>
@@ -137,8 +137,9 @@ export default {
   max-height: calc(80vh - 56px - 52px); /* main - header - footer */
 }
 
-button.delete {
-  color: red;
+/* fix mdc-textfield--fullwidth padding */
+.mdc-textfield--fullwidth:not(.mdc-textfield--textarea) .mdc-textfield__input {
+  padding: 10px 0;
 }
 
 .mdc-grid-list {
