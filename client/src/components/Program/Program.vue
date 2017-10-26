@@ -94,7 +94,8 @@ export default {
     '$route': 'fetchData',
     program: function (value) {
       // change the Toolbar's first row background image
-      var styleElem = this.$el.querySelector('.mdc-toolbar--flexible .mdc-toolbar__row:first-child style') ? this.$el.querySelector('.mdc-toolbar--flexible .mdc-toolbar__row:first-child style') : this.$el.querySelector('.mdc-toolbar--flexible .mdc-toolbar__row:first-child').appendChild(document.createElement('style'))
+      let tbFirstRow = this.$el.querySelector('.mdc-toolbar--flexible .mdc-toolbar__row:first-child')
+      let styleElem = tbFirstRow.querySelector('style') ? tbFirstRow.querySelector('style') : tbFirstRow.appendChild(document.createElement('style'))
       styleElem.innerHTML = '.mdc-toolbar--flexible .mdc-toolbar__row:first-child::after { background-image: url(' + (value.thumbnail ? value.thumbnail : require('../../assets/geekinc-logo_512.png')) + '); }'
     }
   },
@@ -124,9 +125,7 @@ export default {
         data = new FormData()
         data.append('thumbnail', file)
         for (let key in program) {
-          if (!(program[key] instanceof Object)) {
-            data.append(key, program[key])
-          }
+          if (!(program[key] instanceof Object)) data.append(key, program[key])
         }
       }
       Event.$emit('progressbar.toggle', true)
