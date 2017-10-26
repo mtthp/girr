@@ -7,7 +7,7 @@ import VueResource from 'vue-resource'
 import VueSocketio from 'vue-socket.io'
 
 Vue.use(VueResource)
-Vue.use(VueSocketio, process.env.WEBSOCKET_URI)
+Vue.use(VueSocketio, '/')
 
 Vue.config.productionTip = false
 

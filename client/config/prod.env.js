@@ -1,4 +1,3 @@
 module.exports = {
-  NODE_ENV: '"production"',
-  WEBSOCKET_URI: '"/"'
+  NODE_ENV: '"production"'
 }

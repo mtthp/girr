@@ -42,6 +42,14 @@ module.exports = {
         pathRewrite: {
           '^/data': ''
         }
+      },
+      '/socket.io': {
+        target: 'ws://localhost:8080/socket.io',
+        changeOrigin: true,
+        ws: true,
+        pathRewrite: {
+          '^/socket.io': ''
+        }
       }
     },
     // CSS Sourcemaps off by default because relative paths are "buggy"
