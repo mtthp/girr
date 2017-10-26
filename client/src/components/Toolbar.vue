@@ -1,5 +1,5 @@
 <template>
-  <header class="mdc-toolbar mdc-toolbar--fixed mdc-toolbar--waterfall" :class="classes">
+  <header class="mdc-toolbar mdc-toolbar--fixed mdc-toolbar--waterfall">
     <div class="mdc-toolbar__row">
       <section class="mdc-toolbar__section mdc-toolbar__section--align-start">
         <a class="material-icons mdc-toolbar__icon--menu mdc-ripple-surface menu" aria-label="Menu" alt="Menu" data-mdc-auto-init="MDCRipple">menu</a>
@@ -30,7 +30,7 @@ import { toolbar } from 'material-components-web'
 
 export default {
   name: 'Toolbar',
-  props: ['title', 'classes', 'backgroundImage'],
+  props: ['title', 'classes'],
   components: { Drawer },
   mounted: function () {
     Event.$on('progressbar.toggle', this.toggleProgressBar)

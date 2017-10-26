@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Toolbar :title="program.name" :classes="'mdc-toolbar--flexible mdc-toolbar--flexible-default-behavior'" :backgroundImage="program.thumbnail">
+    <Toolbar :title="program.name" :class="{ 'mdc-toolbar--flexible mdc-toolbar--flexible-default-behavior' : true }">
       <section class="mdc-toolbar__section mdc-toolbar__section--align-end" slot="headerActions">
         <button class="material-icons mdc-toolbar__icon mdc-ripple-surface" arial-label="Edit" v-on:click="editProgram">edit</button>
       </section>
