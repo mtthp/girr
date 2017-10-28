@@ -13,7 +13,7 @@ Vue.config.productionTip = false
 
 Vue.filter('formatDate', function (value) {
   if (value) {
-    var date = new Date(String(value))
+    const date = new Date(String(value))
     return isNaN(date) ? value : date.toLocaleDateString() + ' at ' + date.toLocaleTimeString()
   }
 })
@@ -23,13 +23,13 @@ Vue.filter('formatTime', function (millisecondsTimestamp) {
   // Create a new JavaScript Date object based on the timestamp
   // multiplied by 1000 so that the argument is in milliseconds, not seconds.
   if (millisecondsTimestamp < 0) millisecondsTimestamp = 0
-  var date = new Date(millisecondsTimestamp)
+  const date = new Date(millisecondsTimestamp)
   // Hours part from the timestamp
-  var hours = date.getUTCHours()
+  const hours = date.getUTCHours()
   // Minutes part from the timestamp
-  var minutes = '0' + date.getUTCMinutes()
+  const minutes = '0' + date.getUTCMinutes()
   // Seconds part from the timestamp
-  var seconds = '0' + date.getUTCSeconds()
+  const seconds = '0' + date.getUTCSeconds()
 
   // Will display time in 30:23 or 02:30:23 format
   return (hours > 0 ? hours + ':' : '') + minutes.substr(-2) + ':' + seconds.substr(-2)
