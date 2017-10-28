@@ -2,7 +2,7 @@
   <main class="xsplit" :style="{ 'background-image': background }">
     <div class="title">{{ xsplit.title }}</div>
     <div class="content">
-      <img :src="xsplit.picture" v-bind:class="{ loading: xsplit.picture }" v-on:load="loaded($event)" v-on:error="failed($event)">
+      <img v-if="xsplit.picture" :src="xsplit.picture" v-bind:class="{ loading: xsplit.picture }" v-on:load="loaded($event)" v-on:error="failed($event)">
    	</div>
   </main>
 </template>
@@ -45,11 +45,15 @@ export default {
     },
     loaded: function (event) {
       event.target.classList.remove('loading')
-      event.target.classList.remove('failed')
+      // event.target.classList.remove('failed')
     },
     failed: function (event) {
       event.target.classList.remove('loading')
-      event.target.classList.add('failed')
+      if (this.xsplit.picture) {
+        event.target.src = require('../assets/error.gif')
+        // event.target.classList.add('failed')
+        // Event.$emit('snackbar.message', `Unable to load ${event.target.src}`)
+      }
     }
   }
 }
@@ -170,10 +174,11 @@ export default {
 }
 
 .failed {
+  height: 100%;
   background: transparent;
   background-repeat: no-repeat;
   background-position: center center;
+  background-size: contain;
   background-image: url('../assets/error.gif');
 }
-
 </style>
