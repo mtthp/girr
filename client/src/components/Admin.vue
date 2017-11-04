@@ -4,7 +4,7 @@
     <main class="mdc-toolbar-fixed-adjust">
       <div class="mdc-textfield mdc-textfield--fullwidth mdc-textfield--with-trailing-icon" v-bind:class="{ 'mdc-textfield--upgraded' : xsplit.title }">
         <i class="material-icons mdc-textfield__icon" tabindex="0">label</i>
-        <input type="text" id="title" class="mdc-textfield__input" :value="xsplit.title" v-model.lazy="xsplit.title" v-on:input="updateXsplit({title: $event.target.value})">
+        <input type="text" id="title" class="mdc-textfield__input" :value="xsplit.title" v-model.lazy="xsplit.title" v-on:change="updateXsplit({title: $event.target.value})">
         <label for="title" class="mdc-textfield__label" v-bind:class="{ 'mdc-textfield__label--float-above' : xsplit.title }">Title</label>
       </div>
       <div class="mdc-textfield mdc-textfield--fullwidth mdc-textfield--with-trailing-icon" v-bind:class="{ 'mdc-textfield--upgraded' : xsplit.picture }">

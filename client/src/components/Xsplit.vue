@@ -1,6 +1,6 @@
 <template>
   <main class="xsplit" :style="{ 'background-image': background }">
-    <div class="title">{{ xsplit.title }}</div>
+    <div class="title">{{ animatedTitle }}</div>
     <div class="content">
       <img v-if="xsplit.picture" :src="xsplit.picture" v-bind:class="{ loading: xsplit.picture }" v-on:load="loaded($event)" v-on:error="failed($event)">
    	</div>
@@ -9,18 +9,62 @@
 
 <script>
 import Event from '../utils/EventBus.js'
+import TWEEN from 'tween.js/src/Tween'
 
 export default {
   name: 'xsplit',
   data () {
     return {
-      xsplit: {}
+      xsplit: {},
+      animatedTitle: ''
     }
   },
   created () {
     this.fetchData()
     this.$options.sockets['xsplit'] = (data) => {
       this.xsplit = data
+    }
+  },
+  watch: {
+    'xsplit.title' (newValue, oldValue) {
+      function animate () {
+        if (TWEEN.update()) {
+          requestAnimationFrame(animate)
+        }
+      }
+
+      let vm = this
+      if (oldValue) {
+        new TWEEN.Tween({numberOfCharsToDisplay: oldValue.length})
+          .easing(TWEEN.Easing.Quadratic.Out)
+          .to({ numberOfCharsToDisplay: 0 }, 500)
+          .onUpdate(function () {
+            vm.animatedTitle = oldValue.substr(0, this.numberOfCharsToDisplay)
+          })
+          .onComplete(function () {
+            if (newValue) {
+              new TWEEN.Tween({numberOfCharsToDisplay: 0})
+                .easing(TWEEN.Easing.Quadratic.Out)
+                .to({ numberOfCharsToDisplay: newValue.length }, 500)
+                .onUpdate(function () {
+                  vm.animatedTitle = newValue.substr(0, this.numberOfCharsToDisplay)
+                })
+                .start()
+            }
+          })
+          .start()
+      } else {
+        if (newValue) {
+          new TWEEN.Tween({numberOfCharsToDisplay: 0})
+            .easing(TWEEN.Easing.Quadratic.Out)
+            .to({ numberOfCharsToDisplay: newValue.length }, 500)
+            .onUpdate(function () {
+              vm.animatedTitle = newValue.substr(0, this.numberOfCharsToDisplay)
+            })
+            .start()
+        }
+      }
+      animate()
     }
   },
   computed: {
