@@ -56,4 +56,47 @@ body {
   --mdc-theme-primary: #005976; /* customize MDC color */
   --mdc-theme-secondary: #ff4200;
 }
+
+.mdc-badge {
+  position: relative;
+  white-space: nowrap;
+  margin-right: 24px;
+}
+
+.mdc-badge[data-badge]::after {
+  content: attr(data-badge);
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-flex-wrap: wrap;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  -webkit-align-content: center;
+  -ms-flex-line-pack: center;
+  align-content: center;
+  -webkit-align-items: center;
+  -ms-flex-align: center;
+  align-items: center;
+  position: absolute;
+  top: -11px;
+  right: -24px;
+  font-family: "Roboto","Helvetica","Arial",sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--mdc-theme-secondary);
+  color: #fff;
+}
+
+.mdc-badge.mdc-badge--overlap::after {
+  right: -10px;
+}
 </style>
