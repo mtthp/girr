@@ -3,7 +3,10 @@
     <nav class="mdc-temporary-drawer__drawer">
       <header class="mdc-temporary-drawer__header">
         <div class="mdc-temporary-drawer__header-content">
-          <div>GeekInc Remote Regie</div>
+          <div class="title">
+            GeekInc Remote Regie
+            <i class="material-icons mdc-badge mdc-badge--overlap" :data-badge="usersCount" v-if="usersCount > 1">people</i>
+          </div>
         </div>
       </header>
       <nav id="icon-with-text-demo" class="mdc-temporary-drawer__content mdc-list">
@@ -29,6 +32,16 @@ import { drawer } from 'material-components-web'
 import Event from '../utils/EventBus.js'
 
 export default {
+  data () {
+    return {
+      usersCount: 0
+    }
+  },
+  created () {
+    this.$options.sockets['users.count'] = (data) => {
+      this.usersCount = parseInt(data)
+    }
+  },
   mounted: function () {
     this.dw = new drawer.MDCTemporaryDrawer(this.$el)
     Event.$on('drawer.toggle', this.toggleDrawer)
@@ -55,9 +68,14 @@ export default {
   background-repeat: no-repeat;
 }
 
-.mdc-temporary-drawer__header-content div {
+.mdc-temporary-drawer__header-content .title {
   width: 100%;
+  font-size: 18px;
   padding: 12px 16px;
   background-color: rgba(0, 0, 0, 0.5);
+}
+
+.mdc-temporary-drawer__header-content .material-icons {
+  float: right;
 }
 </style>
