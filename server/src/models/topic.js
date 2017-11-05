@@ -4,6 +4,7 @@ const Media = require('./media')
 const logger = require('../logger')
 const websockets = require('../websockets')()
 const cache = require('memory-cache')
+const XSplit = require('./xsplit')
 
 /*
  * The purpose of this setter is to end all playing topics
@@ -34,8 +35,23 @@ function stopPlayingTopics (time_value) {
   return time_value // hmm, we can also return Date.now() instead ?
 }
 
+/**
+ * Change the XSplit title accordingly if the Topic is currently playing
+ */
+function setTitle (newTitle) {
+  if (this.started && !this.ended) {
+    let xsplit = new XSplit()
+    if (xsplit.title == this.title) {
+      xsplit.title = newTitle
+      xsplit.save()
+    }
+  }
+
+  return newTitle
+}
+
 let topicSchema = new mongoose.Schema({
-    title: { type: String, required: true },
+    title: { type: String, set: setTitle, required: true },
     description: String,
     position: { type: Number },
     started: { type: Date, set: stopPlayingTopics },
