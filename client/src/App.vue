@@ -50,6 +50,8 @@ body {
 <!-- Google Material Icons -->
 <style>@import '../node_modules/material-design-icons/iconfont/material-icons.css'</style>
 
+<style>@import 'https://fonts.googleapis.com/css?family=Oswald'</style>
+
 <!-- Styling MDC -->
 <style>
 :root {
