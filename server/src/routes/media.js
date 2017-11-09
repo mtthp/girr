@@ -22,7 +22,12 @@ const storage = multer.diskStorage({
     cb(null, path.basename(file.originalname, path.extname(file.originalname)).replace(/\s/g, "_") + '-' + uuidv4() + path.extname(file.originalname))
   }
 })
-const upload = multer({ storage: storage })
+const upload = multer({ 
+  storage: storage,
+  limits: { 
+    fieldSize: 10 * 1024 * 1024 // 10 MB
+  }
+})
 
 /**
  * @swagger
