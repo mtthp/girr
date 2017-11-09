@@ -15,13 +15,14 @@ Le stockage est actuellement dans MongoDB.
 Le choix de mongodb est du principalement à la facilté d'y stocker nativement du JSON, ainsi que la capacité à stocker des images (les incrusts, logo, etc.).
 
 La communication avec le front se fait :
-- par API REST pour les manipulations de données en base
-- par socket.io pour le pilotage en live
+- par API REST pour les accès en lecture/écriture sur les données
+- par Websocket pour être notifié des changements des données
 
 ## Frontend
-Le frontend est pour le moment découpé en 3 pages HTML suivant les cas d'usages.
-1. une page `emissions.html` qui est la partie préparation
-2. une page `presentateur.html` qui est l'interface de pilotage du live
-3. une page `xsplit.html` qui est la page intégrée en overlay dans le logiciel d'enregistrement (XSplit)
+Le frontend est une WebApp construite avec Webpack et VueJS. Elle permet de manipuler les données en consommant l'API REST du back-end et de recevoir les changements en se connectant aux Events du serveur Websocket.
+Elle est découper en 3 parties principales :
+1. la manipulation des émissions dans /programs
+2. l'affichage en overlay pour le logiciel d'enregistrement XSplit dans /xsplit
+3. l'administration direct des données affichées à /xsplit dans /admin
 
 Le frontend utilise VueJS pour l'aspect dynamique, principalement car j'avais envie de tester ce framework, mais aussi par son aspect léger.
