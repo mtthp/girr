@@ -165,6 +165,7 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  margin-top: 1.5em;
 }
 
 .xsplit .content img {
