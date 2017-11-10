@@ -19,7 +19,7 @@
       </span>
     </li>
     <div class="content">
-      {{ topic.description ? topic.description : 'Empty in here' }}
+      <pre>{{ topic.description ? topic.description : 'Empty in here' }}</pre>
       <div class="mdc-grid-list">
         <draggable
           v-if="medias.length > 0"
@@ -342,6 +342,10 @@ export default {
   transition: all 0.2s, max-height 1s; /* open slowly */
   max-height: 2048px;
   overflow: auto;
+}
+
+.topic.expanded .content pre {
+  font-family: inherit;
 }
 
 .topic .chevron {
