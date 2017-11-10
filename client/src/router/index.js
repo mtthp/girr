@@ -4,6 +4,7 @@ import Programs from '@/components/Program/Programs'
 import Program from '@/components/Program/Program'
 import Episode from '@/components/Episode/Episode'
 import Xsplit from '@/components/Xsplit'
+import XsplitExtension from '@/components/XsplitExtension'
 import Admin from '@/components/Admin'
 
 Vue.use(Router)
@@ -39,6 +40,11 @@ export default new Router({
       name: 'Xsplit',
       path: '/xsplit',
       component: Xsplit
+    },
+    {
+      name: 'Xsplit Extension',
+      path: '/xsplit/extension',
+      component: XsplitExtension
     }
   ]
 })
