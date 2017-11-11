@@ -9,7 +9,9 @@ const uuidv4 = require('uuid/v4')
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'data/uploads')
+    const uploadsPath = process.env.DATA_PATH + '/uploads'
+    if (!fs.existsSync(uploadsPath)) fs.mkdirSync(uploadsPath)
+    cb(null, uploadsPath)
   },
   filename: function (req, file, cb) {
     cb(null, path.basename(file.originalname, path.extname(file.originalname)).replace(/\s/g, "_") + '-' + uuidv4() + path.extname(file.originalname))
