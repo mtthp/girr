@@ -35,7 +35,7 @@ const jimpOptions = [ // https://github.com/oliver-moran/jimp#basic-methods
  */
 router.get('/:path*', function (req, res, next) {
   const filepath = process.env.DATA_PATH.startsWith('/') ? path.join(process.env.DATA_PATH, req.path) : path.join(__base, process.env.DATA_PATH, req.path)
-  if (mime.getType(filepath).indexOf('image/') >= 0 && Object.keys(req.query).some(queryName => jimpOptions.includes(queryName))) {
+  if (mime.getType(filepath).indexOf('image/') >= 0 && mime.getType(filepath).indexOf('gif') < 0 && Object.keys(req.query).some(queryName => jimpOptions.includes(queryName))) {
     Jimp
       .read(filepath)
       .then((image) => {
