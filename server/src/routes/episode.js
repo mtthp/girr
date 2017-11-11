@@ -309,6 +309,7 @@ router.get('/:episodeId/start', function (req, res, next) {
         let xsplit = new XSplit()
         xsplit.title = episode.name
         xsplit.picture = null
+        xsplit.logo = req.program.thumbnail
         xsplit.save()
       })
       .catch(function(error) {
@@ -381,6 +382,7 @@ router.get('/:episodeId/stop', function (req, res, next) {
           let xsplit = new XSplit()
           xsplit.title = null
           xsplit.picture = null
+          xsplit.logo = null
           xsplit.save()
         })
         .catch(function(error) {
