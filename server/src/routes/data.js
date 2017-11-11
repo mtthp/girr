@@ -8,6 +8,7 @@ const Jimp = require('jimp')
 const jimpOptions = [ // https://github.com/oliver-moran/jimp#basic-methods
   'height', // int
   'width', // int
+  'quality', // int
   'contrast', // float from -1 to +1
   'greyscale',
   'invert'
@@ -46,6 +47,9 @@ router.get('/:path*', function (req, res, next) {
               break
             case 'width':
               if (req.query[queryName]) image.resize(parseInt(req.query[queryName]), req.query.height ? parseInt(req.query.height) : Jimp.AUTO)
+              break
+            case 'quality':
+              image[queryName](parseInt(req.query[queryName]))
               break
             case 'contrast':
               if (req.query[queryName]) image.contrast(parseFloat(req.query[queryName]))
