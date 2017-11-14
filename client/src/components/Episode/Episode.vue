@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <div class="episode">
+    <EpisodeDialog></EpisodeDialog>
     <Toolbar :title="episode.name">
       <section class="mdc-toolbar__section mdc-toolbar__section--align-end" slot="headerActions">
         <button class="material-icons mdc-toolbar__icon mdc-ripple-surface" arial-label="Edit" v-on:click="editEpisode">edit</button>
@@ -9,28 +10,25 @@
       </section>
     </Toolbar>
     <main class="mdc-toolbar-fixed-adjust" :class="{ empty: topics.length == 0 }">
-      <EpisodeDialog></EpisodeDialog>
-      <div class="episode">
-        <TopicDialog></TopicDialog>
-        <draggable
-          v-if="topics.length > 0"
-          element="ul"
-          v-model="topics"
-          :options="dragOptions"
-          @change="itemMoved"
-          class="topics mdc-list mdc-list--avatar-list mdc-list--two-line">
-          <transition-group name="fade">
-            <TopicCard v-for="topic in topics" :key="topic._id" :topic="topic" ></TopicCard>
-          </transition-group>
-        </draggable>
-        <EmptyState v-else></EmptyState>
-        <button class="mdc-fab material-icons fab" aria-label="add" data-mdc-auto-init="MDCRipple" v-on:click="addTopic">
-          <span class="mdc-fab__icon">
-            add
-          </span>
-        </button>
-      </div>
+      <TopicDialog></TopicDialog>
+      <draggable
+        v-if="topics.length > 0"
+        element="ul"
+        v-model="topics"
+        :options="dragOptions"
+        @change="itemMoved"
+        class="topics mdc-list mdc-list--avatar-list mdc-list--two-line">
+        <transition-group name="fade">
+          <TopicCard v-for="topic in topics" :key="topic._id" :topic="topic" ></TopicCard>
+        </transition-group>
+      </draggable>
+      <EmptyState v-else></EmptyState>
     </main>
+    <button class="mdc-fab material-icons fab" aria-label="add" data-mdc-auto-init="MDCRipple" v-on:click="addTopic">
+      <span class="mdc-fab__icon">
+        add
+      </span>
+    </button>
   </div>
 </template>
 
@@ -41,6 +39,7 @@ import draggable from 'vuedraggable'
 import TopicCard from '../Topic/TopicCard'
 import TopicDialog from '../Topic/TopicDialog'
 import Toolbar from '../Toolbar'
+import Bottombar from '../Bottombar'
 import EmptyState from '../EmptyState'
 
 export default {
@@ -51,6 +50,7 @@ export default {
     TopicCard,
     TopicDialog,
     Toolbar,
+    Bottombar,
     EmptyState
   },
   computed: {
@@ -60,6 +60,11 @@ export default {
         handle: '.mdc-list-item__start-detail',
         delay: 0
       }
+    },
+    playingTopic () {
+      return this.topics.find(function (episodeTopic) {
+        return episodeTopic.started && !episodeTopic.ended
+      })
     }
   },
   data () {
@@ -267,7 +272,6 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
 .topics {
   max-width: 1024px;
   margin: 0 auto;
