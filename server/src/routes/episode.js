@@ -307,7 +307,10 @@ router.get('/:episodeId/start', function (req, res, next) {
         res.json(episode)
 
         let xsplit = new XSplit()
+        xsplit.episode = req.episode
         xsplit.title = episode.name
+        xsplit.topic = null
+        xsplit.media = null
         xsplit.picture = null
         xsplit.save()
       })
@@ -379,6 +382,9 @@ router.get('/:episodeId/stop', function (req, res, next) {
           res.json(episode)
 
           let xsplit = new XSplit()
+          xsplit.episode = null
+          xsplit.topic = null
+          xsplit.media = null
           xsplit.title = null
           xsplit.picture = null
           xsplit.save()

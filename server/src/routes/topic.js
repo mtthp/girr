@@ -334,23 +334,27 @@ router.get('/:topicId/start', function (req, res, next) {
     .save()
     .then(function(topicStarted) {
       logger.debug("Started " + topicStarted.toString())
-
-      let xsplit = new XSplit()
-      xsplit.title = req.topic.title
-      xsplit.picture = null
-      xsplit.save()
       res.json(topicStarted)
+      
+      let xsplit = new XSplit()
+      xsplit.topic = topicStarted
+      xsplit.title = topicStarted.title
+      xsplit.media = null // no content should be displayed when cast start talking about a Topic
+      xsplit.picture = null
+
+      // we start the parent Episode if it isn't already
+      if (!(req.episode.started && !req.episode.ended)) {
+        req.episode.started = Date.now()
+        req.episode.ended = null
+        req.episode.save()
+
+        xsplit.episode = req.episode
+      }
+      xsplit.save()
     })
     .catch(function(error) {
       next(error)
     })
-
-  // we start the parent Episode if it isn't already
-  if (!(req.episode.started && !req.episode.ended)) {
-    req.episode.started = Date.now()
-    req.episode.ended = null
-    req.episode.save()
-  }
 })
 
 /**
@@ -404,6 +408,8 @@ router.get('/:topicId/stop', function (req, res, next) {
             logger.error(error)
           })
         var xsplit = new XSplit()
+        xsplit.topic = null
+        xsplit.media = null
         xsplit.title = req.episode.name
         xsplit.picture = null
         xsplit.save()
