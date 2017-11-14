@@ -8,11 +8,10 @@
       </span>
       <span class="mdc-list-item__text">
         {{ topic.title }}
-        <span class="mdc-list-item__text__secondary">{{ topic.description }}</span>
+        <span class="mdc-list-item__text__secondary" v-if="topic.started">{{ timePlayed | formatTime }}</span>
       </span>
       <span class="mdc-list-item__end-detail">
         <i class="mdc-icon-toggle material-icons edit-button" arial-label="Edit" v-on:click="editTopic">edit</i>
-        <time v-if="topic.started">{{ timePlayed | formatTime }}</time>
         <i v-if="topic.started !== null && topic.ended === null" class="mdc-icon-toggle material-icons" arial-label="Stop" v-on:click="stop">stop</i>
         <i v-else class="mdc-icon-toggle material-icons" arial-label="Playing" v-on:click="start">play_arrow</i>
         <i class="material-icons chevron unselectable" arial-label="Chevron">keyboard_arrow_down</i>
@@ -377,10 +376,6 @@ export default {
 .topic.playing .mdc-list-item__end-detail,
 .topic.playing i {
   color: var(--mdc-theme-secondary,#ff4081);
-}
-
-.topic.expanded .mdc-list-item__text__secondary {
-  display: none;
 }
 
 .topic .mdc-list-divider {
