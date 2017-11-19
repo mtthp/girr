@@ -328,7 +328,6 @@ router.route('/:topicId')
  *           $ref: '#/definitions/Topic'
  */
 router.get('/:topicId/start', function (req, res, next) {
-  let xsplit = new XSplit()
   req.topic.started = Date.now()
   req.topic.ended = null
   req.topic

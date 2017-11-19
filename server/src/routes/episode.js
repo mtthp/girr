@@ -342,7 +342,7 @@ router.get('/:episodeId/start', function (req, res, next) {
  *         type: uuid
  *     responses:
  *       200:
- *         description: Episode stooped
+ *         description: Episode stopped
  *         schema:
  *           $ref: '#/definitions/Episode'
  */
@@ -396,6 +396,80 @@ router.get('/:episodeId/stop', function (req, res, next) {
         })
   } else {
     next({message:"Episode " + req.params.episodeId + " cannot be stopped if it isn't playing", status: 417})
+  }
+})
+
+/**
+ * @swagger
+ * /programs/{programId}/episodes/{episodeId}/next:
+ *   get:
+ *     tags:
+ *       - Episodes
+ *     description: > 
+ *       Find the current playing Topic and start its next sibling.
+ *       If there is no playing Topic, start the first.
+ *       If it is already the last, send an error.
+ *     summary: Start the next Episode's topic
+ *     produces: application/json
+ *     parameters:
+ *       - name: programId
+ *         description: Program's id
+ *         in: path
+ *         required: true
+ *         type: uuid
+ *       - name: episodeId
+ *         description: Episode's id
+ *         in: path
+ *         required: true
+ *         type: uuid
+ *     responses:
+ *       200:
+ *         description: Topic started
+ *         schema:
+ *           $ref: '#/definitions/Topic'
+ */
+router.get('/:episodeId/next', function (req, res, next) {
+  if (req.episode.started && !req.episode.ended) {
+    Topic
+        .find({ episode: req.episode._id })
+        .sort({ 'position': 1 })
+        .then(function(topics) {
+          let nextTopic = topics[0]
+          for (let i = 0; i < topics.length; i++) {
+            if (topics[i].started && !topics[i].ended) {
+              if (++i < topics.length) {
+                nextTopic = topics[i]
+                break
+              } else {
+                next({message: "Episode " + req.params.episodeId + " is at its end", status: 400})
+                return
+              }
+            }
+          }
+          nextTopic.started = Date.now()
+          nextTopic.ended = null
+          nextTopic
+            .save()
+            .then(function(topicStarted) {
+              logger.debug("Started " + topicStarted.toString())
+              res.json(topicStarted)
+
+              let xsplit = new XSplit()
+              xsplit.topic = topicStarted
+              xsplit.media = null
+              xsplit.title = topicStarted.title
+              xsplit.picture = null
+              xsplit.save()
+            })
+            .catch(function(error) {
+              next(error)
+            })
+        })
+        .catch(function(error) {
+          next(error)
+        })
+  } else {
+    next({message:"Episode " + req.params.episodeId + " isn't playing", status: 417})
   }
 })
 
