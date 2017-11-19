@@ -3,10 +3,15 @@
     <EpisodeDialog></EpisodeDialog>
     <Toolbar :title="episode.name">
       <section class="mdc-toolbar__section mdc-toolbar__section--align-end" slot="headerActions">
-        <button class="material-icons mdc-toolbar__icon mdc-ripple-surface" arial-label="Edit" v-on:click="editEpisode">edit</button>
-        <time v-if="episode.started" v-bind:class="{ 'mdc-theme--secondary' : episode.started && !episode.ended }">{{ timePlayed | formatTime }}</time>
-        <button v-if="episode.started && !episode.ended" class="material-icons mdc-toolbar__icon mdc-ripple-surface" arial-label="Stop" v-on:click="stopEpisode(episode)">stop</button>
-        <button v-else class="material-icons mdc-toolbar__icon mdc-ripple-surface" arial-label="Playing" v-on:click="startEpisode(episode)">play_arrow</button>
+        <time v-if="episode.started" >{{ timePlayed | formatTime }}</time>
+        <button class="material-icons mdc-toolbar__icon mdc-ripple-surface toggle-menu" arial-label="Menu" data-mdc-auto-init="MDCRipple">more_vert</button>
+        <div class="mdc-simple-menu mdc-simple-menu--open-from-bottom-right" tabindex="-1">
+          <ul class="mdc-simple-menu__items mdc-list" role="menu" aria-hidden="true">
+            <li class="mdc-list-item" role="menuitem" tabindex="0" v-on:click="editEpisode">Edit</li>
+            <li class="mdc-list-item" role="menuitem" tabindex="0" v-on:click="stopEpisode(episode)" v-if="episode.started && !episode.ended">Stop</li>
+            <li class="mdc-list-item" role="menuitem" tabindex="0" v-on:click="startEpisode(episode)" v-else>Start</li>
+          </ul>
+        </div>
       </section>
     </Toolbar>
     <main class="mdc-toolbar-fixed-adjust" :class="{ empty: topics.length == 0 }">
@@ -34,6 +39,7 @@
 
 <script>
 import Event from '../../utils/EventBus.js'
+import { menu } from 'material-components-web'
 import EpisodeDialog from './EpisodeDialog'
 import draggable from 'vuedraggable'
 import TopicCard from '../Topic/TopicCard'
@@ -112,6 +118,14 @@ export default {
         return episodeTopic._id === topic._id
       }))
       if (index > -1) this.topics.splice(index, 1)
+    })
+  },
+  mounted () {
+    this.menu = new menu.MDCSimpleMenu(this.$el.querySelector('.mdc-toolbar__section .mdc-simple-menu'))
+    // Add event listener to some button to toggle the menu on and off.
+    this.$el.querySelector('.mdc-toolbar__section  .toggle-menu').addEventListener('click', (event) => {
+      event.preventDefault()
+      this.menu.open = !this.menu.open
     })
   },
   watch: {

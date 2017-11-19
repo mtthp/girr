@@ -81,6 +81,7 @@ export default {
     },
     stopEpisode: function (event) {
       event.stopPropagation()
+      this.menu.open = false
       Event.$emit('progressbar.toggle', true)
       this.$http.get(`/api/programs/${this.xsplit.episode.program}/episodes/${this.xsplit.episode._id}/stop`).then(
         function (response) {
