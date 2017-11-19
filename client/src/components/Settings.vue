@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Toolbar :title="'Administration'"></Toolbar>
+    <Toolbar :title="'Settings'"></Toolbar>
     <main class="mdc-toolbar-fixed-adjust">
       <div class="mdc-textfield mdc-textfield--fullwidth mdc-textfield--with-trailing-icon" v-bind:class="{ 'mdc-textfield--upgraded' : xsplit.title }">
         <i class="material-icons mdc-textfield__icon" tabindex="0">label</i>
@@ -33,7 +33,7 @@ import Toolbar from './Toolbar'
 import { textfield } from 'material-components-web'
 
 export default {
-  name: 'admin',
+  name: 'settings',
   components: {
     Toolbar
   },

@@ -25,6 +25,7 @@ export default {
     this.$options.sockets['xsplit'] = (data) => {
       this.xsplit = data
     }
+    document.title = 'GIRR'
   },
   watch: {
     'xsplit.title' (newValue, oldValue) {
