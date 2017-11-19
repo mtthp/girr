@@ -1,12 +1,10 @@
 <template>
-    <footer>
+    <footer v-on:click="goToEpisode($event)">
       <img v-if="thumbnail" class="thumbnail" :src="thumbnail">
-      <router-link v-if="xsplit.episode" :to="{ name: 'Episode', params: { programId: xsplit.episode.program, episodeId: xsplit.episode._id }}" style="cursor: pointer; text-decoration: none;">
-        <div class="metadata">
-          <label>{{ xsplit.title }}</label>
-          <time v-if="timePlayed > 0">{{ timePlayed | formatTime }}</time>
-        </div>
-      </router-link>
+      <div class="metadata">
+        <label>{{ xsplit.title }}</label>
+        <time v-if="timePlayed > 0">{{ timePlayed | formatTime }}</time>
+      </div>
       <div class="actions">
         <button class="material-icons mdc-toolbar__icon mdc-ripple-surface" arial-label="Next" data-mdc-auto-init="MDCRipple" v-on:click="nextTopic($event)">skip_next</button>
         <button class="material-icons mdc-toolbar__icon mdc-ripple-surface toggle-menu" arial-label="Menu" data-mdc-auto-init="MDCRipple">more_vert</button>
@@ -64,6 +62,7 @@ export default {
     this.menu = new menu.MDCSimpleMenu(this.$el.querySelector('.mdc-simple-menu'))
     // Add event listener to some button to toggle the menu on and off.
     this.$el.querySelector('.toggle-menu').addEventListener('click', (event) => {
+      event.stopPropagation()
       event.preventDefault()
       this.menu.open = !this.menu.open
     })
@@ -78,6 +77,9 @@ export default {
           Event.$emit('http.error', response)
         }
       )
+    },
+    goToEpisode: function (event) {
+      window.location = this.$router.resolve({name: 'Episode', params: { programId: this.xsplit.episode.program, episodeId: this.xsplit.episode._id }}).href
     },
     stopEpisode: function (event) {
       event.stopPropagation()
@@ -124,6 +126,7 @@ footer {
   flex-flow: row;
   align-items: center;
   padding: 0 12px;
+  cursor: pointer;
 }
 
 footer .thumbnail {
