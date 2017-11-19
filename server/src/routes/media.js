@@ -427,7 +427,7 @@ router.get('/:mediaId/start', function (req, res, next) {
     req.episode.ended = null
     req.episode.save()
 
-    xsplit.logo = req.program.thumbnail
+    xsplit.logo = req.program.logoBW
     xsplit.save()
   }
 })

@@ -309,7 +309,7 @@ router.get('/:episodeId/start', function (req, res, next) {
         let xsplit = new XSplit()
         xsplit.title = episode.name
         xsplit.picture = null
-        xsplit.logo = req.program.thumbnail
+        xsplit.logo = req.program.logoBW
         xsplit.save()
       })
       .catch(function(error) {

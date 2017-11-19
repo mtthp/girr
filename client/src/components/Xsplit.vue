@@ -76,7 +76,7 @@ export default {
       return null
     },
     logo () {
-      return this.xsplit.logo ? this.xsplit.logo + '?greyscale&contrast=1&height=72' : null
+      return this.xsplit.logo ? this.xsplit.logo + '?height=72' : null
     }
   },
   methods: {
