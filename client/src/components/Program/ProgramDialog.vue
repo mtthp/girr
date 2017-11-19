@@ -16,17 +16,17 @@
           <input type="text" id="name" class="mdc-textfield__input" :value="program.name" v-model.lazy="program.name">
           <label for="name" class="mdc-textfield__label" v-bind:class="{ 'mdc-textfield__label--float-above' : program.name }">Name</label>
         </div>
-        <div class="picture" v-on:click="$event.currentTarget.querySelector('input').click()">
+        <div class="picture thumbnail" v-on:click="$event.currentTarget.querySelector('input').click()">
           <i class="material-icons">edit</i>
           <img :src="program.thumbnail"/>
           <input type="file" name="thumbnail" accept="image/*" class="input-file" v-on:change="fileChange($event);" style="display: none;">
         </div>
-        <div class="picture" v-on:click="$event.currentTarget.querySelector('input').click()">
+        <div class="picture logo" v-on:click="$event.currentTarget.querySelector('input').click()">
           <i class="material-icons">edit</i>
           <img :src="program.logo"/>
           <input type="file" name="logo" accept="image/*" class="input-file" v-on:change="fileChange($event);" style="display: none;">
         </div>
-        <div class="picture" v-on:click="$event.currentTarget.querySelector('input').click()">
+        <div class="picture logoBW" v-on:click="$event.currentTarget.querySelector('input').click()">
           <i class="material-icons">edit</i>
           <img :src="program.logoBW"/>
           <input type="file" name="logoBW" accept="image/*" class="input-file" v-on:change="fileChange($event);" style="display: none;">
@@ -173,18 +173,49 @@ export default {
 .mdc-dialog__body .picture img {
   object-fit: contain;
   min-height: 100px;
-  max-width: 100%;
+  width: 100%;
   background: transparent;
   background-repeat: no-repeat;
   background-position: center center;
+}
+
+.mdc-dialog__body .picture.thumbnail img {
   background-image: url("\
   data:image/svg+xml;utf8, \
     <svg xmlns='http://www.w3.org/2000/svg' version='1.1' width='170px' height='50px'> \
-      <rect x='0' y='0' width='200' height='100'\
-        style='fill: transparent; fill-opacity: 0.7; '/> \
       <text x='85' y='28' \
         style='text-anchor: middle' font-size='16'> \
         Thumbnail \
+      </text> \
+    </svg>\
+  ");
+}
+
+.mdc-dialog__body .picture.logo,
+.mdc-dialog__body .picture.logoBW {
+  display: inline-block;
+  width: calc(50% - 4px);
+}
+
+.mdc-dialog__body .picture.logo img {
+  background-image: url("\
+  data:image/svg+xml;utf8, \
+    <svg xmlns='http://www.w3.org/2000/svg' version='1.1' width='170px' height='50px'> \
+      <text x='85' y='28' \
+        style='text-anchor: middle' font-size='16'> \
+        Logo \
+      </text> \
+    </svg>\
+  ");
+}
+
+.mdc-dialog__body .picture.logoBW img {
+  background-image: url("\
+  data:image/svg+xml;utf8, \
+    <svg xmlns='http://www.w3.org/2000/svg' version='1.1' width='170px' height='50px'> \
+      <text x='85' y='28' \
+        style='text-anchor: middle' font-size='16'> \
+        Logo Black and White \
       </text> \
     </svg>\
   ");
