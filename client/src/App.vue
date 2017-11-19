@@ -47,6 +47,11 @@ export default {
     Event.$on('bottombar.toggle', (boolean) => {
       this.bottombar = boolean
     })
+    Event.$on('http.error', (response) => {
+      let message = response.body.message ? response.body.message : `Error : ${response.statusText ? response.statusText : 'no connection'}`
+      console.error(response)
+      Event.$emit('snackbar.message', message)
+    })
   },
   mounted: function () {
     autoInit() // autoInit MDC
