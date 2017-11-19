@@ -8,7 +8,7 @@
         </div>
       </router-link>
       <div class="actions">
-        <button class="material-icons mdc-toolbar__icon mdc-ripple-surface" arial-label="Next" data-mdc-auto-init="MDCRipple">skip_next</button>
+        <button class="material-icons mdc-toolbar__icon mdc-ripple-surface" arial-label="Next" data-mdc-auto-init="MDCRipple" v-on:click="nextTopic($event)">skip_next</button>
         <button class="material-icons mdc-toolbar__icon mdc-ripple-surface toggle-menu" arial-label="Menu" data-mdc-auto-init="MDCRipple">more_vert</button>
         <div class="mdc-simple-menu mdc-simple-menu--open-from-bottom-right" tabindex="-1">
           <ul class="mdc-simple-menu__items mdc-list" role="menu" aria-hidden="true">
@@ -80,18 +80,34 @@ export default {
         }
       )
     },
-    startNextTopic: function () {
+    stopEpisode: function (event) {
+      event.stopPropagation()
       Event.$emit('progressbar.toggle', true)
-      this.$http.get(`/api/programs/${this.$route.params.programId}/episodes/${this.$route.params.episodeId}/next`).then(
+      this.$http.get(`/api/programs/${this.xsplit.episode.program}/episodes/${this.xsplit.episode._id}/stop`).then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('episode.updated', response.body)
-          Event.$emit('snackbar.message', `Episode ${response.body.name} started`)
+          Event.$emit('snackbar.message', `Episode ${response.body.name} stopped`)
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
           console.error(response)
           Event.$emit('snackbar.message', `Error : ${response.statusText ? response.statusText : 'no connection'}`)
+        }
+      )
+    },
+    nextTopic: function (event) {
+      event.stopPropagation()
+      Event.$emit('progressbar.toggle', true)
+      this.$http.get(`/api/programs/${this.xsplit.episode.program}/episodes/${this.xsplit.episode._id}/next`).then(
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          Event.$emit('topic.updated', response.body)
+          Event.$emit('snackbar.message', `Topic ${response.body.title} started`)
+        },
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          Event.$emit('http.error', response)
         }
       )
     }
