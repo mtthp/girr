@@ -1,6 +1,6 @@
 <template>
   <div id="app" :class="{ bottombarActive : bottombarShown }">
-    <router-view class="content"></router-view>
+    <router-view class="main-content"></router-view>
     <transition name="slide">
       <Bottombar v-show="bottombarShown" style="position: fixed; bottom: 0;"></Bottombar>
     </transition>
@@ -94,7 +94,7 @@ body {
   transition: margin-bottom 0.5s;
 }
 
-#app.bottombarActive .content,
+#app.bottombarActive .main-content,
 #app.bottombarActive .fab {
   margin-bottom: 56px;
 }
