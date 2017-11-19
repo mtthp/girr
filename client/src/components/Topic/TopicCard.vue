@@ -364,10 +364,13 @@ export default {
 }
 
 .topic.playing .mdc-list-item__text,
-.topic.playing .mdc-list-item__start-detail,
 .topic.playing .mdc-list-item__end-detail,
-.topic.playing i {
+.topic.playing .mdc-list-item__end-detail i {
   color: var(--mdc-theme-secondary,#ff4081);
+}
+
+.topic.playing .mdc-list-item__start-detail {
+  background-color: var(--mdc-theme-secondary,#ff4081);
 }
 
 .topic .mdc-list-divider {
