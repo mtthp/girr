@@ -328,12 +328,14 @@ router.route('/:topicId')
  *           $ref: '#/definitions/Topic'
  */
 router.get('/:topicId/start', function (req, res, next) {
+  let xsplit = new XSplit()
   req.topic.started = Date.now()
   req.topic.ended = null
   req.topic
     .save()
     .then(function(topicStarted) {
       logger.debug("Started " + topicStarted.toString())
+
       res.json(topicStarted)
       
       let xsplit = new XSplit()
@@ -348,6 +350,7 @@ router.get('/:topicId/start', function (req, res, next) {
         req.episode.ended = null
         req.episode.save()
 
+        xsplit.logo = req.program.logoBW
         xsplit.episode = req.episode
       }
       xsplit.save()

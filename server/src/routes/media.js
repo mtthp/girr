@@ -424,6 +424,7 @@ router.get('/:mediaId/start', function (req, res, next) {
           req.episode.save()
 
           xsplit.episode = req.episode
+          xsplit.logo = req.program.logoBW
         }
 
         xsplit.save()

@@ -2,7 +2,7 @@
   <div class="topic" v-bind:class="{ expanded : topic.expanded, playing : topic.started !== null && topic.ended === null }">
     <li role="separator" class="mdc-list-divider"></li>
     <li class="mdc-list-item" data-mdc-auto-init="MDCRipple" v-on:click="toggle(!topic.expanded)">
-      <img v-if="medias.length > 0" class="mdc-list-item__start-detail unselectable" :src="medias[0].uri" width="56" height="56" :alt="medias[0].label">
+      <img v-if="medias.length > 0" class="mdc-list-item__start-detail unselectable" :src="medias[0].uri ? medias[0].uri + '?height=56' : null" width="56" height="56" :alt="medias[0].label">
       <span v-else class="mdc-list-item__start-detail" role="presentation">
         <i class="material-icons" aria-hidden="true">comment</i>
       </span>
