@@ -48,6 +48,7 @@ export default {
         this.$el.querySelector('.mdc-toolbar__row:first-child').classList.remove('flex')
       }
     })
+    document.title = `${this.title} - GIRR`
   },
   watch: {
     title: function (newTitle) {
