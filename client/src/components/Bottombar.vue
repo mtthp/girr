@@ -10,6 +10,8 @@
         <button class="material-icons mdc-toolbar__icon mdc-ripple-surface toggle-menu" arial-label="Menu" data-mdc-auto-init="MDCRipple">more_vert</button>
         <div class="mdc-simple-menu mdc-simple-menu--open-from-bottom-right" tabindex="-1">
           <ul class="mdc-simple-menu__items mdc-list" role="menu" aria-hidden="true">
+            <li class="mdc-list-item" role="menuitem" tabindex="0" :aria-disabled="isAtEpisode" v-if="xsplit.episode" v-on:click="goToEpisode($event)">Go to {{ xsplit.episode.name }}</li>
+            <li class="mdc-list-divider" role="separator"></li>
             <li class="mdc-list-item" role="menuitem" tabindex="0" v-on:click="stopEpisode($event)">Stop</li>
           </ul>
         </div>
@@ -32,6 +34,9 @@ export default {
   computed: {
     thumbnail () {
       return this.xsplit.picture ? this.xsplit.picture : (this.xsplit.logo ? this.xsplit.logo : null)
+    },
+    isAtEpisode () {
+      return this.$router.resolve({name: 'Episode', params: { programId: this.xsplit.episode.program, episodeId: this.xsplit.episode._id }}).route.fullPath === this.$route.fullPath
     }
   },
   watch: {
@@ -79,7 +84,9 @@ export default {
       )
     },
     goToEpisode: function (event) {
-      window.location = this.$router.resolve({name: 'Episode', params: { programId: this.xsplit.episode.program, episodeId: this.xsplit.episode._id }}).href
+      if (!this.isAtEpisode) {
+        window.location = this.$router.resolve({name: 'Episode', params: { programId: this.xsplit.episode.program, episodeId: this.xsplit.episode._id }}).href
+      }
     },
     stopEpisode: function (event) {
       event.stopPropagation()
@@ -157,6 +164,10 @@ footer .actions {
   -ms-flex-pack: end;
   justify-content: flex-end;
   flex: 1;
+}
+
+footer .mdc-simple-menu {
+  bottom: 0px;
 }
 
 .fade-enter-active, .fade-leave-active {

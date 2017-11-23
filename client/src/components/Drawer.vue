@@ -14,7 +14,7 @@
           <i class="material-icons mdc-list-item__start-detail" aria-hidden="true">event</i>Programs
         </router-link>
         <router-link :to="{ name: 'Xsplit' }" @click.native="toggleDrawer(false)" class="mdc-list-item" active-class="mdc-temporary-drawer--selected" data-mdc-auto-init="MDCRipple">
-          <i class="material-icons mdc-list-item__start-detail" aria-hidden="true">tv</i>Display
+          <i class="material-icons mdc-list-item__start-detail" aria-hidden="true">tv</i>Scene
         </router-link>
         <router-link :to="{ name: 'Settings' }" @click.native="toggleDrawer(false)" class="mdc-list-item" active-class="mdc-temporary-drawer--selected" data-mdc-auto-init="MDCRipple">
           <i class="material-icons mdc-list-item__start-detail" aria-hidden="true">settings</i>Settings
