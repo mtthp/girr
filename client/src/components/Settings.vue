@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Toolbar :title="'Administration'"></Toolbar>
+    <Toolbar :title="'Settings'"></Toolbar>
     <main class="mdc-toolbar-fixed-adjust">
       <div class="mdc-textfield mdc-textfield--fullwidth mdc-textfield--with-trailing-icon" v-bind:class="{ 'mdc-textfield--upgraded' : xsplit.title }">
         <i class="material-icons mdc-textfield__icon" tabindex="0">label</i>
@@ -11,6 +11,11 @@
         <i class="material-icons mdc-textfield__icon" tabindex="0">photo</i>
         <input type="text" id="picture" class="mdc-textfield__input" :value="xsplit.picture" v-model.lazy="xsplit.picture" v-on:change="updateXsplit({picture: $event.target.value})">
         <label for="picture" class="mdc-textfield__label" v-bind:class="{ 'mdc-textfield__label--float-above' : xsplit.picture }">Picture</label>
+      </div>
+      <div class="mdc-textfield mdc-textfield--fullwidth mdc-textfield--with-trailing-icon" v-bind:class="{ 'mdc-textfield--upgraded' : xsplit.logo }">
+        <i class="material-icons mdc-textfield__icon flip-vertically" tabindex="0">photo_album</i>
+        <input type="text" id="logo" class="mdc-textfield__input" :value="xsplit.logo" v-model.lazy="xsplit.logo" v-on:change="updateXsplit({logo: $event.target.value})">
+        <label for="logo" class="mdc-textfield__label" v-bind:class="{ 'mdc-textfield__label--float-above' : xsplit.logo }">Logo</label>
       </div>
       <div class="mdc-textfield mdc-textfield--fullwidth mdc-textfield--with-trailing-icon" v-bind:class="{ 'mdc-textfield--upgraded' : xsplit.background }">
         <i class="material-icons mdc-textfield__icon" tabindex="0">photo_size_select_large</i>
@@ -28,7 +33,7 @@ import Toolbar from './Toolbar'
 import { textfield } from 'material-components-web'
 
 export default {
-  name: 'admin',
+  name: 'settings',
   components: {
     Toolbar
   },
@@ -67,8 +72,7 @@ export default {
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
-          console.error(response)
-          Event.$emit('snackbar.message', 'Error : ' + (response.statusText ? response.statusText : 'no connection'))
+          Event.$emit('http.error', response)
         }
       )
     },
@@ -81,8 +85,7 @@ export default {
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
-          console.error(response)
-          Event.$emit('snackbar.message', 'Error : ' + (response.statusText ? response.statusText : 'no connection'))
+          Event.$emit('http.error', response)
         }
       )
     }
@@ -112,5 +115,14 @@ iframe {
 /* fix mdc-textfield--fullwidth padding */
 .mdc-textfield--fullwidth:not(.mdc-textfield--textarea) .mdc-textfield__input {
   padding: 10px 0;
+}
+
+.flip-vertically {
+  -moz-transform: scaleX(-1);
+  -o-transform: scaleX(-1);
+  -webkit-transform: scaleX(-1);
+  transform: scaleX(-1);
+  filter: FlipH;
+  -ms-filter: "FlipH";
 }
 </style>

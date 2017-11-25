@@ -1,21 +1,57 @@
 <template>
-  <div id="app">
-    <router-view></router-view>
+  <div id="app" :class="{ bottombarActive : bottombarShown }">
+    <router-view class="main-content"></router-view>
+    <transition name="slide">
+      <Bottombar v-show="bottombarShown" style="position: fixed; bottom: 0;"></Bottombar>
+    </transition>
     <Snackbar></Snackbar>
   </div>
 </template>
 
 <script>
+import Event from './utils/EventBus.js'
 import Snackbar from './components/Snackbar'
+import Bottombar from './components/Bottombar'
 import { autoInit } from 'material-components-web'
 
 export default {
   name: 'app',
-  components: { Snackbar },
+  components: { Snackbar, Bottombar },
   data () {
     return {
-      title: 'GeekInc Remote Regie'
+      title: 'GeekInc Remote Regie',
+      bottombar: false
     }
+  },
+  watch: {
+    'episode.started' (value) {
+      if (value !== null && this.episode.ended === null) {
+        this.timePlayedHandler = window.setInterval(() => {
+          this.timePlayed = !this.episode.started ? 0 : (this.episode.ended ? new Date(this.episode.ended).getTime() : new Date().getTime()) - new Date(this.episode.started).getTime()
+        }, 1000)
+      }
+      this.timePlayed = !this.episode.started ? 0 : (this.episode.ended ? new Date(this.episode.ended).getTime() : new Date().getTime()) - new Date(this.episode.started).getTime()
+    },
+    'episode.ended' (value) {
+      if (value !== null && this.episode.started !== null) {
+        window.clearInterval(this.timePlayedHandler)
+      }
+    }
+  },
+  computed: {
+    bottombarShown () {
+      return this.bottombar && this.$route.fullPath.indexOf('xsplit') < 0
+    }
+  },
+  created () {
+    Event.$on('bottombar.toggle', (boolean) => {
+      this.bottombar = boolean
+    })
+    Event.$on('http.error', (response) => {
+      let message = response.body.message ? response.body.message : `Error : ${response.statusText ? response.statusText : 'no connection'}`
+      console.error(response)
+      Event.$emit('snackbar.message', message)
+    })
   },
   mounted: function () {
     autoInit() // autoInit MDC
@@ -31,6 +67,15 @@ export default {
 }
 </script>
 
+<style scoped>
+.slide-enter-active, .slide-leave-active {
+  transition: transform 0.5s
+}
+.slide-enter, .slide-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  transform: translateY(100%);
+}
+</style> 
+
 <style>
 #app {
   font-family: Roboto,sans-serif;
@@ -41,6 +86,25 @@ export default {
 
 body {
   margin: 0;
+}
+
+.content,
+.content .fab {
+  -webkit-transition: margin-bottom 0.5s; /* Safari */
+  transition: margin-bottom 0.5s;
+}
+
+#app.bottombarActive .main-content,
+#app.bottombarActive .fab {
+  margin-bottom: 56px;
+}
+
+.unselectable {
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 </style>
 
