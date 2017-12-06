@@ -11,10 +11,10 @@
         </h2>
       </header>
       <section id="my-mdc-dialog-description" class="mdc-dialog__body mdc-dialog__body--scrollable">
-        <div class="mdc-textfield mdc-textfield--fullwidth mdc-textfield--with-trailing-icon" v-bind:class="{ 'mdc-textfield--upgraded' : program.name }">
-          <i class="material-icons mdc-textfield__icon" tabindex="0">label</i>
-          <input type="text" id="name" class="mdc-textfield__input" :value="program.name" v-model.lazy="program.name">
-          <label for="name" class="mdc-textfield__label" v-bind:class="{ 'mdc-textfield__label--float-above' : program.name }">Name</label>
+        <div class="mdc-text-field mdc-text-field--fullwidth mdc-text-field--with-trailing-icon" v-bind:class="{ 'mdc-text-field--upgraded' : program.name }">
+          <i class="material-icons mdc-text-field__icon" tabindex="0">label</i>
+          <input type="text" id="name" class="mdc-text-field__input" :value="program.name" v-model.lazy="program.name">
+          <label for="name" class="mdc-text-field__label" v-bind:class="{ 'mdc-text-field__label--float-above' : program.name }">Name</label>
         </div>
         <div class="picture thumbnail" v-on:click="$event.currentTarget.querySelector('input').click()">
           <i class="material-icons">edit</i>
@@ -49,7 +49,7 @@
 
 <script>
 import Event from '../../utils/EventBus.js'
-import { dialog, textfield } from 'material-components-web'
+import { dialog, textField } from 'material-components-web'
 import assign from 'object-assign'
 
 export default {
@@ -62,7 +62,7 @@ export default {
   },
   mounted () {
     this.dialog = new dialog.MDCDialog(this.$el)
-    textfield.MDCTextfield.attachTo(this.$el.querySelector('.mdc-textfield'))
+    textField.MDCTextField.attachTo(this.$el.querySelector('.mdc-text-field'))
     Event.$on('programDialog.show', this.show)
     Event.$on('programDialog.close', this.close)
   },
@@ -143,7 +143,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.mdc-textfield--textarea {
+.mdc-text-field--textarea {
   margin-top: 16px;
 }
 
@@ -219,8 +219,8 @@ export default {
   ");
 }
 
-/* fix mdc-textfield--fullwidth padding */
-.mdc-textfield--fullwidth:not(.mdc-textfield--textarea) .mdc-textfield__input {
+/* fix mdc-text-field--fullwidth padding */
+.mdc-text-field--fullwidth:not(.mdc-text-field--textarea) .mdc-text-field__input {
   padding: 10px 0;
 }
 
