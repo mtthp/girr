@@ -22,8 +22,8 @@
         <input type="text" id="background" class="mdc-text-field__input" :value="xsplit.background" v-model.lazy="xsplit.background" v-on:change="updateXsplit({background: $event.target.value})">
         <label for="background" class="mdc-text-field__label" v-bind:class="{ 'mdc-text-field__label--float-above' : xsplit.background }">Background</label>
       </div>
-      <div class="mdc-text-field mdc-text-field--fullwidth">
-        <select v-if="xsplit.scenes" class="mdc-select" v-on:change="changeScene($event)" id="activeScene">
+      <div class="mdc-text-field mdc-text-field--fullwidth" v-if="xsplit.scenes && xsplit.scenes.length > 0">
+        <select class="mdc-select" v-on:change="changeScene($event)" id="activeScene">
           <option v-for="scene in xsplit.scenes" :key="scene._id" :value="scene._id" :selected="scene.active">{{ scene.name }}</option>
         </select>
         <label for="activeScene" class="mdc-text-field__label mdc-text-field__label--float-above">Scene</label>
