@@ -2,27 +2,32 @@
   <div>
     <Toolbar :title="'Settings'"></Toolbar>
     <main class="mdc-toolbar-fixed-adjust">
-      <div class="mdc-textfield mdc-textfield--fullwidth mdc-textfield--with-trailing-icon" v-bind:class="{ 'mdc-textfield--upgraded' : xsplit.title }">
-        <i class="material-icons mdc-textfield__icon" tabindex="0">label</i>
-        <input type="text" id="title" class="mdc-textfield__input" :value="xsplit.title" v-model.lazy="xsplit.title" v-on:change="updateXsplit({title: $event.target.value})">
-        <label for="title" class="mdc-textfield__label" v-bind:class="{ 'mdc-textfield__label--float-above' : xsplit.title }">Title</label>
+      <div class="mdc-text-field mdc-text-field--fullwidth mdc-text-field--with-trailing-icon" v-bind:class="{ 'mdc-text-field--upgraded' : xsplit.title }">
+        <i class="material-icons mdc-text-field__icon" tabindex="0">label</i>
+        <input type="text" id="title" class="mdc-text-field__input" :value="xsplit.title" v-model.lazy="xsplit.title" v-on:change="updateXsplit({title: $event.target.value})">
+        <label for="title" class="mdc-text-field__label" v-bind:class="{ 'mdc-text-field__label--float-above' : xsplit.title }">Title</label>
       </div>
-      <div class="mdc-textfield mdc-textfield--fullwidth mdc-textfield--with-trailing-icon" v-bind:class="{ 'mdc-textfield--upgraded' : xsplit.picture }">
-        <i class="material-icons mdc-textfield__icon" tabindex="0">photo</i>
-        <input type="text" id="picture" class="mdc-textfield__input" :value="xsplit.picture" v-model.lazy="xsplit.picture" v-on:change="updateXsplit({picture: $event.target.value})">
-        <label for="picture" class="mdc-textfield__label" v-bind:class="{ 'mdc-textfield__label--float-above' : xsplit.picture }">Picture</label>
+      <div class="mdc-text-field mdc-text-field--fullwidth mdc-text-field--with-trailing-icon" v-bind:class="{ 'mdc-text-field--upgraded' : xsplit.picture }">
+        <i class="material-icons mdc-text-field__icon" tabindex="0">photo</i>
+        <input type="text" id="picture" class="mdc-text-field__input" :value="xsplit.picture" v-model.lazy="xsplit.picture" v-on:change="updateXsplit({picture: $event.target.value})">
+        <label for="picture" class="mdc-text-field__label" v-bind:class="{ 'mdc-text-field__label--float-above' : xsplit.picture }">Picture</label>
       </div>
-      <div class="mdc-textfield mdc-textfield--fullwidth mdc-textfield--with-trailing-icon" v-bind:class="{ 'mdc-textfield--upgraded' : xsplit.logo }">
-        <i class="material-icons mdc-textfield__icon flip-vertically" tabindex="0">photo_album</i>
-        <input type="text" id="logo" class="mdc-textfield__input" :value="xsplit.logo" v-model.lazy="xsplit.logo" v-on:change="updateXsplit({logo: $event.target.value})">
-        <label for="logo" class="mdc-textfield__label" v-bind:class="{ 'mdc-textfield__label--float-above' : xsplit.logo }">Logo</label>
+      <div class="mdc-text-field mdc-text-field--fullwidth mdc-text-field--with-trailing-icon" v-bind:class="{ 'mdc-text-field--upgraded' : xsplit.logo }">
+        <i class="material-icons mdc-text-field__icon flip-vertically" tabindex="0">photo_album</i>
+        <input type="text" id="logo" class="mdc-text-field__input" :value="xsplit.logo" v-model.lazy="xsplit.logo" v-on:change="updateXsplit({logo: $event.target.value})">
+        <label for="logo" class="mdc-text-field__label" v-bind:class="{ 'mdc-text-field__label--float-above' : xsplit.logo }">Logo</label>
       </div>
-      <div class="mdc-textfield mdc-textfield--fullwidth mdc-textfield--with-trailing-icon" v-bind:class="{ 'mdc-textfield--upgraded' : xsplit.background }">
-        <i class="material-icons mdc-textfield__icon" tabindex="0">photo_size_select_large</i>
-        <input type="text" id="background" class="mdc-textfield__input" :value="xsplit.background" v-model.lazy="xsplit.background" v-on:change="updateXsplit({background: $event.target.value})">
-        <label for="background" class="mdc-textfield__label" v-bind:class="{ 'mdc-textfield__label--float-above' : xsplit.background }">Background</label>
+      <div class="mdc-text-field mdc-text-field--fullwidth mdc-text-field--with-trailing-icon" v-bind:class="{ 'mdc-text-field--upgraded' : xsplit.background }">
+        <i class="material-icons mdc-text-field__icon" tabindex="0">photo_size_select_large</i>
+        <input type="text" id="background" class="mdc-text-field__input" :value="xsplit.background" v-model.lazy="xsplit.background" v-on:change="updateXsplit({background: $event.target.value})">
+        <label for="background" class="mdc-text-field__label" v-bind:class="{ 'mdc-text-field__label--float-above' : xsplit.background }">Background</label>
       </div>
-      <iframe :src="xsplitPath"/>
+      <div class="mdc-text-field mdc-text-field--fullwidth">
+        <select v-if="xsplit.scenes" class="mdc-select" v-on:change="changeScene($event)" id="activeScene">
+          <option v-for="scene in xsplit.scenes" :key="scene._id" :value="scene._id" :selected="scene.active">{{ scene.name }}</option>
+        </select>
+        <label for="activeScene" class="mdc-text-field__label mdc-text-field__label--float-above">Scene</label>
+      </div>
     </main>
   </div>
 </template>
@@ -30,7 +35,8 @@
 <script>
 import Event from '../utils/EventBus.js'
 import Toolbar from './Toolbar'
-import { textfield } from 'material-components-web'
+import { textField } from 'material-components-web'
+import xjs from 'xjs-framework/dist/xjs-es2015' // be aware of https://github.com/xjsframework/xjs/issues/171
 
 export default {
   name: 'settings',
@@ -47,20 +53,70 @@ export default {
       return this.$router.resolve({name: 'Xsplit'}).href
     }
   },
+  watch: {// call again the method if the route changes
+    '$route': 'getXsplit',
+    'xsplit.scenes' (scenes) {
+      xjs.Scene.getActiveScene().then(currentActiveScene => {
+        const sceneToActive = scenes.find(scene => {
+          return scene.active
+        })
+        if (sceneToActive && currentActiveScene._id !== sceneToActive._id) {
+          xjs.Scene.setActiveScene(sceneToActive.index)
+        }
+      })
+    }
+  },
   created () {
     this.getXsplit()
     this.$options.sockets['xsplit'] = (data) => {
       this.xsplit = data
     }
+    xjs
+      .ready()
+      .then(xjs.Scene.getSceneCount)
+      .then(count => {
+        function getScene (index) {
+          return new Promise(function (resolve, reject) {
+            resolve(xjs.Scene.getById(index).then(scene => {
+              scene.index = index
+              return scene.getName().then(name => {
+                scene.name = name
+                return scene.getItems().then(items => {
+                  scene.items = items
+                  return scene
+                })
+              })
+            }))
+          })
+        }
+        // inspired by https://stackoverflow.com/a/29906506
+        function processArray (array, fn) {
+          let results = []
+          return array.reduce(function (p, item) {
+            return p.then(function () {
+              return fn(item).then(function (data) {
+                results.push(data)
+                return results
+              })
+            })
+          }, Promise.resolve())
+        }
+        let indexesArray = Array.from({length: count}, (v, k) => k + 1)
+        processArray(indexesArray, getScene).then((scenes) => {
+          xjs.Scene.getActiveScene().then(activeScene => {
+            scenes.forEach((scene) => {
+              scene.active = (scene._id === activeScene._id)
+            })
+            this.xsplit.scenes = scenes
+            this.updateXsplit(this.xsplit)
+          })
+        })
+      })
   },
   mounted () {
-    this.$el.querySelectorAll('.mdc-textfield').forEach(function (mdlTextfield) {
-      textfield.MDCTextfield.attachTo(mdlTextfield)
+    this.$el.querySelectorAll('.mdc-text-field').forEach(function (mdlTextfield) {
+      textField.MDCTextField.attachTo(mdlTextfield)
     })
-  },
-  watch: {
-    // call again the method if the route changes
-    '$route': 'getXsplit'
   },
   methods: {
     getXsplit: function () {
@@ -88,6 +144,12 @@ export default {
           Event.$emit('http.error', response)
         }
       )
+    },
+    changeScene: function (event) {
+      this.xsplit.scenes.forEach((scene) => {
+        scene.active = (Number(event.target.value) === scene._id)
+      })
+      this.updateXsplit({ scenes: this.xsplit.scenes })
     }
   }
 }
@@ -109,12 +171,19 @@ main {
 
 iframe {
   width: 100%;
+  min-height: 100px;
   flex: 1 1 100%; /* fills remaining space */
 }
 
-/* fix mdc-textfield--fullwidth padding */
-.mdc-textfield--fullwidth:not(.mdc-textfield--textarea) .mdc-textfield__input {
-  padding: 10px 0;
+/* fix mdc-text-field--fullwidth padding */
+.mdc-text-field--fullwidth:not(.mdc-text-field--textarea) .mdc-text-field__input {
+  padding-top: 10px;
+}
+
+.mdc-select {
+  margin-top: 24px;
+  width: 100%;
+  max-width: 100%;
 }
 
 .flip-vertically {
