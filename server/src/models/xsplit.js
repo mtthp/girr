@@ -23,6 +23,7 @@ class XSplit {
       this.media = data.media
       this.created = data.created
       this.modified = data.modified
+      this.scenes = data.scenes
     } else { // default values
       this.title = null
       this.picture = null
@@ -31,6 +32,7 @@ class XSplit {
       this.episode = null // or {} or search for playing episode in the database
       this.topic = null // same
       this.media = null // same
+      this.scenes = []
       this.created = Date.now()
       this.modified = Date.now()
     }
