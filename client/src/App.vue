@@ -99,6 +99,11 @@ body {
   margin-bottom: 56px;
 }
 
+#app.bottombarActive .mdc-snackbar--active {
+  bottom: 70px;
+  z-index: 1;
+}
+
 .unselectable {
   -moz-user-select: none;
   -khtml-user-select: none;

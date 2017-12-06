@@ -134,6 +134,7 @@ footer {
   align-items: center;
   padding: 0 12px;
   cursor: pointer;
+  z-index: 2;
 }
 
 footer .thumbnail {
