@@ -11,7 +11,7 @@
           <button class="material-icons mdc-toolbar__icon mdc-ripple-surface toggle-scenes-menu" arial-label="Menu" data-mdc-auto-init="MDCRipple">videocam</button>
           <div class="mdc-simple-menu mdc-simple-menu--open-from-bottom-right scenes-menu" tabindex="-1">
             <ul class="mdc-simple-menu__items mdc-list" role="menu" aria-hidden="true">
-              <li class="mdc-list-item" v-for="scene in xsplit.scenes" :key="scene._id" v-on:click="activeScene(scene)">{{ scene.name }}</li>
+              <li class="mdc-list-item" v-for="scene in xsplit.scenes" :class="{ active: scene.active }" v-on:click="activeScene(scene)">{{ scene.name }}</li>
             </ul>
           </div>
         </div>
@@ -79,6 +79,7 @@ export default {
     this.$el.querySelector('.toggle-menu').addEventListener('click', (event) => {
       event.stopPropagation()
       event.preventDefault()
+      this.scenesMenu.open = false
       this.menu.open = !this.menu.open
     })
 
@@ -87,6 +88,7 @@ export default {
     this.$el.querySelector('.toggle-scenes-menu').addEventListener('click', (event) => {
       event.stopPropagation()
       event.preventDefault()
+      this.menu.open = false
       this.scenesMenu.open = !this.scenesMenu.open
     })
   },
@@ -206,6 +208,11 @@ footer .actions {
 
 footer .mdc-simple-menu {
   bottom: 0px;
+}
+
+footer .scenes-menu .mdc-list-item.active {
+  background: var(--mdc-theme-secondary);
+  color: #fff;
 }
 
 .fade-enter-active, .fade-leave-active {
