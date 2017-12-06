@@ -132,7 +132,6 @@ body {
 .mdc-badge {
   position: relative;
   white-space: nowrap;
-  margin-right: 24px;
 }
 
 .mdc-badge[data-badge]::after {
