@@ -153,10 +153,12 @@ export default {
       )
     },
     activeScene: function (activeScene) {
+      event.stopPropagation()
       this.xsplit.scenes.forEach((scene) => {
         scene.active = (activeScene === scene)
       })
       this.updateXsplit({ scenes: this.xsplit.scenes })
+      this.scenesMenu.open = false
     }
   }
 }
