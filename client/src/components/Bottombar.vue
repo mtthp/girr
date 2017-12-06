@@ -7,13 +7,23 @@
       </div>
       <div class="actions">
         <button class="material-icons mdc-toolbar__icon mdc-ripple-surface" arial-label="Next" data-mdc-auto-init="MDCRipple" v-on:click="nextTopic($event)">skip_next</button>
-        <button class="material-icons mdc-toolbar__icon mdc-ripple-surface toggle-menu" arial-label="Menu" data-mdc-auto-init="MDCRipple">more_vert</button>
-        <div class="mdc-simple-menu mdc-simple-menu--open-from-bottom-right" tabindex="-1">
-          <ul class="mdc-simple-menu__items mdc-list" role="menu" aria-hidden="true">
-            <li class="mdc-list-item" role="menuitem" tabindex="0" :aria-disabled="isAtEpisode" v-if="xsplit.episode" v-on:click="goToEpisode($event)">Go to {{ xsplit.episode.name }}</li>
-            <li class="mdc-list-divider" role="separator"></li>
-            <li class="mdc-list-item" role="menuitem" tabindex="0" v-on:click="stopEpisode($event)">Stop</li>
-          </ul>
+        <div class="mdc-menu-anchor" v-show="xsplit.scenes && xsplit.scenes.length > 0">
+          <button class="material-icons mdc-toolbar__icon mdc-ripple-surface toggle-scenes-menu" arial-label="Menu" data-mdc-auto-init="MDCRipple">videocam</button>
+          <div class="mdc-simple-menu mdc-simple-menu--open-from-bottom-right scenes-menu" tabindex="-1">
+            <ul class="mdc-simple-menu__items mdc-list" role="menu" aria-hidden="true">
+              <li class="mdc-list-item" v-for="scene in xsplit.scenes" :key="scene._id" v-on:click="activeScene(scene)">{{ scene.name }}</li>
+            </ul>
+          </div>
+        </div>
+        <div class="mdc-menu-anchor">
+          <button class="material-icons mdc-toolbar__icon mdc-ripple-surface toggle-menu" arial-label="Menu" data-mdc-auto-init="MDCRipple">more_vert</button>
+          <div class="mdc-simple-menu mdc-simple-menu--open-from-bottom-right bottombar-menu" tabindex="-1">
+            <ul class="mdc-simple-menu__items mdc-list" role="menu" aria-hidden="true">
+              <li class="mdc-list-item" role="menuitem" tabindex="0" :aria-disabled="isAtEpisode" v-if="xsplit.episode" v-on:click="goToEpisode($event)">Go to {{ xsplit.episode.name }}</li>
+              <li class="mdc-list-divider" role="separator"></li>
+              <li class="mdc-list-item" role="menuitem" tabindex="0" v-on:click="stopEpisode($event)">Stop</li>
+            </ul>
+          </div>
         </div>
       </div>
     </footer>
@@ -64,12 +74,20 @@ export default {
     }
   },
   mounted () {
-    this.menu = new menu.MDCSimpleMenu(this.$el.querySelector('.mdc-simple-menu'))
+    this.menu = new menu.MDCSimpleMenu(this.$el.querySelector('.bottombar-menu'))
     // Add event listener to some button to toggle the menu on and off.
     this.$el.querySelector('.toggle-menu').addEventListener('click', (event) => {
       event.stopPropagation()
       event.preventDefault()
       this.menu.open = !this.menu.open
+    })
+
+    this.scenesMenu = new menu.MDCSimpleMenu(this.$el.querySelector('.scenes-menu'))
+    // Add event listener to some button to toggle the menu on and off.
+    this.$el.querySelector('.toggle-scenes-menu').addEventListener('click', (event) => {
+      event.stopPropagation()
+      event.preventDefault()
+      this.scenesMenu.open = !this.scenesMenu.open
     })
   },
   methods: {
@@ -79,6 +97,19 @@ export default {
           this.xsplit = response.body
         },
         function (response) {
+          Event.$emit('http.error', response)
+        }
+      )
+    },
+    updateXsplit: function (data) {
+      Event.$emit('progressbar.toggle', true)
+      this.$http.put('/api/xsplit/', data).then(
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          this.xsplit = response.body
+        },
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
           Event.$emit('http.error', response)
         }
       )
@@ -118,6 +149,12 @@ export default {
           Event.$emit('http.error', response)
         }
       )
+    },
+    activeScene: function (activeScene) {
+      this.xsplit.scenes.forEach((scene) => {
+        scene.active = (activeScene === scene)
+      })
+      this.updateXsplit({ scenes: this.xsplit.scenes })
     }
   }
 }
