@@ -204,7 +204,7 @@ main.empty .empty-state {
   max-height: calc(100vh - (5 * 72px)); /* --mdc-toolbar-ratio-to-extend-flexible * 72px */
 }
 
-.content.bottombarActive main.empty .empty-state {
+#app.bottombarActive main.empty .empty-state {
   max-height: calc(100vh - (5 * 72px) - 56px); /* --mdc-toolbar-ratio-to-extend-flexible * 72px */
 }
 
