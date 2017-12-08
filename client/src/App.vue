@@ -68,15 +68,6 @@ export default {
 </script>
 
 <style scoped>
-.slide-enter-active, .slide-leave-active {
-  transition: transform 0.5s
-}
-.slide-enter, .slide-leave-to /* .fade-leave-active below version 2.1.8 */ {
-  transform: translateY(100%);
-}
-</style> 
-
-<style>
 #app {
   font-family: Roboto,sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -84,25 +75,37 @@ export default {
   color: #2c3e50;
 }
 
-body {
-  margin: 0;
+.main-content {
   background-color: white;
 }
 
-.content,
-.content .fab {
+.main-content,
+.main-content >>> .fab {
   -webkit-transition: margin-bottom 0.5s; /* Safari */
   transition: margin-bottom 0.5s;
 }
 
 #app.bottombarActive .main-content,
-#app.bottombarActive .fab {
+#app.bottombarActive .main-content >>> .fab {
   margin-bottom: 56px;
 }
 
 #app.bottombarActive .mdc-snackbar--active {
   bottom: 70px;
   z-index: 1;
+}
+
+.slide-enter-active, .slide-leave-active {
+  transition: transform 0.5s
+}
+.slide-enter, .slide-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  transform: translateY(100%);
+}
+</style>
+
+<style>
+body {
+  margin: 0;
 }
 
 .unselectable {

@@ -108,14 +108,12 @@ export default {
 }
 </script>
 
-<style>
-body {
-  background-color: transparent;
-}
-</style>
-
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.main-content {
+  background-color: transparent;
+}
+
 .xsplit {
 	display: flex;
 	flex-flow: column-reverse;
