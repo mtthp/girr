@@ -128,7 +128,6 @@ export default {
   align-self: flex-start; /* sized to content */
   flex: 1 0 auto; /* grow to content */
   margin: 0.5em 1em;
-  padding: 10px;
   max-width: calc(100% - 2em - 400px); /* je ne sais pas quelle taille fait exactement le twitch chat donc j'ai mis 400px à l'arrache */
   font-family: 'Oswald', sans-serif;
   font-weight: 400;
@@ -139,6 +138,10 @@ export default {
   overflow: hidden;
   box-sizing: border-box;
   background-color: white;
+}
+
+.xsplit .title:not(:empty) {
+  padding: 10px;
 }
 
 @media (min-width: 481px) and (max-width: 840px) {
