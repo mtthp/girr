@@ -148,7 +148,7 @@ router.route('/')
         media.label = req.file.originalname
       }
       media.path = req.file.path
-      media.uri = '/' + media.path // should be calculate automatically from the path instead
+      media.uri = media.path.replace(process.env.DATA_PATH, '/data').replace(/\\/g, path.posix.sep)
       media.mimeType = req.file.mimetype
     } else if (media.uri) { // otherwise, tries to download the file and place it under the data directory
       let response = await request({uri: media.uri, encoding: 'binary', resolveWithFullResponse: true})
@@ -160,7 +160,7 @@ router.route('/')
 
       if (typeof media.label === "undefined") media.label = path.basename(media.uri)
       media.path = filepath
-      media.uri = '/' + media.path // should be calculate automatically from the path instead
+      media.uri = media.path.replace(process.env.DATA_PATH, '/data').replace(/\\/g, path.posix.sep)
       media.mimeType = mimeType
     } else {
       next({message:"No media file or URI was provided", status: 417})

@@ -169,9 +169,9 @@ router.route('/:programId')
     { name: 'logo', maxCount: 1 },
     { name: 'logoBW', maxCount: 1 }
   ]), function (req, res, next) {
-    if (req.files['thumbnail']) req.body.thumbnail = '/' + req.files['thumbnail'][0].path
-    if (req.files['logo']) req.body.logo = '/' + req.files['logo'][0].path
-    if (req.files['logoBW']) req.body.logoBW = '/' + req.files['logoBW'][0].path
+    Object.keys(req.files).forEach(function (filename) {
+      req.body[filename] = req.files[filename][0].path.replace(process.env.DATA_PATH, '/data').replace(/\\/g, path.posix.sep)
+    })
 
     req.program = Object.assign(req.program, req.body, {modified: Date.now()})
     req.program
