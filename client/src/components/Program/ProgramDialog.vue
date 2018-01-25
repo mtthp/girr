@@ -13,7 +13,7 @@
       <section id="my-mdc-dialog-description" class="mdc-dialog__body mdc-dialog__body--scrollable">
         <div class="mdc-text-field mdc-text-field--fullwidth mdc-text-field--with-trailing-icon" v-bind:class="{ 'mdc-text-field--upgraded' : program.name }">
           <i class="material-icons mdc-text-field__icon" tabindex="0">label</i>
-          <input type="text" id="name" class="mdc-text-field__input" :value="program.name" v-model.lazy="program.name">
+          <input type="text" id="name" class="mdc-text-field__input" v-model.lazy="program.name">
           <label for="name" class="mdc-text-field__label" v-bind:class="{ 'mdc-text-field__label--float-above' : program.name }">Name</label>
         </div>
         <div class="picture thumbnail" v-on:click="$event.currentTarget.querySelector('input').click()">

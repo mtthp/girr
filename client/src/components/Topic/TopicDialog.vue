@@ -12,7 +12,7 @@
       </header>
       <section id="my-mdc-dialog-description" class="mdc-dialog__body mdc-dialog__body--scrollable">
         <div class="mdc-text-field mdc-text-field--fullwidth" v-bind:class="{ 'mdc-text-field--upgraded' : topic.title }">
-          <input type="text" id="title" class="mdc-text-field__input" :value="topic.title" v-model.lazy="topic.title">
+          <input type="text" id="title" class="mdc-text-field__input" v-model.lazy="topic.title">
           <label for="title" class="mdc-text-field__label" v-bind:class="{ 'mdc-text-field__label--float-above' : topic.title }">Title</label>
         </div>
         <div class="mdc-text-field mdc-text-field--fullwidth mdc-text-field--textarea">
@@ -46,7 +46,7 @@
       </section>
       <footer class="mdc-dialog__footer">
         <div style="margin-right: auto;">
-          <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--delete" v-on:click="deletedTopic(topic)">
+          <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--delete" v-on:click="deleteTopic(topic)">
             <i class="material-icons mdc-button__icon">delete</i>
             <span>Delete</span>
           </button>
@@ -159,6 +159,10 @@ export default {
 <style scoped>
 .mdc-text-field--textarea {
   margin-top: 16px;
+}
+
+.mdc-text-field--textarea textarea {
+  padding-top: 16px;
 }
 
 .mdc-dialog__body--scrollable {

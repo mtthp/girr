@@ -63,7 +63,7 @@ export default {
     dragOptions () {
       return {
         animation: 0,
-        handle: '.mdc-list-item__start-detail',
+        handle: '.mdc-list-item__graphic',
         delay: 0
       }
     },

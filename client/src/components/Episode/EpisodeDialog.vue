@@ -13,12 +13,12 @@
       <section id="my-mdc-dialog-description" class="mdc-dialog__body mdc-dialog__body--scrollable">
         <div class="mdc-text-field mdc-text-field--fullwidth mdc-text-field--with-trailing-icon" v-bind:class="{ 'mdc-text-field--upgraded' : episode.name }">
           <i class="material-icons mdc-text-field__icon" tabindex="0">label</i>
-          <input type="text" id="name" class="mdc-text-field__input" :value="episode.name" v-model.lazy="episode.name">
+          <input type="text" id="name" class="mdc-text-field__input" v-model.lazy="episode.name">
           <label for="name" class="mdc-text-field__label" v-bind:class="{ 'mdc-text-field__label--float-above' : episode.name }">Name</label>
         </div>
         <div class="mdc-text-field mdc-text-field--fullwidth mdc-text-field--with-trailing-icon" v-bind:class="{ 'mdc-text-field--upgraded' : episode.number }">
           <i class="material-icons mdc-text-field__icon" tabindex="0">format_list_numbered</i>
-          <input type="text" id="number" class="mdc-text-field__input" :value="episode.number" v-model.lazy="episode.number" pattern="[0-9]+">
+          <input type="text" id="number" class="mdc-text-field__input" v-model.lazy="episode.number" pattern="[0-9]+">
           <label for="number" class="mdc-text-field__label" v-bind:class="{ 'mdc-text-field__label--float-above' : episode.number }">Number</label>
         </div>
       </section>

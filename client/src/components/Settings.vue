@@ -4,22 +4,22 @@
     <main class="mdc-toolbar-fixed-adjust">
       <div class="mdc-text-field mdc-text-field--fullwidth mdc-text-field--with-trailing-icon" v-bind:class="{ 'mdc-text-field--upgraded' : xsplit.title }">
         <i class="material-icons mdc-text-field__icon" tabindex="0">label</i>
-        <input type="text" id="title" class="mdc-text-field__input" :value="xsplit.title" v-model.lazy="xsplit.title" v-on:change="updateXsplit({title: $event.target.value})">
+        <input type="text" id="title" class="mdc-text-field__input" v-model.lazy="xsplit.title" v-on:change="updateXsplit({title: $event.target.value})">
         <label for="title" class="mdc-text-field__label" v-bind:class="{ 'mdc-text-field__label--float-above' : xsplit.title }">Title</label>
       </div>
       <div class="mdc-text-field mdc-text-field--fullwidth mdc-text-field--with-trailing-icon" v-bind:class="{ 'mdc-text-field--upgraded' : xsplit.picture }">
         <i class="material-icons mdc-text-field__icon" tabindex="0">photo</i>
-        <input type="text" id="picture" class="mdc-text-field__input" :value="xsplit.picture" v-model.lazy="xsplit.picture" v-on:change="updateXsplit({picture: $event.target.value})">
+        <input type="text" id="picture" class="mdc-text-field__input" v-model.lazy="xsplit.picture" v-on:change="updateXsplit({picture: $event.target.value})">
         <label for="picture" class="mdc-text-field__label" v-bind:class="{ 'mdc-text-field__label--float-above' : xsplit.picture }">Picture</label>
       </div>
       <div class="mdc-text-field mdc-text-field--fullwidth mdc-text-field--with-trailing-icon" v-bind:class="{ 'mdc-text-field--upgraded' : xsplit.logo }">
         <i class="material-icons mdc-text-field__icon flip-vertically" tabindex="0">photo_album</i>
-        <input type="text" id="logo" class="mdc-text-field__input" :value="xsplit.logo" v-model.lazy="xsplit.logo" v-on:change="updateXsplit({logo: $event.target.value})">
+        <input type="text" id="logo" class="mdc-text-field__input" v-model.lazy="xsplit.logo" v-on:change="updateXsplit({logo: $event.target.value})">
         <label for="logo" class="mdc-text-field__label" v-bind:class="{ 'mdc-text-field__label--float-above' : xsplit.logo }">Logo</label>
       </div>
       <div class="mdc-text-field mdc-text-field--fullwidth mdc-text-field--with-trailing-icon" v-bind:class="{ 'mdc-text-field--upgraded' : xsplit.background }">
         <i class="material-icons mdc-text-field__icon" tabindex="0">photo_size_select_large</i>
-        <input type="text" id="background" class="mdc-text-field__input" :value="xsplit.background" v-model.lazy="xsplit.background" v-on:change="updateXsplit({background: $event.target.value})">
+        <input type="text" id="background" class="mdc-text-field__input" v-model.lazy="xsplit.background" v-on:change="updateXsplit({background: $event.target.value})">
         <label for="background" class="mdc-text-field__label" v-bind:class="{ 'mdc-text-field__label--float-above' : xsplit.background }">Background</label>
       </div>
       <scenes :scenes="xsplit.scenes" v-if="xsplit.scenes"></scenes>

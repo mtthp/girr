@@ -206,6 +206,7 @@ footer .actions {
   -ms-flex-pack: end;
   justify-content: flex-end;
   flex: 1;
+  color: rgb(255, 255, 255);
 }
 
 footer .mdc-simple-menu {

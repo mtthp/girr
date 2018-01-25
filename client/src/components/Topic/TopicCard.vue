@@ -1,16 +1,16 @@
 <template>
-  <div class="topic" v-bind:class="{ expanded : topic.expanded, playing : topic.started !== null && topic.ended === null }">
+  <div class="topic" v-bind:class="{ playing : topic.started !== null && topic.ended === null }">
     <li role="separator" class="mdc-list-divider"></li>
     <li class="mdc-list-item" data-mdc-auto-init="MDCRipple" v-on:click="toggle(!topic.expanded)">
-      <img v-if="medias.length > 0" class="mdc-list-item__start-detail unselectable" :src="medias[0].uri ? medias[0].uri + '?height=56' : null" width="56" height="56" :alt="medias[0].label">
-      <span v-else class="mdc-list-item__start-detail" role="presentation">
+      <img v-if="medias.length > 0" class="mdc-list-item__graphic unselectable" :src="medias[0].uri ? medias[0].uri + '?height=56' : null" width="56" height="56" :alt="medias[0].label">
+      <span v-else class="mdc-list-item__graphic" role="presentation">
         <i class="material-icons" aria-hidden="true">comment</i>
       </span>
       <span class="mdc-list-item__text">
         {{ topic.title }}
-        <span class="mdc-list-item__text__secondary" v-if="topic.started">{{ timePlayed | formatTime }}</span>
+        <span class="mdc-list-item__secondary-text" v-if="topic.started">{{ timePlayed | formatTime }}</span>
       </span>
-      <span class="mdc-list-item__end-detail">
+      <span class="mdc-list-item__meta">
         <i class="mdc-icon-toggle material-icons edit-button" arial-label="Edit" v-on:click="editTopic">edit</i>
         <i v-if="topic.started !== null && topic.ended === null" class="mdc-icon-toggle material-icons" arial-label="Stop" v-on:click="stopTopic">stop</i>
         <i v-else class="mdc-icon-toggle material-icons" arial-label="Playing" v-on:click="startTopic">play_arrow</i>
@@ -269,6 +269,7 @@ export default {
   max-height: 0px;
   margin: 10px 0;
   overflow: hidden;
+  padding: 0 16px;
   transition: all 0.2s, max-height 0.2s; /* close rapidly */
 }
 
@@ -295,24 +296,24 @@ export default {
   margin: auto;
 }
 
-.topic .mdc-list-item__start-detail {
+.topic .mdc-list-item__graphic {
   cursor: move; /* fallback: */
   cursor: -webkit-grab; /* Chrome 1-21, Safari 4+ */
   cursor:    -moz-grab; /* Firefox 1.5-26 */
   cursor:         grab; /* W3C standards syntax, should come least */
 }
 
-.topic img.mdc-list-item__start-detail {
+.topic img.mdc-list-item__graphic {
   object-fit: cover;
 }
 
 .topic.playing .mdc-list-item__text,
-.topic.playing .mdc-list-item__end-detail,
-.topic.playing .mdc-list-item__end-detail i {
+.topic.playing .mdc-list-item__meta,
+.topic.playing .mdc-list-item__meta i {
   color: var(--mdc-theme-secondary,#ff4081);
 }
 
-.topic.playing .mdc-list-item__start-detail {
+.topic.playing .mdc-list-item__graphic {
   background-color: var(--mdc-theme-secondary,#ff4081);
 }
 
@@ -340,11 +341,11 @@ export default {
   text-overflow: ellipsis;
 }
 
-.mdc-list-item .mdc-list-item__text__secondary {
+.mdc-list-item .mdc-list-item__secondary-text {
   min-width: 0;
 }
 
-.mdc-list-item .mdc-list-item__end-detail {
+.mdc-list-item .mdc-list-item__meta {
   width: auto;
   height: auto;
   display: inline-flex;
@@ -352,10 +353,8 @@ export default {
   align-items: flex-end;
 }
 
-.mdc-list-item .mdc-list-item__start-detail {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+.mdc-list-item .mdc-list-item__graphic {
+  flex: none;
   color: white;
   background-color: rgba(0, 0, 0, .26);
 }
