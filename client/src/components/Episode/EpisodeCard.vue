@@ -26,12 +26,6 @@ export default {
     this.$options.sockets[`episodes.${this.episode._id}`] = function (data) {
       Event.$emit('episode.updated', data)
     }
-    Event.$on('episode.update', (episode) => {
-      if (episode._id === this.episode._id) this.updateEpisode(episode)
-    })
-    Event.$on('episode.delete', (episode) => {
-      if (episode._id === this.episode._id) this.deleteEpisode(episode)
-    })
   },
   mounted () {
     this.menu = new menu.MDCSimpleMenu(this.$el.querySelector('.mdc-simple-menu'))
@@ -46,34 +40,6 @@ export default {
       event.preventDefault()
       event.stopPropagation()
       Event.$emit('episodeDialog.show', this.episode)
-    },
-    updateEpisode: function (episode) {
-      Event.$emit('progressbar.toggle', true)
-      this.$http.put(`/api/programs/${this.$route.params.programId}/episodes/${episode._id}`, episode).then(
-        function (response) {
-          Event.$emit('progressbar.toggle', false)
-          Event.$emit('episode.updated', response.body)
-          Event.$emit('snackbar.message', `Episode ${response.body.name} updated`)
-        },
-        function (response) {
-          Event.$emit('progressbar.toggle', false)
-          Event.$emit('http.error', response)
-        }
-      )
-    },
-    deleteEpisode: function (episode) {
-      Event.$emit('progressbar.toggle', true)
-      this.$http.delete(`/api/programs/${this.$route.params.programId}/episodes/${episode._id}`).then(
-        function (response) {
-          Event.$emit('progressbar.toggle', false)
-          Event.$emit('episode.deleted', episode)
-          Event.$emit('snackbar.message', `Episode ${episode.name} deleted`)
-        },
-        function (response) {
-          Event.$emit('progressbar.toggle', false)
-          Event.$emit('http.error', response)
-        }
-      )
     }
   }
 }

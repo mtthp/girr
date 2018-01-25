@@ -118,42 +118,6 @@ export default {
         }
       )
     },
-    updateProgram: function (program, file) {
-      let data = program
-      if (typeof file !== 'undefined') {
-        data = new FormData()
-        data.append('thumbnail', file)
-        for (let key in program) {
-          if (!(program[key] instanceof Object)) data.append(key, program[key])
-        }
-      }
-      Event.$emit('progressbar.toggle', true)
-      this.$http.put(`/api/programs/${program._id}`, data).then(
-        (response) => {
-          Event.$emit('progressbar.toggle', false)
-          this.program = response.body
-          Event.$emit('snackbar.message', `Program ${response.body.name} updated`)
-        },
-        function (response) {
-          Event.$emit('progressbar.toggle', false)
-          Event.$emit('http.error', response)
-        }
-      )
-    },
-    deleteProgram: function (program) {
-      Event.$emit('progressbar.toggle', true)
-      this.$http.delete(`/api/programs/${program._id}`).then(
-        function (response) {
-          Event.$emit('progressbar.toggle', false)
-          window.location = this.$router.resolve({name: 'Programs'}).href
-          Event.$emit('snackbar.message', `Program ${program.name} deleted`)
-        },
-        function (response) {
-          Event.$emit('progressbar.toggle', false)
-          Event.$emit('http.error', response)
-        }
-      )
-    },
     fetchEpisodes: function () {
       Event.$emit('progressbar.toggle', true)
       this.$http.get(`/api/programs/${this.$route.params.programId}/episodes`).then(

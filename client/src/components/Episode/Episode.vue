@@ -24,7 +24,7 @@
         @change="itemMoved"
         class="topics mdc-list mdc-list--avatar-list mdc-list--two-line">
         <transition-group name="fade">
-          <TopicCard v-for="topic in topics" :key="topic._id" :topic="topic" ></TopicCard>
+          <TopicCard v-for="topic in topics" :key="topic._id" :topic="topic" v-bind:class="{ expanded : topic.expanded }"></TopicCard>
         </transition-group>
       </draggable>
       <EmptyState v-else></EmptyState>
@@ -119,6 +119,15 @@ export default {
       }))
       if (index > -1) this.topics.splice(index, 1)
     })
+    // remove this to expand multiple topics at the same time
+    Event.$off('topic.toggle').$on('topic.toggle', (topic) => {
+      this.topics.forEach(function (episodeTopic) {
+        if (episodeTopic !== topic) {
+          episodeTopic.expanded = false
+        }
+      })
+      this.$forceUpdate()
+    })
   },
   mounted () {
     this.menu = new menu.MDCSimpleMenu(this.$el.querySelector('.mdc-toolbar__section .mdc-simple-menu'))
@@ -145,6 +154,9 @@ export default {
     }
   },
   methods: {
+    editEpisode: function (event) {
+      Event.$emit('episodeDialog.show', this.episode)
+    },
     fetchData: function () {
       this.episode = {} // reset the episode
       Event.$emit('progressbar.toggle', true)
@@ -156,37 +168,6 @@ export default {
             this.episode = data
           }
           this.fetchTopics()
-        },
-        function (response) {
-          Event.$emit('progressbar.toggle', false)
-          Event.$emit('http.error', response)
-        }
-      )
-    },
-    editEpisode: function (event) {
-      Event.$emit('episodeDialog.show', this.episode)
-    },
-    updateEpisode: function (episode) {
-      Event.$emit('progressbar.toggle', true)
-      this.$http.put(`/api/programs/${this.$route.params.programId}/episodes/${episode._id}`, episode).then(
-        function (response) {
-          Event.$emit('progressbar.toggle', false)
-          Event.$emit('episode.updated', response.body)
-          Event.$emit('snackbar.message', `Episode ${response.body.name} updated`)
-        },
-        function (response) {
-          Event.$emit('progressbar.toggle', false)
-          Event.$emit('http.error', response)
-        }
-      )
-    },
-    deleteEpisode: function (episode) {
-      Event.$emit('progressbar.toggle', true)
-      this.$http.delete(`/api/programs/${this.$route.params.programId}/episodes/${episode._id}`).then(
-        function (response) {
-          Event.$emit('progressbar.toggle', false)
-          window.location = this.$router.resolve({name: 'Program', params: { programId: this.$route.params.programId }}).href
-          Event.$emit('snackbar.message', `Episode ${episode.name} deleted`)
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)

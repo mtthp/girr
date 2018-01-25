@@ -7,7 +7,7 @@
     <div class="mdc-dialog__surface">
       <header class="mdc-dialog__header">
         <h2 id="my-mdc-dialog-label" class="mdc-dialog__header__title">
-          {{ program.name }}
+          {{ title }}
         </h2>
       </header>
       <section id="my-mdc-dialog-description" class="mdc-dialog__body mdc-dialog__body--scrollable">
@@ -57,17 +57,19 @@ export default {
   data () {
     return {
       dialog: null,
+      title: null,
       program: {}
     }
   },
   mounted () {
     this.dialog = new dialog.MDCDialog(this.$el)
     textField.MDCTextField.attachTo(this.$el.querySelector('.mdc-text-field'))
-    Event.$on('programDialog.show', this.show)
-    Event.$on('programDialog.close', this.close)
+    Event.$off('programDialog.show').$on('programDialog.show', this.show)
+    Event.$off('programDialog.close').$on('programDialog.close', this.close)
   },
   methods: {
     show: function (program) {
+      this.title = program.name
       this.program = assign({}, program)
       this.$el.querySelector('input[type=file]').value = null
       this.dialog.show()
@@ -76,9 +78,7 @@ export default {
       this.dialog.close()
     },
     confirm: function () {
-      // Event.$emit('program.update', this.program, this.$el.querySelectorAll('input[type=file]'))
       this.updateProgram(this.program, this.$el.querySelectorAll('input[type=file]'))
-      this.close()
     },
     fileChange: function (event) {
       if (event.target.files.length > 0) {
@@ -88,10 +88,6 @@ export default {
         })
         FR.readAsDataURL(event.target.files[0])
       }
-    },
-    delete: function () {
-      Event.$emit('program.delete', this.program)
-      this.close()
     },
     updateProgram: function (program, inputs) {
       let data = program
@@ -114,6 +110,7 @@ export default {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('program.updated', response.body)
           Event.$emit('snackbar.message', `Program ${response.body.name} updated`)
+          this.close()
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)

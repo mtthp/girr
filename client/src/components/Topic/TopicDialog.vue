@@ -7,7 +7,7 @@
     <div class="mdc-dialog__surface">
       <header class="mdc-dialog__header">
         <h2 id="my-mdc-dialog-label" class="mdc-dialog__header__title">
-          {{ topic.title }}
+          {{ title }}
         </h2>
       </header>
       <section id="my-mdc-dialog-description" class="mdc-dialog__body mdc-dialog__body--scrollable">
@@ -46,7 +46,7 @@
       </section>
       <footer class="mdc-dialog__footer">
         <div style="margin-right: auto;">
-          <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--delete" v-on:click="deleteTopic">
+          <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--delete" v-on:click="deletedTopic(topic)">
             <i class="material-icons mdc-button__icon">delete</i>
             <span>Delete</span>
           </button>
@@ -70,6 +70,7 @@ export default {
   data () {
     return {
       dialog: null,
+      title: null,
       topic: {},
       medias: []
     }
@@ -78,11 +79,12 @@ export default {
     this.dialog = new dialog.MDCDialog(this.$el)
     textField.MDCTextField.attachTo(this.$el.querySelector('.mdc-text-field'))
     this.addTileTextfield = new textField.MDCTextField(this.$el.querySelector('.add-tile .mdc-text-field'))
-    Event.$on('topicDialog.show', this.show)
-    Event.$on('topicDialog.close', this.close)
+    Event.$off('topicDialog.show').$on('topicDialog.show', this.show)
+    Event.$off('topicDialog.close').$on('topicDialog.close', this.close)
   },
   methods: {
     show: function (topic, medias) {
+      this.title = topic.title
       this.topic = assign({}, topic)
       this.medias = assign([], medias)
       this.$el.querySelector('textarea').value = this.topic.description ? this.topic.description : ''
@@ -92,12 +94,8 @@ export default {
       this.dialog.close()
     },
     confirm: function () {
-      Event.$emit('topic.update', this.topic, this.medias)
-      this.close()
-    },
-    deleteTopic: function () {
-      Event.$emit('topic.delete', this.topic)
-      this.close()
+      Event.$emit(`topics.${this.topic._id}.update`, this.topic, this.medias)
+      this.updateTopic(this.topic)
     },
     fileChange: function (name, files) {
       if (files.length > 0) {
@@ -122,6 +120,36 @@ export default {
         return dialogMedia === media
       }))
       if (index > -1) this.medias.splice(index, 1)
+    },
+    updateTopic: function (topic) {
+      Event.$emit('progressbar.toggle', true)
+      this.$http.put(`/api/programs/${this.$route.params.programId}/episodes/${this.$route.params.episodeId}/topics/${topic._id}`, topic).then(
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          Event.$emit('topic.updated', response.body)
+          Event.$emit('snackbar.message', `Topic ${response.body.title} updated`)
+          this.close()
+        },
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          Event.$emit('http.error', response)
+        }
+      )
+    },
+    deleteTopic: function (topic) {
+      Event.$emit('progressbar.toggle', true)
+      this.$http.delete(`/api/programs/${this.$route.params.programId}/episodes/${this.$route.params.episodeId}/topics/${topic._id}`).then(
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          Event.$emit('topic.deleted', topic)
+          Event.$emit('snackbar.message', `Topic ${topic.title} deleted`)
+          this.close()
+        },
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          Event.$emit('http.error', response)
+        }
+      )
     }
   }
 }

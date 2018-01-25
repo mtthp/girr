@@ -12,8 +12,8 @@
       </span>
       <span class="mdc-list-item__end-detail">
         <i class="mdc-icon-toggle material-icons edit-button" arial-label="Edit" v-on:click="editTopic">edit</i>
-        <i v-if="topic.started !== null && topic.ended === null" class="mdc-icon-toggle material-icons" arial-label="Stop" v-on:click="stop">stop</i>
-        <i v-else class="mdc-icon-toggle material-icons" arial-label="Playing" v-on:click="start">play_arrow</i>
+        <i v-if="topic.started !== null && topic.ended === null" class="mdc-icon-toggle material-icons" arial-label="Stop" v-on:click="stopTopic">stop</i>
+        <i v-else class="mdc-icon-toggle material-icons" arial-label="Playing" v-on:click="startTopic">play_arrow</i>
         <i class="material-icons chevron unselectable" arial-label="Chevron">keyboard_arrow_down</i>
       </span>
     </li>
@@ -62,7 +62,7 @@ export default {
     }
   },
   created () {
-    this.topic.expanded = false
+    // this.topic.expanded = false
     this.$options.sockets[`topics.${this.topic._id}.delete`] = function (data) {
       Event.$emit('topic.deleted', data)
     }
@@ -79,6 +79,50 @@ export default {
         this.timePlayed = !this.topic.started ? 0 : (this.topic.ended ? new Date(this.topic.ended).getTime() : new Date().getTime()) - new Date(this.topic.started).getTime()
       }, 1000)
     }
+    Event.$off(`topics.${this.topic._id}.update`).$on(`topics.${this.topic._id}.update`, (dialogTopic, dialogMedias) => {
+      // parcours des Topic's medias pour savoir lesquels sont à supprimer
+      topicMediasLoop:
+      for (let i = 0; i < this.medias.length; i++) {
+        for (let j = 0; j < dialogMedias.length; j++) {
+          if (this.medias[i]._id === dialogMedias[j]._id) {
+            continue topicMediasLoop
+          }
+        }
+        this.deleteMedia(this.medias[i])
+      }
+
+      // parcours des Dialog's medias pour savoir lesquels sont à ajouter
+      dialogMedias.forEach((dialogMedia) => {
+        if (!dialogMedia._id && (dialogMedia.file || dialogMedia.uri)) {
+          this.addMedia(dialogMedia)
+        }
+      })
+    })
+    Event.$off(`topics.${this.topic._id}.delete`).$on(`topics.${this.topic._id}.delete`, (dialogTopic) => {
+      this.deleteTopic(dialogTopic)
+    })
+    Event.$off(`topics.${this.topic._id}.media.added`).$on(`topics.${this.topic._id}.media.added`, (media) => {
+      const index = this.medias.indexOf(this.medias.find(function (topicMedia) {
+        return topicMedia._id === media._id
+      }))
+      if (index < 0) this.medias.push(media)
+    })
+    Event.$off(`topics.${this.topic._id}.media.updated`).$on(`topics.${this.topic._id}.media.updated`, (media) => {
+      for (let i = 0; i < this.medias.length; i++) {
+        if (this.medias[i]._id === media._id) {
+          this.medias[i] = media
+          this.medias.sort(function (m1, m2) { return m1.position - m2.position })
+          this.$forceUpdate()
+          break
+        }
+      }
+    })
+    Event.$off(`topics.${this.topic._id}.media.deleted`).$on(`topics.${this.topic._id}.media.deleted`, (media) => {
+      const index = this.medias.indexOf(this.medias.find(function (topicMedia) {
+        return topicMedia._id === media._id
+      }))
+      if (index > -1) this.medias.splice(index, 1)
+    })
     this.fetchMedias()
   },
   watch: {
@@ -99,105 +143,23 @@ export default {
   mounted () {
     // code here executes once the component is rendered
     autoInit(this.$el) // reapply MDCRipple to all mdc-list-item
-    Event.$on('topic.update', (dialogTopic, dialogMedias) => {
-      if (dialogTopic._id === this.topic._id) {
-        // parcours des Topic's medias pour savoir lesquels sont à supprimer
-        topicMediasLoop:
-        for (let i = 0; i < this.medias.length; i++) {
-          for (let j = 0; j < dialogMedias.length; j++) {
-            if (this.medias[i]._id === dialogMedias[j]._id) {
-              continue topicMediasLoop
-            }
-          }
-          this.deleteMedia(this.medias[i])
-        }
-
-        // parcours des Dialog's medias pour savoir lesquels sont à ajouter
-        dialogMedias.forEach((dialogMedia) => {
-          if (!dialogMedia._id && (dialogMedia.file || dialogMedia.uri)) {
-            this.addMedia(dialogMedia)
-          }
-        })
-        this.updateTopic(dialogTopic)
-      }
-    })
-    Event.$on('topic.delete', (dialogTopic) => {
-      if (dialogTopic._id === this.topic._id) {
-        this.deleteTopic(dialogTopic)
-      }
-    })
-    Event.$on('topic.start', (topic) => {
-      if (topic._id === this.topic._id) {
-        this.startTopic(topic)
-      }
-    })
-    Event.$on('topic.stop', (topic) => {
-      if (topic._id === this.topic._id) {
-        this.stopTopic(topic)
-      }
-    })
-    // remove this to expand multiple topics at the same time
-    Event.$on('topic.toggle', (topic) => {
-      if (this.topic !== topic) {
-        this.topic.expanded = false
-        this.$forceUpdate()
-      }
-    })
-    Event.$on(`topics.${this.topic._id}.media.added`, (media) => {
-      const index = this.medias.indexOf(this.medias.find(function (topicMedia) {
-        return topicMedia._id === media._id
-      }))
-      if (index < 0) this.medias.push(media)
-    })
-    Event.$on(`topics.${this.topic._id}.media.updated`, (media) => {
-      for (let i = 0; i < this.medias.length; i++) {
-        if (this.medias[i]._id === media._id) {
-          this.medias[i] = media
-          this.medias.sort(function (m1, m2) { return m1.position - m2.position })
-          this.$forceUpdate()
-          break
-        }
-      }
-    })
-    Event.$on(`topics.${this.topic._id}.media.deleted`, (media) => {
-      const index = this.medias.indexOf(this.medias.find(function (topicMedia) {
-        return topicMedia._id === media._id
-      }))
-      if (index > -1) this.medias.splice(index, 1)
-    })
   },
   methods: {
-    updateTopic: function (topic) {
-      Event.$emit('progressbar.toggle', true)
-      this.$http.put(`/api/programs/${this.$route.params.programId}/episodes/${this.$route.params.episodeId}/topics/${topic._id}`, topic).then(
-        function (response) {
-          Event.$emit('progressbar.toggle', false)
-          Event.$emit('topic.updated', response.body)
-          Event.$emit('snackbar.message', `Topic ${response.body.title} updated`)
-        },
-        function (response) {
-          Event.$emit('progressbar.toggle', false)
-          Event.$emit('http.error', response)
-        }
-      )
+    toggle: function (bool) {
+      this.topic.expanded = bool
+      this.$forceUpdate()
+      Event.$emit('topic.toggle', this.topic)
     },
-    deleteTopic: function (topic) {
-      Event.$emit('progressbar.toggle', true)
-      this.$http.delete(`/api/programs/${this.$route.params.programId}/episodes/${this.$route.params.episodeId}/topics/${topic._id}`).then(
-        function (response) {
-          Event.$emit('progressbar.toggle', false)
-          Event.$emit('topic.deleted', topic)
-          Event.$emit('snackbar.message', `Topic ${topic.title} deleted`)
-        },
-        function (response) {
-          Event.$emit('progressbar.toggle', false)
-          Event.$emit('http.error', response)
-        }
-      )
+    editTopic: function (event) {
+      event.stopImmediatePropagation()
+      Event.$emit('topicDialog.show', this.topic, this.medias)
     },
-    startTopic: function (topic) {
+    startTopic: function () {
+      event.stopImmediatePropagation()
+      this.timePlayed = 0
+      this.toggle(true)
       Event.$emit('progressbar.toggle', true)
-      this.$http.get(`/api/programs/${this.$route.params.programId}/episodes/${this.$route.params.episodeId}/topics/${topic._id}/start`).then(
+      this.$http.get(`/api/programs/${this.$route.params.programId}/episodes/${this.$route.params.episodeId}/topics/${this.topic._id}/start`).then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('topic.updated', response.body)
@@ -209,9 +171,10 @@ export default {
         }
       )
     },
-    stopTopic: function (topic) {
+    stopTopic: function () {
+      event.stopImmediatePropagation()
       Event.$emit('progressbar.toggle', true)
-      this.$http.get(`/api/programs/${this.$route.params.programId}/episodes/${this.$route.params.episodeId}/topics/${topic._id}/stop`).then(
+      this.$http.get(`/api/programs/${this.$route.params.programId}/episodes/${this.$route.params.episodeId}/topics/${this.topic._id}/stop`).then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('topic.updated', response.body)
@@ -235,26 +198,6 @@ export default {
           Event.$emit('http.error', response)
         }
       )
-    },
-    toggle: function (bool) {
-      Event.$emit('topic.toggle', this.topic)
-      this.topic.expanded = bool
-      this.$forceUpdate()
-    },
-    editTopic: function (event) {
-      event.stopImmediatePropagation()
-      Event.$emit('topicDialog.show', this.topic, this.medias)
-    },
-    start: function (event) {
-      event.stopImmediatePropagation()
-      this.toggle(true)
-      this.timePlayed = 0
-      Event.$emit('topic.start', this.topic)
-      Event.$emit('xsplit.update', { title: this.topic.title, picture: null })
-    },
-    stop: function (event) {
-      event.stopImmediatePropagation()
-      Event.$emit('topic.stop', this.topic)
     },
     addMedia: function (media) {
       let formData = new FormData()
