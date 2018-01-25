@@ -262,6 +262,15 @@ router.route('/:episodeId')
       .then(function(result) {
         if (result !== null) {
           logger.debug("Removed Episode " + req.params.episodeId)
+          let xsplit = new XSplit()
+          xsplit.episode = null
+          xsplit.topic = null
+          xsplit.media = null
+          xsplit.title = null
+          xsplit.picture = null
+          xsplit.logo = null
+          xsplit.save()
+          
           res.status(204).json(result.toString())
         } else {
           next({message:"Episode " + req.params.episodeId + " wasn't deleted", status: 417})
