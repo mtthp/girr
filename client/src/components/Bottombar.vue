@@ -2,8 +2,8 @@
     <footer v-on:click="goToEpisode($event)">
       <img v-if="thumbnail" class="thumbnail" :src="thumbnail">
       <div class="metadata">
-        <label>{{ xsplit.title }}</label>
-        <time v-if="timePlayed > 0">{{ timePlayed | formatTime }}</time>
+        <div class="mdc-typography--subheading2">{{ xsplit.title }}</div>
+        <div v-if="timePlayed > 0" class="mdc-typography--body1">{{ timePlayed | formatTime }}</div>
       </div>
       <div class="actions">
         <button class="material-icons mdc-toolbar__icon mdc-ripple-surface" arial-label="Next" data-mdc-auto-init="MDCRipple" v-on:click="nextTopic($event)">skip_next</button>
@@ -22,6 +22,7 @@
               <li class="mdc-list-item" role="menuitem" tabindex="0" :aria-disabled="isAtEpisode" v-if="xsplit.episode" v-on:click="goToEpisode($event)">Go to {{ xsplit.episode.name }}</li>
               <li class="mdc-list-divider" role="separator"></li>
               <li class="mdc-list-item" role="menuitem" tabindex="0" v-on:click="stopEpisode($event)">Stop</li>
+              <li class="mdc-list-item" role="menuitem" tabindex="0" :aria-disabled="isTopicPlaying" v-on:click="stopTopic($event)">Pause</li>
             </ul>
           </div>
         </div>
@@ -47,22 +48,25 @@ export default {
     },
     isAtEpisode () {
       return this.$router.resolve({name: 'Episode', params: { programId: this.xsplit.episode.program, episodeId: this.xsplit.episode._id }}).route.fullPath === this.$route.fullPath
+    },
+    isTopicPlaying () {
+      return !(this.xsplit.topic ? this.xsplit.topic.started && !this.xsplit.topic.ended : false)
     }
   },
   watch: {
     'xsplit.episode' (value) {
       Event.$emit('bottombar.toggle', value !== null)
     },
-    'xsplit.episode.started' (value) {
-      if (value !== null && this.xsplit && this.xsplit.episode && this.xsplit.episode.ended === null) {
+    'xsplit.topic.started' (value) {
+      if (value !== null && this.xsplit && this.xsplit.topic && this.xsplit.topic.ended === null) {
         this.timePlayedHandler = window.setInterval(() => {
-          this.timePlayed = this.xsplit && this.xsplit.episode ? ((this.xsplit.episode.ended ? new Date(this.xsplit.episode.ended).getTime() : new Date().getTime()) - new Date(this.xsplit.episode.started).getTime()) : 0
+          this.timePlayed = this.xsplit && this.xsplit.topic ? ((this.xsplit.topic.ended ? new Date(this.xsplit.topic.ended).getTime() : new Date().getTime()) - new Date(this.xsplit.topic.started).getTime()) : 0
         }, 1000)
       }
-      this.timePlayed = this.xsplit && this.xsplit.episode ? ((this.xsplit.episode.ended ? new Date(this.xsplit.episode.ended).getTime() : new Date().getTime()) - new Date(this.xsplit.episode.started).getTime()) : 0
+      this.timePlayed = this.xsplit && this.xsplit.topic ? ((this.xsplit.topic.ended ? new Date(this.xsplit.topic.ended).getTime() : new Date().getTime()) - new Date(this.xsplit.topic.started).getTime()) : 0
     },
-    'xsplit.episode.ended' (value) {
-      if (value !== null && this.xsplit && this.xsplit.episode && this.xsplit.episode.started !== null) {
+    'xsplit.topic.ended' (value) {
+      if (value !== null && this.xsplit && this.xsplit.topic && this.xsplit.topic.started !== null) {
         window.clearInterval(this.timePlayedHandler)
       }
     }
@@ -129,6 +133,22 @@ export default {
         function (response) {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('episode.updated', response.body)
+          Event.$emit('snackbar.message', `Episode ${response.body.name} stopped`)
+        },
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          Event.$emit('http.error', response)
+        }
+      )
+    },
+    stopTopic: function (event) {
+      event.stopPropagation()
+      this.menu.open = false
+      Event.$emit('progressbar.toggle', true)
+      this.$http.get(`/api/programs/${this.xsplit.episode.program}/episodes/${this.xsplit.episode._id}/topics/${this.xsplit.topic._id}/stop`).then(
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          Event.$emit('topic.updated', response.body)
           Event.$emit('snackbar.message', `Episode ${response.body.name} stopped`)
         },
         function (response) {
