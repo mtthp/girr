@@ -1,13 +1,16 @@
 "use strict" // https://stackoverflow.com/a/33001437
 // set all config variables as env variables
-require('dotenv-extended').load({
-    path: __dirname + '/config/.env',
-    defaults: __dirname + '/config/.env.defaults',
-    errorOnMissing: false,
-    errorOnExtra: false,
-    assignToProcessEnv: true,
-    overrideProcessEnv: false
+const config = require('dotenv-extended').load({
+  path: __dirname + '/config/.env',
+  defaults: __dirname + '/config/.env.defaults',
+  errorOnMissing: false,
+  errorOnExtra: false,
+  assignToProcessEnv: true,
+  overrideProcessEnv: false
 })
+
+// to retrieve the absolute project path without doing some magic (ie. '../../..')
+global.__base = __dirname + '/'
 
 const express = require('express')
 const bodyParser = require('body-parser')
@@ -18,49 +21,59 @@ const basicAuth = require('express-basic-auth')
 const logger = require("./src/logger")
 const path = require('path')
 const fs = require('fs')
+const utils = require('./src/utils')
 
-// to retrieve the absolute project path without doing some magic (ie. '../../..')
-global.__base = __dirname + '/'
-
-let password = process.env.GIRR_PASSWORD
-if(password) {
+const password = process.env.GIRR_PASSWORD
+if (password) {
   app.use(basicAuth({
-    users: { girr: password },
+    users: {
+      girr: password
+    },
     challenge: true,
     realm: 'g1RR'
   }));
 }
 
-let dataPath = process.env.DATA_PATH
-if (!fs.existsSync(dataPath)) fs.mkdirSync(dataPath)
+process.env.DATA_PATH = process.env.DATA_PATH.startsWith('/') ? process.env.DATA_PATH : path.join(__base, process.env.DATA_PATH)
+if (!fs.existsSync(process.env.DATA_PATH)) utils.mkdirSyncRecursive(process.env.DATA_PATH)
 
-// parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }))
-// parse application/json
-.use(bodyParser.json())
-// middleware to use for all requests
-.use(function (req, res, next) {
-  // do logging
-  logger.log('info',
-    '[%s] >> %s %s %s',
-    req.connection.remoteAddress,
-    req.method,
-    req.url,
-    Object.keys(req.body).length ? JSON.stringify(req.body) : ''
-  )
-  next() // make sure we go to the next routes and don't stop here
+app
+  .use(bodyParser.urlencoded({ extended: false })) // parse application/x-www-form-urlencoded
+  .use(bodyParser.json()) // parse application/json
+  .use(function (req, res, next) { // logging middleware to use for all requests
+    logger.log('info',
+      '[%s] >> %s %s %s',
+      req.connection.remoteAddress,
+      req.method,
+      req.url,
+      Object.keys(req.body).length ? JSON.stringify(req.body) : ''
+    )
+    next() // make sure we go to the next routes and don't stop here
+  })
+  .use(express.static('./dist'))
+  .use('/data', require('./src/routes/data.js'))
+  .use('/api', require('./src/routes'))
+
+logger.info('Configuration :')
+Object.keys(config).forEach(function (index) {
+  logger.info(`\t${index} : ${process.env[index]}`)
 })
-.use(express.static('./dist'))
-.use('/data', require('./src/routes/data.js'))
-.use('/api', require('./src/routes'))
 
 mongoose.Promise = Promise;
 mongoose.connect(process.env.MONGO_ENDPOINT, { useMongoClient: true })
-mongoose.connection.on('error', console.error.bind(console, 'connection error:'))
-mongoose.connection.on('open', () => {
-  io.listen(
-    app.listen(process.env.PORT, () => {
-      console.log(`Server started at http://localhost:${process.env.PORT}/`);
-    })
-  )
-})
+  .then(() => {
+    io.listen(
+      app.listen(process.env.PORT, () => {
+        const interfaces = require('os').networkInterfaces()
+        logger.info('Server listening at :')
+        Object.keys(interfaces).forEach(function (element) {
+          if (!element.includes('lo') && interfaces[element][0].family === 'IPv4') {
+            logger.info(`\thttp://${interfaces[element][0].address}:${process.env.PORT}/`)
+          }
+        })
+      })
+    )
+  })
+  .catch((err) => {
+    logger.error(err)
+  })

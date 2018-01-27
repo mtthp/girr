@@ -1,15 +1,16 @@
-var express = require('express')
-var router = express.Router()
-var swaggerJSDoc = require('swagger-jsdoc')
-var path = require('path')
+const express = require('express')
+const router = express.Router()
+const swaggerJSDoc = require('swagger-jsdoc')
+const path = require('path')
+const package = require('../package.json');
 
 // check here for documentation https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md
 
 // swagger definition
-var swaggerDefinition = {
+const swaggerDefinition = {
   info: {
     title: 'GeekInc Remote Regie API',
-    version: '2.0.1',
+    version: package.version,
     description: 'This is the GIRR (aka GeekInc Remote Regie) app API. You can find out more about GIRR at [https://github.com/chriscamicas/girr](https://github.com/chriscamicas/girr) or on [geekinc.fr](http://geekinc.fr).'
   },
   // host: 'localhost:' + port, // TO DO - define it dynamically
@@ -17,7 +18,7 @@ var swaggerDefinition = {
 }
 
 // options for the swagger docs
-var options = {
+const options = {
   // import swaggerDefinitions
   swaggerDefinition: swaggerDefinition,
   // path to the API docs
@@ -25,7 +26,7 @@ var options = {
 }
 
 // initialize swagger-jsdoc
-var swaggerSpec = swaggerJSDoc(options)
+const swaggerSpec = swaggerJSDoc(options)
 
 // serve swagger
 router.get('/swagger.json', function (req, res) {
