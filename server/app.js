@@ -77,3 +77,5 @@ mongoose.connect(process.env.MONGO_ENDPOINT, { useMongoClient: true })
   .catch((err) => {
     logger.error(err)
   })
+
+module.exports = app

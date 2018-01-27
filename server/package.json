@@ -5,7 +5,8 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "dev": "nodemon --config config/nodemon.json app.js"
+    "dev": "nodemon --config config/nodemon.json app.js",
+    "test": "MONGO_ENDPOINT=mongodb://localhost/girr_test mocha --timeout 10000 --exit" 
   },
   "author": "Christophe Camicas",
   "license": "MIT",
@@ -28,6 +29,9 @@
     "winston": "^2.3.1"
   },
   "devDependencies": {
+    "chai": "^4.1.2",
+    "chai-http": "^3.0.0",
+    "mocha": "^5.0.0",
     "nodemon": "^1.11.0"
   }
 }
