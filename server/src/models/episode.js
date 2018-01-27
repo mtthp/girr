@@ -59,6 +59,28 @@ function setName (newName) {
   return newName
 }
 
+/**
+ * @swagger
+ * definitions:
+ *   Episode:
+ *     properties:
+ *       number:
+ *         type: integer
+ *         description: unique identifier in the Episode
+ *         required: true
+ *       name:
+ *         type: string
+ *         description: name
+ *       date:
+ *         type: date
+ *         description: when an episode air
+ *       started:
+ *         type: date
+ *         description: time and date when the Episode has started
+ *       ended:
+ *         type: date
+ *         description: time and date when the Episode has ended
+ */
 let episodeSchema = new mongoose.Schema({
     number: { type: Number, required: true, index: true },
     name: { type: String, set: setName },

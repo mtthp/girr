@@ -5,6 +5,46 @@ const websockets = require('../websockets')()
  * Class representing the displayed data for XSplit
  */
 class XSplit {
+
+  /**
+   * @swagger
+   * definitions:
+   *   Xsplit:
+   *     properties:
+   *       title:
+   *         type: string
+   *         description: displayed title on the xsplit scene
+   *       picture:
+   *         type: string
+   *         description: picture uri
+   *       background:
+   *         type: string
+   *         description: background image uri
+   *       logo:
+   *         type: string
+   *         description: logo image uri, displayed at the top-right corner
+   *       episode:
+   *         $ref: '#/definitions/Episode'
+   *       topic:
+   *         $ref: '#/definitions/Topic'
+   *       media:
+   *         $ref: '#/definitions/Media'
+   *       scenes:
+   *         type: array
+   *         description: XSplit scenes
+   *         items:
+   *           type: object
+   *           properties:
+   *             _id:
+   *               type: integer
+   *               description: Xsplit internal scene id
+   *             name:
+   *               type: string
+   *               description: scene given name in Xsplit
+   *             active:
+   *               type: boolean
+   *               description: whether the scene is currently active or not
+   */
   constructor () {
     "use strict";
     let data = cache.get('xsplit')

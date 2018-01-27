@@ -29,6 +29,40 @@ const jimpOptions = [ // https://github.com/oliver-moran/jimp#basic-methods
  *         in: path
  *         required: true
  *         type: string
+ *       - name: height
+ *         description: Image height
+ *         in: query
+ *         type: integer
+ *         format: int32
+ *         minimum: 0
+ *       - name: width
+ *         description: Image width
+ *         in: query
+ *         type: integer
+ *         format: int32
+ *         minimum: 0
+ *       - name: quality
+ *         description: Image JPEG quality
+ *         in: query
+ *         type: integer
+ *         format: int32
+ *         minimum: 0
+ *         maximum: 100
+ *       - name: contrast
+ *         description: Image contrast
+ *         in: query
+ *         type: number
+ *         format: float
+ *         minimum: -1
+ *         maximum: 1
+ *       - name: invert
+ *         description: Invert the image colors
+ *         in: query
+ *         type: boolean
+ *       - name: greyscale
+ *         description: Set greyscale
+ *         in: query
+ *         type: boolean
  *     responses:
  *       200:
  *         description: A single file

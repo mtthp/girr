@@ -29,26 +29,6 @@ const upload = multer({
   }
 })
 
-/**
- * @swagger
- * definitions:
- *   Media:
- *     properties:
- *       label:
- *         type: string
- *         description: Media's label
- *       uri:
- *         type: string
- *         description: Path to the media file
- *         required: true
- *       started:
- *         type: date
- *         description: time and date when the Media has started
- *       ended:
- *         type: date
- *         description: time and date when the Media has ended
- */
-
 router.route('/')
   /**
    * @swagger

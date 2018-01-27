@@ -3,22 +3,6 @@ const express = require('express')
 const router = express.Router()
 const XSplit = require('../models/xsplit')
 
-/**
- * @swagger
- * definitions:
- *   Xsplit:
- *     properties:
- *       title:
- *         type: string
- *         description: displayed title on the xsplit scene
- *       picture:
- *         type: string
- *         description: picture uri
- *       background:
- *         type: string
- *         description: background image uri
- */
-
 router.route('/')
   /**
    * @swagger

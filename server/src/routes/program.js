@@ -20,76 +20,62 @@ const storage = multer.diskStorage({
 })
 const upload = multer({ storage: storage })
 
-/**
- * @swagger
- * definitions:
- *   Program:
- *     properties:
- *       name:
- *         type: string
- *         description: a name to identify the Program between others
- *         required: true
- *       thumbnail:
- *         type: string
- *         description: thumbnail uri
- */
-
 router.route('/')
-    /**
-     * @swagger
-     * /programs:
-     *   get:
-     *     tags:
-     *       - Programs
-     *     description: Return all programs
-     *     summary: Get all programs
-     *     produces: application/json
-     *     responses:
-     *       200:
-     *         description: An array of programs
-     *         schema:
-     *           type: array
-     *           items:
-     *             $ref: '#/definitions/Program'
-     */
-    .get((req, res) => {
-        Program.find((err, programs) => {
-            res.send(programs)
-        })
+  /**
+   * @swagger
+   * /programs:
+   *   get:
+   *     tags:
+   *       - Programs
+   *     description: Return all programs
+   *     summary: Get all programs
+   *     produces: application/json
+   *     responses:
+   *       200:
+   *         description: An array of programs
+   *         schema:
+   *           type: array
+   *           items:
+   *             $ref: '#/definitions/Program'
+   */
+  .get((req, res) => {
+    Program.find((err, programs) => {
+      res.send(programs)
     })
-    /**
-     * @swagger
-     * /programs:
-     *   post:
-     *     tags:
-     *       - Programs
-     *     description: Create a new program
-     *     summary: Add a new one
-     *     produces: application/json
-     *     parameters:
-     *       - name: program
-     *         in: body
-     *         description: Fields for the Program resource
-     *         schema:
-     *           type: array
-     *           $ref: '#/definitions/Program'
-     *     responses:
-     *       200:
-     *         description: Successfully created
-     *         schema:
-     *           $ref: '#/definitions/Program'
-     */
-    .post(function(req, res, next) {
-        let program = new Program(Object.assign({name: "New Program at " + (new Date()).toLocaleTimeString()}, req.body, {created: Date.now(), modified: Date.now()}));
-        program.save()
-          .then(function(program) {
-            logger.debug("Add a new Program " + program.toString())
-            res.json(program)
-          })
-          .catch(function(error) {
-            next(error)
-          })
-    });
+  })
+  /**
+   * @swagger
+   * /programs:
+   *   post:
+   *     tags:
+   *       - Programs
+   *     description: Create a new program
+   *     summary: Add a new one
+   *     produces: application/json
+   *     parameters:
+   *       - name: program
+   *         in: body
+   *         description: Fields for the Program resource
+   *         schema:
+   *           type: array
+   *           $ref: '#/definitions/Program'
+   *     responses:
+   *       200:
+   *         description: Successfully created
+   *         schema:
+   *           $ref: '#/definitions/Program'
+   */
+  .post(function(req, res, next) {
+    let program = new Program(Object.assign({name: "New Program at " + (new Date()).toLocaleTimeString()}, req.body, {created: Date.now(), modified: Date.now()}));
+    program.save()
+      .then(function(program) {
+        logger.debug("Add a new Program " + program.toString())
+        res.json(program)
+      })
+      .catch(function(error) {
+        next(error)
+      })
+  });
 
 // Middleware : we check if the program exists in the DB before going further
 router.param('programId', function (req, res, next, value, name) {

@@ -22,7 +22,7 @@ const options = {
   // import swaggerDefinitions
   swaggerDefinition: swaggerDefinition,
   // path to the API docs
-  apis: [path.resolve('src/routes/*.js')]
+  apis: [path.resolve('src/*/*.js')]
 }
 
 // initialize swagger-jsdoc

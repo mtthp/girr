@@ -7,29 +7,6 @@ const Media = require('../models/media')
 const Episode = require('../models/episode')
 const XSplit = require('../models/xsplit')
 
-/**
- * @swagger
- * definitions:
- *   Topic:
- *     properties:
- *       title:
- *         type: string
- *         description: Topic's title
- *       description:
- *         type: string
- *         description: Some notes that should be useful
- *       position:
- *         type: integer
- *         description: current position, because it can moved
- *         required: true
- *       started:
- *         type: date
- *         description: time and date when the Topic has started
- *       ended:
- *         type: date
- *         description: time and date when the Topic has ended
- */
-
 router.route('/')
   /**
    * @swagger
