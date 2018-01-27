@@ -1,0 +1,11 @@
+install:
+  - npm install --prefix server
+#before_script: cd server
+script:
+  - npm test --prefix server
+language: node_js
+node_js:
+  - "node"
+services: mongodb
+env:
+  - NODE_ENV=TEST
