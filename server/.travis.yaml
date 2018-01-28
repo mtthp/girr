@@ -1,0 +1,9 @@
+language: node_js
+node_js:
+  - "node"
+services: mongodb
+env:
+  - NODE_ENV=TEST
+branches:
+  only:
+  - develop
