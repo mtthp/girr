@@ -1,5 +1,6 @@
 <template>
   <main class="xsplit" :style="{ 'background-image': background }">
+    <div class="bar">{{ animatedTitle }}</div>
     <div class="title">{{ animatedTitle }}</div>
     <div class="content">
       <img v-if="xsplit.picture" :src="xsplit.picture" :class="{ loading: xsplit.picture }" v-on:load="loaded($event)" v-on:error="failed($event)">
@@ -72,7 +73,7 @@ export default {
   computed: {
     background () {
       if (this.xsplit.picture) {
-        return 'url(' + (this.xsplit.background ? this.xsplit.background : require('../assets/brick-wall.jpg')) + ')'
+        return 'url(' + (this.xsplit.background ? this.xsplit.background : require('../assets/img-background.jpg')) + ')'
       }
       return null
     },
@@ -124,20 +125,39 @@ export default {
   height: 100vh;
 }
 
-.xsplit .title {
+.xsplit .title,
+.xsplit .bar
+ {
   align-self: flex-start; /* sized to content */
   flex: 1 0 auto; /* grow to content */
-  margin: 0.5em 1em;
+  margin: 0.5em 30px;
+  padding:0 30px;
   max-width: calc(100% - 2em - 400px); /* je ne sais pas quelle taille fait exactement le twitch chat donc j'ai mis 400px à l'arrache */
-  font-family: 'Oswald', sans-serif;
-  font-weight: 400;
-  font-size: 52px;
-  color: black;
+  font-family:'Montserra', sans-serif;
+  font-weight:400;
+  font-size:48px;
+  color:#000;
   text-transform: uppercase;
   text-overflow: ellipsis; /* ou au pire clip */
   overflow: hidden;
   box-sizing: border-box;
   background-color: white;
+  line-height:80px;
+  border-radius:40px;
+  z-index: 1; /* pour passer par dessus la .bar */
+}
+.xsplit .bar {
+  position:absolute;
+  display:block;
+  font-size:42px;
+  line-height: 60px;
+  left:0;
+  margin: 0;
+  padding: 0 0.2em;
+  margin-top: -66px;
+  background:#790102;
+  color:#790102;
+  border-radius:0 30px 30px 0;
 }
 
 .xsplit .title:not(:empty) {
@@ -145,14 +165,18 @@ export default {
 }
 
 @media (min-width: 481px) and (max-width: 840px) {
-  .xsplit .title {
+  .xsplit .title,
+  .xsplit .bar
+   {
     margin: 0.5 0.5em;
     max-width: calc(100% - 1em);
   }
 }
 
 @media (max-width: 480px) {
-  .xsplit .title {
+  .xsplit .title,
+  .xsplit .bar
+   {
     margin: 0;
     max-width: calc(100%);
   }
