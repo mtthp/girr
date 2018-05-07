@@ -281,6 +281,10 @@ export default {
 
 .topic.expanded .content pre {
   font-family: inherit;
+  white-space: -moz-pre-wrap;
+  white-space: -o-pre-wrap;
+  white-space: pre-wrap;
+  word-wrap: break-word;
 }
 
 .topic .chevron {
