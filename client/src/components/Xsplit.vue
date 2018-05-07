@@ -25,7 +25,7 @@ export default {
     this.$options.sockets['xsplit'] = (data) => {
       this.xsplit = data
     }
-    document.title = 'GIRR'
+    document.title = 'Remote Regie'
   },
   watch: {
     'xsplit.title' (newValue, oldValue) {
@@ -150,7 +150,7 @@ export default {
   width: 100%;
   height: 80%;
   border-radius: 0 30px 30px 0;
-  background-color: var(--mdc-theme-secondary);
+  background-color: var(--mdc-theme-primary);
   z-index: -1;
 }
 
