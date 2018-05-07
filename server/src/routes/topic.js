@@ -5,7 +5,7 @@ const logger = require('../logger')
 const Topic = require('../models/topic')
 const Media = require('../models/media')
 const Episode = require('../models/episode')
-const XSplit = require('../models/xsplit')
+const Scene = require('../models/scene')
 
 router.route('/')
   /**
@@ -314,11 +314,11 @@ router.get('/:topicId/start', function (req, res, next) {
 
       res.json(topicStarted)
       
-      let xsplit = new XSplit()
-      xsplit.topic = topicStarted
-      xsplit.title = topicStarted.title
-      xsplit.media = null // no content should be displayed when cast start talking about a Topic
-      xsplit.picture = null
+      let scene = new Scene()
+      scene.topic = topicStarted
+      scene.title = topicStarted.title
+      scene.media = null // no content should be displayed when cast start talking about a Topic
+      scene.picture = null
 
       // we start the parent Episode if it isn't already
       if (!(req.episode.started && !req.episode.ended)) {
@@ -326,10 +326,10 @@ router.get('/:topicId/start', function (req, res, next) {
         req.episode.ended = null
         req.episode.save()
 
-        xsplit.logo = req.program.logoBW
-        xsplit.episode = req.episode
+        scene.logo = req.program.logoBW
+        scene.episode = req.episode
       }
-      xsplit.save()
+      scene.save()
     })
     .catch(function(error) {
       next(error)
@@ -386,12 +386,12 @@ router.get('/:topicId/stop', function (req, res, next) {
           .catch(function(error) {
             logger.error(error)
           })
-        var xsplit = new XSplit()
-        xsplit.topic = null
-        xsplit.media = null
-        xsplit.title = req.episode.name
-        xsplit.picture = null
-        xsplit.save()
+        var scene = new Scene()
+        scene.topic = null
+        scene.media = null
+        scene.title = req.episode.name
+        scene.picture = null
+        scene.save()
 
         logger.debug("Started " + topic.toString())
         res.json(topic)

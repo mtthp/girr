@@ -2,16 +2,16 @@
     <footer v-on:click="goToEpisode($event)">
       <img v-if="thumbnail" class="thumbnail" :src="thumbnail">
       <div class="metadata">
-        <div class="mdc-typography--subheading2">{{ xsplit.title }}</div>
+        <div class="mdc-typography--subheading2">{{ scene.title }}</div>
         <div v-if="timePlayed > 0" class="mdc-typography--body1">{{ timePlayed | formatTime }}</div>
       </div>
       <div class="actions">
         <button class="material-icons mdc-toolbar__icon mdc-ripple-surface" arial-label="Next" data-mdc-auto-init="MDCRipple" v-on:click="nextTopic($event)">skip_next</button>
-        <div class="mdc-menu-anchor" v-show="xsplit.scenes && xsplit.scenes.length > 0">
+        <div class="mdc-menu-anchor" v-show="scene.scenes && scene.scenes.length > 0">
           <button class="material-icons mdc-toolbar__icon mdc-ripple-surface toggle-scenes-menu" arial-label="Menu" data-mdc-auto-init="MDCRipple">videocam</button>
           <div class="mdc-simple-menu mdc-simple-menu--open-from-bottom-right scenes-menu" tabindex="-1">
             <ul class="mdc-simple-menu__items mdc-list" role="menu" aria-hidden="true">
-              <li class="mdc-list-item" v-for="scene in xsplit.scenes" :class="{ active: scene.active }" v-on:click="activeScene(scene)">{{ scene.name }}</li>
+              <li class="mdc-list-item" v-for="scene in scene.scenes" :class="{ active: scene.active }" v-on:click="activeScene(scene)">{{ scene.name }}</li>
             </ul>
           </div>
         </div>
@@ -19,7 +19,7 @@
           <button class="material-icons mdc-toolbar__icon mdc-ripple-surface toggle-menu" arial-label="Menu" data-mdc-auto-init="MDCRipple">more_vert</button>
           <div class="mdc-simple-menu mdc-simple-menu--open-from-bottom-right bottombar-menu" tabindex="-1">
             <ul class="mdc-simple-menu__items mdc-list" role="menu" aria-hidden="true">
-              <li class="mdc-list-item" role="menuitem" tabindex="0" :aria-disabled="isAtEpisode" v-if="xsplit.episode" v-on:click="goToEpisode($event)">Go to {{ xsplit.episode.name }}</li>
+              <li class="mdc-list-item" role="menuitem" tabindex="0" :aria-disabled="isAtEpisode" v-if="scene.episode" v-on:click="goToEpisode($event)">Go to {{ scene.episode.name }}</li>
               <li class="mdc-list-divider" role="separator"></li>
               <li class="mdc-list-item" role="menuitem" tabindex="0" v-on:click="stopEpisode($event)">Stop</li>
               <li class="mdc-list-item" role="menuitem" tabindex="0" :aria-disabled="isTopicPlaying" v-on:click="stopTopic($event)">Pause</li>
@@ -38,43 +38,43 @@ export default {
   name: 'Bottombar',
   data () {
     return {
-      xsplit: {},
-      timePlayed: this.xsplit && this.xsplit.episode ? ((this.xsplit.episode.ended ? new Date(this.xsplit.episode.ended).getTime() : new Date().getTime()) - new Date(this.xsplit.episode.started).getTime()) : 0
+      scene: {},
+      timePlayed: this.scene && this.scene.episode ? ((this.scene.episode.ended ? new Date(this.scene.episode.ended).getTime() : new Date().getTime()) - new Date(this.scene.episode.started).getTime()) : 0
     }
   },
   computed: {
     thumbnail () {
-      return this.xsplit.picture ? this.xsplit.picture : (this.xsplit.logo ? this.xsplit.logo : null)
+      return this.scene.picture ? this.scene.picture : (this.scene.logo ? this.scene.logo : null)
     },
     isAtEpisode () {
-      return this.$router.resolve({name: 'Episode', params: { programId: this.xsplit.episode.program, episodeId: this.xsplit.episode._id }}).route.fullPath === this.$route.fullPath
+      return this.$router.resolve({name: 'Episode', params: { programId: this.scene.episode.program, episodeId: this.scene.episode._id }}).route.fullPath === this.$route.fullPath
     },
     isTopicPlaying () {
-      return !(this.xsplit.topic ? this.xsplit.topic.started && !this.xsplit.topic.ended : false)
+      return !(this.scene.topic ? this.scene.topic.started && !this.scene.topic.ended : false)
     }
   },
   watch: {
-    'xsplit.episode' (value) {
+    'scene.episode' (value) {
       Event.$emit('bottombar.toggle', value !== null)
     },
-    'xsplit.topic.started' (value) {
-      if (value !== null && this.xsplit && this.xsplit.topic && this.xsplit.topic.ended === null) {
+    'scene.topic.started' (value) {
+      if (value !== null && this.scene && this.scene.topic && this.scene.topic.ended === null) {
         this.timePlayedHandler = window.setInterval(() => {
-          this.timePlayed = this.xsplit && this.xsplit.topic ? ((this.xsplit.topic.ended ? new Date(this.xsplit.topic.ended).getTime() : new Date().getTime()) - new Date(this.xsplit.topic.started).getTime()) : 0
+          this.timePlayed = this.scene && this.scene.topic ? ((this.scene.topic.ended ? new Date(this.scene.topic.ended).getTime() : new Date().getTime()) - new Date(this.scene.topic.started).getTime()) : 0
         }, 1000)
       }
-      this.timePlayed = this.xsplit && this.xsplit.topic ? ((this.xsplit.topic.ended ? new Date(this.xsplit.topic.ended).getTime() : new Date().getTime()) - new Date(this.xsplit.topic.started).getTime()) : 0
+      this.timePlayed = this.scene && this.scene.topic ? ((this.scene.topic.ended ? new Date(this.scene.topic.ended).getTime() : new Date().getTime()) - new Date(this.scene.topic.started).getTime()) : 0
     },
-    'xsplit.topic.ended' (value) {
-      if (value !== null && this.xsplit && this.xsplit.topic && this.xsplit.topic.started !== null) {
+    'scene.topic.ended' (value) {
+      if (value !== null && this.scene && this.scene.topic && this.scene.topic.started !== null) {
         window.clearInterval(this.timePlayedHandler)
       }
     }
   },
   created () {
     this.fetchData()
-    this.$options.sockets['xsplit'] = (data) => {
-      this.xsplit = data
+    this.$options.sockets['scene'] = (data) => {
+      this.scene = data
     }
   },
   mounted () {
@@ -98,21 +98,21 @@ export default {
   },
   methods: {
     fetchData: function () {
-      this.$http.get('/api/xsplit/').then(
+      this.$http.get('/api/scene/').then(
         (response) => {
-          this.xsplit = response.body
+          this.scene = response.body
         },
         function (response) {
           Event.$emit('http.error', response)
         }
       )
     },
-    updateXsplit: function (data) {
+    updateScene: function (data) {
       Event.$emit('progressbar.toggle', true)
-      this.$http.put('/api/xsplit/', data).then(
+      this.$http.put('/api/scene/', data).then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
-          this.xsplit = response.body
+          this.scene = response.body
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
@@ -122,14 +122,14 @@ export default {
     },
     goToEpisode: function (event) {
       if (!this.isAtEpisode) {
-        window.location = this.$router.resolve({name: 'Episode', params: { programId: this.xsplit.episode.program, episodeId: this.xsplit.episode._id }}).href
+        window.location = this.$router.resolve({name: 'Episode', params: { programId: this.scene.episode.program, episodeId: this.scene.episode._id }}).href
       }
     },
     stopEpisode: function (event) {
       event.stopPropagation()
       this.menu.open = false
       Event.$emit('progressbar.toggle', true)
-      this.$http.get(`/api/programs/${this.xsplit.episode.program}/episodes/${this.xsplit.episode._id}/stop`).then(
+      this.$http.get(`/api/programs/${this.scene.episode.program}/episodes/${this.scene.episode._id}/stop`).then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('episode.updated', response.body)
@@ -145,7 +145,7 @@ export default {
       event.stopPropagation()
       this.menu.open = false
       Event.$emit('progressbar.toggle', true)
-      this.$http.get(`/api/programs/${this.xsplit.episode.program}/episodes/${this.xsplit.episode._id}/topics/${this.xsplit.topic._id}/stop`).then(
+      this.$http.get(`/api/programs/${this.scene.episode.program}/episodes/${this.scene.episode._id}/topics/${this.scene.topic._id}/stop`).then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('topic.updated', response.body)
@@ -160,7 +160,7 @@ export default {
     nextTopic: function (event) {
       event.stopPropagation()
       Event.$emit('progressbar.toggle', true)
-      this.$http.get(`/api/programs/${this.xsplit.episode.program}/episodes/${this.xsplit.episode._id}/next`).then(
+      this.$http.get(`/api/programs/${this.scene.episode.program}/episodes/${this.scene.episode._id}/next`).then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('topic.updated', response.body)
@@ -174,10 +174,10 @@ export default {
     },
     activeScene: function (activeScene) {
       event.stopPropagation()
-      this.xsplit.scenes.forEach((scene) => {
+      this.scene.scenes.forEach((scene) => {
         scene.active = (activeScene === scene)
       })
-      this.updateXsplit({ scenes: this.xsplit.scenes })
+      this.updateScene({ scenes: this.scene.scenes })
       this.scenesMenu.open = false
     }
   }

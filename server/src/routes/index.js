@@ -15,7 +15,7 @@ router.use(function (req, res, next) {
 .use('/', require('../swagger'))
 // api routes
 .use('/programs', require('./program.js'))
-.use('/xsplit', require('./xsplit.js'))
+.use('/scene', require('./scene.js'))
 // error handler (middleware)
 .use(function (err, req, res, next) {
   var defaultError = {

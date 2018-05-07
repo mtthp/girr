@@ -40,7 +40,7 @@ export default {
   },
   computed: {
     bottombarShown () {
-      return this.bottombar && this.$route.fullPath.indexOf('xsplit') < 0
+      return this.bottombar && this.$route.fullPath.indexOf('scene') < 0
     }
   },
   created () {

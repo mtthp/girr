@@ -4,7 +4,7 @@ const router = express.Router()
 const logger = require('../logger')
 const Media = require('../models/media')
 const Topic = require('../models/topic')
-const XSplit = require('../models/xsplit')
+const Scene = require('../models/scene')
 const path = require('path')
 const multer = require('multer')
 const uuidv4 = require('uuid/v4')
@@ -383,9 +383,9 @@ router.get('/:mediaId/start', function (req, res, next) {
         logger.debug("Started " + media.toString())
         res.json(media)
 
-        let xsplit = new XSplit()
-        xsplit.media = media
-        xsplit.picture = media.uri
+        let scene = new Scene()
+        scene.media = media
+        scene.picture = media.uri
 
         // we start the parent Topic if it isn't already
         if (!(req.topic.started && !req.topic.ended)) {
@@ -393,8 +393,8 @@ router.get('/:mediaId/start', function (req, res, next) {
           req.topic.ended = null
           req.topic.save()
 
-          xsplit.topic = req.topic
-          xsplit.title = req.topic.title
+          scene.topic = req.topic
+          scene.title = req.topic.title
         }
 
         // we start the parent Episode if it isn't already
@@ -403,11 +403,11 @@ router.get('/:mediaId/start', function (req, res, next) {
           req.episode.ended = null
           req.episode.save()
 
-          xsplit.episode = req.episode
-          xsplit.logo = req.program.logoBW
+          scene.episode = req.episode
+          scene.logo = req.program.logoBW
         }
 
-        xsplit.save()
+        scene.save()
       })
       .catch(function(error) {
         next(error)
@@ -456,10 +456,10 @@ router.get('/:mediaId/stop', function (req, res, next) {
       .save()
       .then(function(media) {
         logger.debug("Stopped " + media.toString())
-        var xsplit = new XSplit()
-        xsplit.media = null
-        xsplit.picture = null
-        xsplit.save()
+        var scene = new Scene()
+        scene.media = null
+        scene.picture = null
+        scene.save()
         res.json(media)
       })
       .catch(function(error) {
