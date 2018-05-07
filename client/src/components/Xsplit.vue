@@ -131,8 +131,7 @@ export default {
   align-self: flex-start; /* sized to content */
   flex: 1 0 auto; /* grow to content */
   margin: 0.5em 30px;
-  padding:0 30px;
-  max-width: calc(100% - 2em - 400px); /* je ne sais pas quelle taille fait exactement le twitch chat donc j'ai mis 400px à l'arrache */
+  padding: 0 30px;
   font-family:'Montserra', sans-serif;
   font-weight:400;
   font-size:48px;
