@@ -1,6 +1,5 @@
 <template>
   <main class="xsplit" :style="{ 'background-image': background }">
-    <div class="bar">{{ animatedTitle }}</div>
     <div class="title">{{ animatedTitle }}</div>
     <div class="content">
       <img v-if="xsplit.picture" :src="xsplit.picture" :class="{ loading: xsplit.picture }" v-on:load="loaded($event)" v-on:error="failed($event)">
@@ -125,57 +124,45 @@ export default {
   height: 100vh;
 }
 
-.xsplit .title,
-.xsplit .bar
- {
+.xsplit .title {
   align-self: flex-start; /* sized to content */
   flex: 1 0 auto; /* grow to content */
   margin: 0.5em 30px;
   padding: 0 30px;
   font-family:'Montserra', sans-serif;
-  font-weight:400;
-  font-size:48px;
-  color:#000;
+  font-weight: 400;
+  font-size: 48px;
+  color: black;
+  background-color: white;
   text-transform: uppercase;
   text-overflow: ellipsis; /* ou au pire clip */
-  overflow: hidden;
   box-sizing: border-box;
-  background-color: white;
-  line-height:80px;
-  border-radius:40px;
-  z-index: 1; /* pour passer par dessus la .bar */
-}
-.xsplit .bar {
-  position:absolute;
-  display:block;
-  font-size:42px;
-  line-height: 60px;
-  left:0;
-  margin: 0;
-  padding: 0 0.2em;
-  margin-top: -66px;
-  background:#790102;
-  color:#790102;
-  border-radius:0 30px 30px 0;
+  line-height: 80px;
+  border-radius: 40px;
+  position: relative;
 }
 
-.xsplit .title:not(:empty) {
-  padding: 10px;
+.xsplit .title::after {
+  content: '';
+  position: absolute;
+  top: -30%;
+  left: -30%;
+  width: 100%;
+  height: 80%;
+  border-radius: 0 30px 30px 0;
+  background-color: #790102;
+  /*background-color: var(--mdc-theme-secondary);*/
+  z-index: -1;
 }
 
 @media (min-width: 481px) and (max-width: 840px) {
-  .xsplit .title,
-  .xsplit .bar
-   {
-    margin: 0.5 0.5em;
+  .xsplit .title {
     max-width: calc(100% - 1em);
   }
 }
 
 @media (max-width: 480px) {
-  .xsplit .title,
-  .xsplit .bar
-   {
+  .xsplit .title {
     margin: 0;
     max-width: calc(100%);
   }
