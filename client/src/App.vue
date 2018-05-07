@@ -128,8 +128,8 @@ body {
 <!-- Styling MDC -->
 <style>
 :root {
-  --mdc-theme-primary: #005976; /* customize MDC color */
-  --mdc-theme-secondary: #ff4200;
+  --mdc-theme-primary: #0F0F0F; /* customize MDC color */
+  --mdc-theme-secondary: #790102;
 }
 
 .mdc-badge {

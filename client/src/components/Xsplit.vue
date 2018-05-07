@@ -150,8 +150,7 @@ export default {
   width: 100%;
   height: 80%;
   border-radius: 0 30px 30px 0;
-  background-color: #790102;
-  /*background-color: var(--mdc-theme-secondary);*/
+  background-color: var(--mdc-theme-secondary);
   z-index: -1;
 }
 
