@@ -50,6 +50,30 @@ function setTitle (newTitle) {
   return newTitle
 }
 
+/**
+ * @swagger
+ * definitions:
+ *   Topic:
+ *     properties:
+ *       title:
+ *         type: string
+ *         description: Topic's title
+ *       description:
+ *         type: string
+ *         description: Some notes that should be useful
+ *       position:
+ *         type: integer
+ *         format: int32
+ *         minimum: 1
+ *         description: current position inside the parent's list
+ *         required: true
+ *       started:
+ *         type: date
+ *         description: time and date when the Topic has started
+ *       ended:
+ *         type: date
+ *         description: time and date when the Topic has ended
+ */
 let topicSchema = new mongoose.Schema({
     title: { type: String, set: setTitle, required: true },
     description: String,

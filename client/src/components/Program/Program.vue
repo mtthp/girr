@@ -96,7 +96,7 @@ export default {
       // change the Toolbar's first row background image
       let tbFirstRow = this.$el.querySelector('.mdc-toolbar--flexible .mdc-toolbar__row:first-child')
       let styleElem = tbFirstRow.querySelector('style') ? tbFirstRow.querySelector('style') : tbFirstRow.appendChild(document.createElement('style'))
-      styleElem.innerHTML = '.mdc-toolbar--flexible .mdc-toolbar__row:first-child::after { background-image: url(' + (value.thumbnail ? value.thumbnail : require('../../assets/geekinc-logo_512.png')) + '); }'
+      styleElem.innerHTML = '.mdc-toolbar--flexible .mdc-toolbar__row:first-child::after { background-image: url(' + (value.thumbnail ? value.thumbnail : require('../../assets/geekinc-logo_452.png')) + '); }'
     }
   },
   methods: {
@@ -114,46 +114,7 @@ export default {
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
-          console.error(response)
-          Event.$emit('snackbar.message', `Error : ${response.statusText ? response.statusText : 'no connection'}`)
-        }
-      )
-    },
-    updateProgram: function (program, file) {
-      let data = program
-      if (typeof file !== 'undefined') {
-        data = new FormData()
-        data.append('thumbnail', file)
-        for (let key in program) {
-          if (!(program[key] instanceof Object)) data.append(key, program[key])
-        }
-      }
-      Event.$emit('progressbar.toggle', true)
-      this.$http.put(`/api/programs/${program._id}`, data).then(
-        (response) => {
-          Event.$emit('progressbar.toggle', false)
-          this.program = response.body
-          Event.$emit('snackbar.message', `Program ${response.body.name} updated`)
-        },
-        function (response) {
-          Event.$emit('progressbar.toggle', false)
-          console.error(response)
-          Event.$emit('snackbar.message', `Error : ${response.statusText ? response.statusText : 'no connection'}`)
-        }
-      )
-    },
-    deleteProgram: function (program) {
-      Event.$emit('progressbar.toggle', true)
-      this.$http.delete(`/api/programs/${program._id}`).then(
-        function (response) {
-          Event.$emit('progressbar.toggle', false)
-          window.location = this.$router.resolve({name: 'Programs'}).href
-          Event.$emit('snackbar.message', `Program ${program.name} deleted`)
-        },
-        function (response) {
-          Event.$emit('progressbar.toggle', false)
-          console.error(response)
-          Event.$emit('snackbar.message', `Error : ${response.statusText ? response.statusText : 'no connection'}`)
+          Event.$emit('http.error', response)
         }
       )
     },
@@ -166,8 +127,7 @@ export default {
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
-          console.error(response)
-          Event.$emit('snackbar.message', `Error : ${response.statusText ? response.statusText : 'no connection'}`)
+          Event.$emit('http.error', response)
         }
       )
     },
@@ -181,8 +141,7 @@ export default {
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
-          console.error(response)
-          Event.$emit('snackbar.message', `Error : ${response.statusText ? response.statusText : 'no connection'}`)
+          Event.$emit('http.error', response)
         }
       )
     },
@@ -207,6 +166,10 @@ export default {
 
 main.empty .empty-state {
   max-height: calc(100vh - (5 * 72px)); /* --mdc-toolbar-ratio-to-extend-flexible * 72px */
+}
+
+#app.bottombarActive main.empty .empty-state {
+  max-height: calc(100vh - (5 * 72px) - 56px); /* --mdc-toolbar-ratio-to-extend-flexible * 72px */
 }
 
 @media (max-width: 1280px) {
@@ -243,7 +206,6 @@ a.episode-card {
   position: fixed;
   bottom: 1rem;
   right: 1rem;
-  z-index: 1; /* to be above the snackbar */
 }
 
 @media(min-width: 1024px) {

@@ -14,7 +14,7 @@ const mime = require('mime')
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    let uploadsPath = process.env.DATA_PATH + '/uploads'
+    const uploadsPath = process.env.DATA_PATH + '/uploads'
     if (!fs.existsSync(uploadsPath)) fs.mkdirSync(uploadsPath)
     cb(null, uploadsPath)
   },
@@ -28,26 +28,6 @@ const upload = multer({
     fieldSize: 10 * 1024 * 1024 // 10 MB
   }
 })
-
-/**
- * @swagger
- * definitions:
- *   Media:
- *     properties:
- *       label:
- *         type: string
- *         description: Media's label
- *       uri:
- *         type: string
- *         description: Path to the media file
- *         required: true
- *       started:
- *         type: date
- *         description: time and date when the Media has started
- *       ended:
- *         type: date
- *         description: time and date when the Media has ended
- */
 
 router.route('/')
   /**
@@ -148,7 +128,7 @@ router.route('/')
         media.label = req.file.originalname
       }
       media.path = req.file.path
-      media.uri = '/' + media.path // should be calculate automatically from the path instead
+      media.uri = media.path.replace(process.env.DATA_PATH, '/data').replace(/\\/g, path.posix.sep)
       media.mimeType = req.file.mimetype
     } else if (media.uri) { // otherwise, tries to download the file and place it under the data directory
       let response = await request({uri: media.uri, encoding: 'binary', resolveWithFullResponse: true})
@@ -160,7 +140,7 @@ router.route('/')
 
       if (typeof media.label === "undefined") media.label = path.basename(media.uri)
       media.path = filepath
-      media.uri = '/' + media.path // should be calculate automatically from the path instead
+      media.uri = media.path.replace(process.env.DATA_PATH, '/data').replace(/\\/g, path.posix.sep)
       media.mimeType = mimeType
     } else {
       next({message:"No media file or URI was provided", status: 417})
@@ -396,7 +376,6 @@ router.route('/:mediaId')
  *           $ref: '#/definitions/Media'
  */
 router.get('/:mediaId/start', function (req, res, next) {
-  let xsplit = new XSplit()
   req.media.started = Date.now()
   req.media
       .save()
@@ -404,29 +383,35 @@ router.get('/:mediaId/start', function (req, res, next) {
         logger.debug("Started " + media.toString())
         res.json(media)
 
-        xsplit.picture = req.media.uri
+        let xsplit = new XSplit()
+        xsplit.media = media
+        xsplit.picture = media.uri
+
+        // we start the parent Topic if it isn't already
+        if (!(req.topic.started && !req.topic.ended)) {
+          req.topic.started = Date.now()
+          req.topic.ended = null
+          req.topic.save()
+
+          xsplit.topic = req.topic
+          xsplit.title = req.topic.title
+        }
+
+        // we start the parent Episode if it isn't already
+        if (!(req.episode.started && !req.episode.ended)) {
+          req.episode.started = Date.now()
+          req.episode.ended = null
+          req.episode.save()
+
+          xsplit.episode = req.episode
+          xsplit.logo = req.program.logoBW
+        }
+
         xsplit.save()
       })
       .catch(function(error) {
         next(error)
       })
-
-  // we start the parent Topic if it isn't already
-  if (!(req.topic.started && !req.topic.ended)) {
-    req.topic.started = Date.now()
-    req.topic.ended = null
-    req.topic.save()
-
-    xsplit.title = req.topic.title
-    xsplit.save()
-  }
-
-  // we start the parent Episode if it isn't already
-  if (!(req.episode.started && !req.episode.ended)) {
-    req.episode.started = Date.now()
-    req.episode.ended = null
-    req.episode.save()
-  }
 })
 
 /**
@@ -472,6 +457,7 @@ router.get('/:mediaId/stop', function (req, res, next) {
       .then(function(media) {
         logger.debug("Stopped " + media.toString())
         var xsplit = new XSplit()
+        xsplit.media = null
         xsplit.picture = null
         xsplit.save()
         res.json(media)

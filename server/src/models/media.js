@@ -29,6 +29,33 @@ function stopPlayingMedias (time_value) {
   return time_value // hmm, we can also return Date.now() instead ?
 }
 
+/**
+ * @swagger
+ * definitions:
+ *   Media:
+ *     properties:
+ *       label:
+ *         type: string
+ *         description: Media's label
+ *       uri:
+ *         type: string
+ *         description: Path to the media file
+ *         required: true
+ *       mimeType:
+ *         type: string
+ *         description: mime type of the file
+ *       position:
+ *         type: integer
+ *         format: int32
+ *         minimum: 1
+ *         description: current position inside the parent's list
+ *       started:
+ *         type: date
+ *         description: time and date when the Media has started
+ *       ended:
+ *         type: date
+ *         description: time and date when the Media has ended
+ */
 let mediaSchema = new mongoose.Schema({
   label: { type: String },
   uri: { type: String, required: true},

@@ -6,38 +6,55 @@ Pour le moment, il permet :
 * de piloter les titres et incrusts à afficher via une [interface tactile simple](http://localhost:8081/presentateur.html)
 * d'afficher les titres et incrusts dynamiquement via une [page overlay pour xsplit](http://localhost:8081/xsplit.html)
 
+<p align="center">
+  <img src="docs/preview.gif">
+</p>
+
 ## Installation
 Prérequis :
-- Node v8
-- MongoDB
+- [Node v8](https://nodejs.org/en/download/current/)
+- [MongoDB](https://docs.mongodb.com/manual/installation/)
 
-```
-git clone
-npm install
+```bash
+git clone https://github.com/chriscamicas/girr
+cd girr
+# build the client
+npm install --prefix client && npm build --prefix client
+# install the server
+npm install --only=production --prefix server
 ```
 
+## Configuration
+Copier le fichier `server/config/.env.defaults` vers `server/config/.env` et changer les valeurs.
 
 ## Lancement
-```
-npm start
-```
-ou pour le lancer en mode développement (auto reload du backend)
-```
-npm run dev
+```bash
+npm start --prefix server
 ```
 
+# Development
 
-## TODOs
+## Install all dependencies (including dev ones)
+```bash
+npm install --prefix client
+npm install --prefix <section></section>rver
+```
 
+## Start the application
+```bash
+npm run dev --prefix server
+npm run dev --prefix client
+```
+
+## TODO
+
+- Tests unitaires
+- Déploiement automatique
 - Diagrammes
   - Architecture
   - Modèles
   - Routes
-- Routes
-  - mock
-- extraction des websockets de app.js
 - voir reprendre les composants mis en place sur https://github.com/codlab/TwitchToast
-
 
 ## Licence
 This project is licensed under the MIT license.

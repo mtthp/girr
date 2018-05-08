@@ -7,22 +7,22 @@
     <div class="mdc-dialog__surface">
       <header class="mdc-dialog__header">
         <h2 id="my-mdc-dialog-label" class="mdc-dialog__header__title">
-          {{ topic.title }}
+          {{ title }}
         </h2>
       </header>
       <section id="my-mdc-dialog-description" class="mdc-dialog__body mdc-dialog__body--scrollable">
-        <div class="mdc-textfield mdc-textfield--fullwidth" v-bind:class="{ 'mdc-textfield--upgraded' : topic.title }">
-          <input type="text" id="title" class="mdc-textfield__input" :value="topic.title" v-model.lazy="topic.title">
-          <label for="title" class="mdc-textfield__label" v-bind:class="{ 'mdc-textfield__label--float-above' : topic.title }">Title</label>
+        <div class="mdc-text-field mdc-text-field--fullwidth" v-bind:class="{ 'mdc-text-field--upgraded' : topic.title }">
+          <input type="text" id="title" class="mdc-text-field__input" v-model.lazy="topic.title">
+          <label for="title" class="mdc-text-field__label" v-bind:class="{ 'mdc-text-field__label--float-above' : topic.title }">Title</label>
         </div>
-        <div class="mdc-textfield mdc-textfield--fullwidth mdc-textfield--textarea">
-          <textarea id="description" class="mdc-textfield__input" rows="8" placeholder="Description" v-model.lazy="topic.description">{{ topic.description }}</textarea>
+        <div class="mdc-text-field mdc-text-field--fullwidth mdc-text-field--textarea">
+          <textarea id="description" class="mdc-text-field__input" rows="8" placeholder="Description" v-model.lazy="topic.description">{{ topic.description }}</textarea>
         </div>
         <div class="mdc-grid-list">
           <ul class="mdc-grid-list__tiles">
             <li class="mdc-grid-tile" v-for="media in medias">
               <div class="mdc-grid-tile__primary">
-                <img class="mdc-grid-tile__primary-content" :src="media.uri" />
+                <img class="mdc-grid-tile__primary-content" :src="media._id && media.uri ? media.uri + '?height=256' : media.uri" />
                 <i class="material-icons" v-on:click="deleteMedia(media)">cancel</i>
               </div>
               <span class="mdc-grid-tile__secondary" v-if="media.label">
@@ -35,9 +35,9 @@
                 <img class="mdc-grid-tile__primary-content" v-on:click="$event.currentTarget.parentNode.querySelector('input').click()"/>
               </div>
               <span class="mdc-grid-tile__secondary">
-                <span class="mdc-grid-tile__title mdc-textfield">
-                  <input type="text" id="uri" class="mdc-textfield__input" v-on:change="uriChange($event)">
-                  <label for="uri" class="mdc-textfield__label">URL</label>
+                <span class="mdc-grid-tile__title mdc-text-field">
+                  <input type="text" id="uri" class="mdc-text-field__input" v-on:change="uriChange($event)">
+                  <label for="uri" class="mdc-text-field__label">URL</label>
                 </span>
               </span>
             </li>
@@ -46,7 +46,7 @@
       </section>
       <footer class="mdc-dialog__footer">
         <div style="margin-right: auto;">
-          <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--delete" v-on:click="deleteTopic">
+          <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--delete" v-on:click="deleteTopic(topic)">
             <i class="material-icons mdc-button__icon">delete</i>
             <span>Delete</span>
           </button>
@@ -61,7 +61,7 @@
 
 <script>
 import Event from '../../utils/EventBus.js'
-import { dialog, textfield } from 'material-components-web'
+import { dialog, textField } from 'material-components-web'
 import assign from 'object-assign'
 import validUrl from 'valid-url'
 
@@ -70,19 +70,21 @@ export default {
   data () {
     return {
       dialog: null,
+      title: null,
       topic: {},
       medias: []
     }
   },
   mounted () {
     this.dialog = new dialog.MDCDialog(this.$el)
-    textfield.MDCTextfield.attachTo(this.$el.querySelector('.mdc-textfield'))
-    this.addTileTextfield = new textfield.MDCTextfield(this.$el.querySelector('.add-tile .mdc-textfield'))
-    Event.$on('topicDialog.show', this.show)
-    Event.$on('topicDialog.close', this.close)
+    textField.MDCTextField.attachTo(this.$el.querySelector('.mdc-text-field'))
+    this.addTileTextfield = new textField.MDCTextField(this.$el.querySelector('.add-tile .mdc-text-field'))
+    Event.$off('topicDialog.show').$on('topicDialog.show', this.show)
+    Event.$off('topicDialog.close').$on('topicDialog.close', this.close)
   },
   methods: {
     show: function (topic, medias) {
+      this.title = topic.title
       this.topic = assign({}, topic)
       this.medias = assign([], medias)
       this.$el.querySelector('textarea').value = this.topic.description ? this.topic.description : ''
@@ -92,12 +94,8 @@ export default {
       this.dialog.close()
     },
     confirm: function () {
-      Event.$emit('topic.update', this.topic, this.medias)
-      this.close()
-    },
-    deleteTopic: function () {
-      Event.$emit('topic.delete', this.topic)
-      this.close()
+      Event.$emit(`topics.${this.topic._id}.update`, this.topic, this.medias)
+      this.updateTopic(this.topic)
     },
     fileChange: function (name, files) {
       if (files.length > 0) {
@@ -122,6 +120,36 @@ export default {
         return dialogMedia === media
       }))
       if (index > -1) this.medias.splice(index, 1)
+    },
+    updateTopic: function (topic) {
+      Event.$emit('progressbar.toggle', true)
+      this.$http.put(`/api/programs/${this.$route.params.programId}/episodes/${this.$route.params.episodeId}/topics/${topic._id}`, topic).then(
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          Event.$emit('topic.updated', response.body)
+          Event.$emit('snackbar.message', `Topic ${response.body.title} updated`)
+          this.close()
+        },
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          Event.$emit('http.error', response)
+        }
+      )
+    },
+    deleteTopic: function (topic) {
+      Event.$emit('progressbar.toggle', true)
+      this.$http.delete(`/api/programs/${this.$route.params.programId}/episodes/${this.$route.params.episodeId}/topics/${topic._id}`).then(
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          Event.$emit('topic.deleted', topic)
+          Event.$emit('snackbar.message', `Topic ${topic.title} deleted`)
+          this.close()
+        },
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          Event.$emit('http.error', response)
+        }
+      )
     }
   }
 }
@@ -129,16 +157,20 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.mdc-textfield--textarea {
+.mdc-text-field--textarea {
   margin-top: 16px;
+}
+
+.mdc-text-field--textarea textarea {
+  padding-top: 16px;
 }
 
 .mdc-dialog__body--scrollable {
   max-height: calc(80vh - 56px - 52px); /* main - header - footer */
 }
 
-/* fix mdc-textfield--fullwidth padding */
-.mdc-textfield--fullwidth:not(.mdc-textfield--textarea) .mdc-textfield__input {
+/* fix mdc-text-field--fullwidth padding */
+.mdc-text-field--fullwidth:not(.mdc-text-field--textarea) .mdc-text-field__input {
   padding: 10px 0;
 }
 
@@ -188,15 +220,15 @@ export default {
   height: inherit;
 }
 
-.add-tile .mdc-grid-tile__secondary .mdc-textfield:not(.mdc-textfield--invalid) label {
+.add-tile .mdc-grid-tile__secondary .mdc-text-field:not(.mdc-text-field--invalid) label {
   color: white;
 }
 
-.add-tile .mdc-grid-tile__secondary .mdc-textfield:not(.mdc-textfield--invalid) input {
+.add-tile .mdc-grid-tile__secondary .mdc-text-field:not(.mdc-text-field--invalid) input {
   border-color: white;
 }
 
-.add-tile .mdc-grid-tile__secondary .mdc-textfield input {
+.add-tile .mdc-grid-tile__secondary .mdc-text-field input {
   color: white;
 }
 

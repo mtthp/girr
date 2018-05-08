@@ -6,9 +6,30 @@ const path = require('path')
 const fs = require('fs')
 const websockets = require('../websockets')()
 
+/**
+ * @swagger
+ * definitions:
+ *   Program:
+ *     properties:
+ *       name:
+ *         type: string
+ *         description: a name to identify the Program between others
+ *         required: true
+ *       thumbnail:
+ *         type: string
+ *         description: thumbnail uri
+ *       logo:
+ *         type: string
+ *         description: logo uri
+ *       logoBW:
+ *         type: string
+ *         description: black and white logo uri
+ */
 let programSchema = new mongoose.Schema({
     name: { type: String, required: true},
     thumbnail: { type: String },
+    logo: { type: String },
+    logoBW: { type: String }, // logo in black and white
     created: { type: Date, required: true },
     modified: { type: Date, required: true },
     episodes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Episode' }]

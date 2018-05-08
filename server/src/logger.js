@@ -1,12 +1,13 @@
-var winston = require('winston')
-var path = require('path')
+const winston = require('winston')
+const path = require('path')
 const fs = require('fs')
+const utils = require('./utils')
+
+process.env.LOGS_PATH = process.env.LOGS_PATH.startsWith('/') ? process.env.LOGS_PATH : path.join(__base, process.env.LOGS_PATH)
+if (!fs.existsSync(process.env.LOGS_PATH)) utils.mkdirSyncRecursive(process.env.LOGS_PATH)
+
 winston.emitErrs = true
-
-let logsPath = process.env.LOGS_PATH
-if (!fs.existsSync(logsPath)) fs.mkdirSync(logsPath)
-
-var logger = new winston.Logger({
+const logger = new winston.Logger({
     transports: [
         new winston.transports.File({
             name: 'info-file',

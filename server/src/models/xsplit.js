@@ -5,6 +5,46 @@ const websockets = require('../websockets')()
  * Class representing the displayed data for XSplit
  */
 class XSplit {
+
+  /**
+   * @swagger
+   * definitions:
+   *   Xsplit:
+   *     properties:
+   *       title:
+   *         type: string
+   *         description: displayed title on the xsplit scene
+   *       picture:
+   *         type: string
+   *         description: picture uri
+   *       background:
+   *         type: string
+   *         description: background image uri
+   *       logo:
+   *         type: string
+   *         description: logo image uri, displayed at the top-right corner
+   *       episode:
+   *         $ref: '#/definitions/Episode'
+   *       topic:
+   *         $ref: '#/definitions/Topic'
+   *       media:
+   *         $ref: '#/definitions/Media'
+   *       scenes:
+   *         type: array
+   *         description: XSplit scenes
+   *         items:
+   *           type: object
+   *           properties:
+   *             _id:
+   *               type: integer
+   *               description: Xsplit internal scene id
+   *             name:
+   *               type: string
+   *               description: scene given name in Xsplit
+   *             active:
+   *               type: boolean
+   *               description: whether the scene is currently active or not
+   */
   constructor () {
     "use strict";
     let data = cache.get('xsplit')
@@ -12,23 +52,27 @@ class XSplit {
       this.title = data.title
       this.picture = data.picture
       this.background = data.background
+      this.logo = data.logo
       /**
-       * actually, we should store the episode, topic and media currently playing :
+       * actually, we should store the program, episode, topic and media currently playing :
        * that way, the client knows what to display (Media > Topic > Episode)
        * and the server doesn't need to tell the client what title or picture
        */
-      // this.episode = data.episode
-      // this.topic = data.topic
-      // this.media = data.media
+      this.episode = data.episode
+      this.topic = data.topic
+      this.media = data.media
       this.created = data.created
       this.modified = data.modified
+      this.scenes = data.scenes
     } else { // default values
       this.title = null
       this.picture = null
       this.background = null
-      // this.episode = null // or {}
-      // this.topic = null // or {}
-      // this.media = null // or {}
+      this.logo = null
+      this.episode = null // or {} or search for playing episode in the database
+      this.topic = null // same
+      this.media = null // same
+      this.scenes = []
       this.created = Date.now()
       this.modified = Date.now()
     }
