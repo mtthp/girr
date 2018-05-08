@@ -4,7 +4,7 @@ const Media = require('./media')
 const logger = require('../logger')
 const websockets = require('../websockets')()
 const cache = require('memory-cache')
-const XSplit = require('./xsplit')
+const Scene = require('./scene')
 
 /*
  * The purpose of this setter is to end all playing topics
@@ -36,14 +36,14 @@ function stopPlayingTopics (time_value) {
 }
 
 /**
- * Change the XSplit title accordingly if the Topic is currently playing
+ * Change the Scene title accordingly if the Topic is currently playing
  */
 function setTitle (newTitle) {
   if (this.started && !this.ended) {
-    let xsplit = new XSplit()
-    if (xsplit.title == this.title) {
-      xsplit.title = newTitle
-      xsplit.save()
+    let scene = new Scene()
+    if (scene.title == this.title) {
+      scene.title = newTitle
+      scene.save()
     }
   }
 

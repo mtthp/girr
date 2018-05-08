@@ -40,7 +40,7 @@ export default {
   },
   computed: {
     bottombarShown () {
-      return this.bottombar && this.$route.fullPath.indexOf('xsplit') < 0
+      return this.bottombar && this.$route.fullPath.indexOf('scene') < 0
     }
   },
   created () {
@@ -128,8 +128,8 @@ body {
 <!-- Styling MDC -->
 <style>
 :root {
-  --mdc-theme-primary: #005976; /* customize MDC color */
-  --mdc-theme-secondary: #ff4200;
+  --mdc-theme-primary: #790102; /* customize MDC color */
+  --mdc-theme-secondary: #C69C6D;
 }
 
 .mdc-badge {

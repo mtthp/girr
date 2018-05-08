@@ -3,7 +3,7 @@ const mongoose = require('mongoose')
 const Topic = require('./topic')
 const logger = require('../logger')
 const websockets = require('../websockets')()
-const XSplit = require('./xsplit')
+const Scene = require('./scene')
 
 /*
  * The purpose of this setter is to end all playing episodes
@@ -45,14 +45,14 @@ function stopPlayingEpisodes (time_value) {
 }
 
 /**
- * Change the XSplit title accordingly if the Episode is currently playing
+ * Change the Scene title accordingly if the Episode is currently playing
  */
 function setName (newName) {
   if (this.started && !this.ended) {
-    let xsplit = new XSplit()
-    if (xsplit.title == this.name) {
-      xsplit.title = newName
-      xsplit.save()
+    let scene = new Scene()
+    if (scene.title == this.name) {
+      scene.title = newName
+      scene.save()
     }
   }
 

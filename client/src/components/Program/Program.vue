@@ -96,7 +96,7 @@ export default {
       // change the Toolbar's first row background image
       let tbFirstRow = this.$el.querySelector('.mdc-toolbar--flexible .mdc-toolbar__row:first-child')
       let styleElem = tbFirstRow.querySelector('style') ? tbFirstRow.querySelector('style') : tbFirstRow.appendChild(document.createElement('style'))
-      styleElem.innerHTML = '.mdc-toolbar--flexible .mdc-toolbar__row:first-child::after { background-image: url(' + (value.thumbnail ? value.thumbnail : require('../../assets/geekinc-logo_452.png')) + '); }'
+      styleElem.innerHTML = '.mdc-toolbar--flexible .mdc-toolbar__row:first-child::after { background-image: url(' + (value.thumbnail ? value.thumbnail : require('../../assets/studiorenegade-logo_157.png')) + '); }'
     }
   },
   methods: {

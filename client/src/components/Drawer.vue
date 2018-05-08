@@ -4,7 +4,7 @@
       <header class="mdc-drawer__header">
         <div class="mdc-drawer__header-content">
           <div class="title">
-            GeekInc Remote Regie
+            Studio Renegade Remote Regie
             <i class="material-icons mdc-badge mdc-badge--overlap" :data-badge="usersCount" v-if="usersCount > 1">people</i>
           </div>
         </div>
@@ -13,7 +13,7 @@
         <router-link :to="{ name: 'Programs' }" @click.native="toggleDrawer(false)" class="mdc-list-item" active-class="mdc-list-item--activated" data-mdc-auto-init="MDCRipple">
           <i class="material-icons mdc-list-item__graphic" aria-hidden="true">event</i>Programs
         </router-link>
-        <router-link :to="{ name: 'Xsplit' }" @click.native="toggleDrawer(false)" class="mdc-list-item" active-class="mdc-list-item--activated" data-mdc-auto-init="MDCRipple">
+        <router-link :to="{ name: 'Scene' }" @click.native="toggleDrawer(false)" class="mdc-list-item" active-class="mdc-list-item--activated" data-mdc-auto-init="MDCRipple">
           <i class="material-icons mdc-list-item__graphic" aria-hidden="true">tv</i>Scene
         </router-link>
         <router-link :to="{ name: 'Settings' }" @click.native="toggleDrawer(false)" class="mdc-list-item" active-class="mdc-list-item--activated" data-mdc-auto-init="MDCRipple">
@@ -62,10 +62,23 @@ export default {
 <style scoped>
 .mdc-drawer__header-content {
   padding: 0px;
-  background-image: url('../assets/geekinc-header_600.jpg');
+  background-image: url('../assets/studiorenegade-logo_157.png');
+  background-size: contain;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+
+.mdc-drawer__header-content::after {
+  background-image: url('../assets/img-background.jpg');
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
+  display: block;
+  content: '';
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  z-index: -1;
 }
 
 .mdc-drawer__header-content .title {

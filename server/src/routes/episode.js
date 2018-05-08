@@ -4,7 +4,7 @@ const logger = require('../logger');
 const Episode = require('../models/episode')
 const Topic = require('../models/topic')
 const Media = require('../models/media')
-const XSplit = require('../models/xsplit')
+const Scene = require('../models/scene')
 
 router.route('/')
   /**
@@ -245,14 +245,14 @@ router.route('/:episodeId')
       .then(function(result) {
         if (result !== null) {
           logger.debug("Removed Episode " + req.params.episodeId)
-          let xsplit = new XSplit()
-          xsplit.episode = null
-          xsplit.topic = null
-          xsplit.media = null
-          xsplit.title = null
-          xsplit.picture = null
-          xsplit.logo = null
-          xsplit.save()
+          let scene = new Scene()
+          scene.episode = null
+          scene.topic = null
+          scene.media = null
+          scene.title = null
+          scene.picture = null
+          scene.logo = null
+          scene.save()
           
           res.status(204).json(result.toString())
         } else {
@@ -298,14 +298,14 @@ router.get('/:episodeId/start', function (req, res, next) {
         logger.debug("Started " + episode.toString())
         res.json(episode)
 
-        let xsplit = new XSplit()
-        xsplit.episode = req.episode
-        xsplit.title = episode.name
-        xsplit.topic = null
-        xsplit.media = null
-        xsplit.picture = null
-        xsplit.logo = req.program.logoBW
-        xsplit.save()
+        let scene = new Scene()
+        scene.episode = req.episode
+        scene.title = episode.name
+        scene.topic = null
+        scene.media = null
+        scene.picture = null
+        scene.logo = req.program.logoBW
+        scene.save()
       })
       .catch(function(error) {
         next(error)
@@ -374,14 +374,14 @@ router.get('/:episodeId/stop', function (req, res, next) {
           logger.debug("Stopped " + episode.toString())
           res.json(episode)
 
-          let xsplit = new XSplit()
-          xsplit.episode = null
-          xsplit.topic = null
-          xsplit.media = null
-          xsplit.title = null
-          xsplit.picture = null
-          xsplit.logo = null
-          xsplit.save()
+          let scene = new Scene()
+          scene.episode = null
+          scene.topic = null
+          scene.media = null
+          scene.title = null
+          scene.picture = null
+          scene.logo = null
+          scene.save()
         })
         .catch(function(error) {
           next(error)
@@ -446,12 +446,12 @@ router.get('/:episodeId/next', function (req, res, next) {
               logger.debug("Started " + topicStarted.toString())
               res.json(topicStarted)
 
-              let xsplit = new XSplit()
-              xsplit.topic = topicStarted
-              xsplit.media = null
-              xsplit.title = topicStarted.title
-              xsplit.picture = null
-              xsplit.save()
+              let scene = new Scene()
+              scene.topic = topicStarted
+              scene.media = null
+              scene.title = topicStarted.title
+              scene.picture = null
+              scene.save()
             })
             .catch(function(error) {
               next(error)

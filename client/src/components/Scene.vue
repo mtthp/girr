@@ -1,8 +1,8 @@
 <template>
-  <main class="xsplit" :style="{ 'background-image': background }">
+  <main class="scene" :style="{ 'background-image': background }">
     <div class="title">{{ animatedTitle }}</div>
     <div class="content">
-      <img v-if="xsplit.picture" :src="xsplit.picture" :class="{ loading: xsplit.picture }" v-on:load="loaded($event)" v-on:error="failed($event)">
+      <img v-if="scene.picture" :src="scene.picture" :class="{ loading: scene.picture }" v-on:load="loaded($event)" v-on:error="failed($event)">
    	</div>
     <img class="logo" v-if="logo" :src="logo">
   </main>
@@ -13,22 +13,22 @@ import Event from '../utils/EventBus.js'
 import TWEEN from 'tween.js/src/Tween'
 
 export default {
-  name: 'xsplit',
+  name: 'scene',
   data () {
     return {
-      xsplit: {},
+      scene: {},
       animatedTitle: ''
     }
   },
   created () {
     this.fetchData()
-    this.$options.sockets['xsplit'] = (data) => {
-      this.xsplit = data
+    this.$options.sockets['scene'] = (data) => {
+      this.scene = data
     }
-    document.title = 'GIRR'
+    document.title = 'Remote Regie'
   },
   watch: {
-    'xsplit.title' (newValue, oldValue) {
+    'scene.title' (newValue, oldValue) {
       function animate () {
         if (TWEEN.update()) {
           requestAnimationFrame(animate)
@@ -71,20 +71,20 @@ export default {
   },
   computed: {
     background () {
-      if (this.xsplit.picture) {
-        return 'url(' + (this.xsplit.background ? this.xsplit.background : require('../assets/brick-wall.jpg')) + ')'
+      if (this.scene.picture) {
+        return 'url(' + (this.scene.background ? this.scene.background : require('../assets/img-background.jpg')) + ')'
       }
       return null
     },
     logo () {
-      return this.xsplit.logo ? this.xsplit.logo + '?height=72' : null
+      return this.scene.logo ? this.scene.logo + '?height=72' : null
     }
   },
   methods: {
     fetchData: function () {
-      this.$http.get('/api/xsplit/').then(
+      this.$http.get('/api/scene/').then(
         (response) => {
-          this.xsplit = response.body
+          this.scene = response.body
         },
         function (response) {
           console.error(response)
@@ -98,7 +98,7 @@ export default {
     },
     failed: function (event) {
       event.target.classList.remove('loading')
-      if (this.xsplit.picture) {
+      if (this.scene.picture) {
         event.target.src = require('../assets/error.gif')
         // event.target.classList.add('failed')
         // Event.$emit('snackbar.message', `Unable to load ${event.target.src}`)
@@ -114,7 +114,7 @@ export default {
   background-color: transparent;
 }
 
-.xsplit {
+.scene {
 	display: flex;
 	flex-flow: column-reverse;
   background-repeat: no-repeat;
@@ -124,41 +124,50 @@ export default {
   height: 100vh;
 }
 
-.xsplit .title {
+.scene .title {
   align-self: flex-start; /* sized to content */
   flex: 1 0 auto; /* grow to content */
-  margin: 0.5em 1em;
-  max-width: calc(100% - 2em - 400px); /* je ne sais pas quelle taille fait exactement le twitch chat donc j'ai mis 400px à l'arrache */
-  font-family: 'Oswald', sans-serif;
+  margin: 0.5em 30px;
+  padding: 0 30px;
+  font-family:'Montserra', sans-serif;
   font-weight: 400;
-  font-size: 52px;
+  font-size: 48px;
   color: black;
+  background-color: white;
   text-transform: uppercase;
   text-overflow: ellipsis; /* ou au pire clip */
-  overflow: hidden;
   box-sizing: border-box;
-  background-color: white;
+  line-height: 80px;
+  border-radius: 40px;
+  position: relative;
 }
 
-.xsplit .title:not(:empty) {
-  padding: 10px;
+.scene .title::after {
+  content: '';
+  position: absolute;
+  top: -30%;
+  left: -30%;
+  width: 100%;
+  height: 80%;
+  border-radius: 0 30px 30px 0;
+  background-color: var(--mdc-theme-primary);
+  z-index: -1;
 }
 
 @media (min-width: 481px) and (max-width: 840px) {
-  .xsplit .title {
-    margin: 0.5 0.5em;
+  .scene .title {
     max-width: calc(100% - 1em);
   }
 }
 
 @media (max-width: 480px) {
-  .xsplit .title {
+  .scene .title {
     margin: 0;
     max-width: calc(100%);
   }
 }
 
-.xsplit .logo {
+.scene .logo {
   position: absolute;
   top: 0;
   right: 0;
@@ -167,7 +176,7 @@ export default {
   margin: 12px;
 }
 
-.xsplit .content {
+.scene .content {
 	flex: 1 1 100%; /* fills remaining space */
 	display: flex;
   flex-direction: column;
@@ -176,7 +185,7 @@ export default {
   margin-top: 1.5em;
 }
 
-.xsplit .content img {
+.scene .content img {
   width: 100%;
 	max-width: 100%;
   max-height: 100%;

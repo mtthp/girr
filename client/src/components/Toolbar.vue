@@ -48,11 +48,11 @@ export default {
         this.$el.querySelector('.mdc-toolbar__row:first-child').classList.remove('flex')
       }
     })
-    document.title = `${this.title} - GIRR`
+    document.title = `${this.title} - Studio Renegade`
   },
   watch: {
     title: function (newTitle) {
-      document.title = `${newTitle} - GIRR`
+      document.title = `${newTitle} - Studio Renegade`
     }
   },
   methods: {

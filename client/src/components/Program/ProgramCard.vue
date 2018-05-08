@@ -51,7 +51,7 @@ export default {
   position: relative;
   width: 100%;
   height: 100%;
-  background-image: url("../../assets/geekinc-logo_452.png");
+  background-image: url("../../assets/studiorenegade-logo_157.png");
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;

@@ -1,12 +1,12 @@
 "use strict";
 const express = require('express')
 const router = express.Router()
-const XSplit = require('../models/xsplit')
+const Scene = require('../models/scene')
 
 router.route('/')
   /**
    * @swagger
-   * /xsplit:
+   * /scene:
    *   get:
    *     tags:
    *       - Xsplit
@@ -20,12 +20,12 @@ router.route('/')
    *           $ref: '#/definitions/Xsplit'
    */
   .get(function (req, res, next) {
-    var xsplit = new XSplit()
-    res.json(xsplit)
+    var scene = new Scene()
+    res.json(scene)
   })
   /**
    * @swagger
-   * /xsplit:
+   * /scene:
    *   put:
    *     tags:
    *       - Xsplit
@@ -33,7 +33,7 @@ router.route('/')
    *     summary: Edit Xsplit data
    *     produces: application/json
    *     parameters:
-   *       - name: xsplit
+   *       - name: scene
    *         in: body
    *         description: Fields for the Xsplit resource
    *         schema:
@@ -46,10 +46,10 @@ router.route('/')
    *           $ref: '#/definitions/Xsplit'
    */
   .put(function (req, res, next) {
-    let xsplit = new XSplit()
-    xsplit = Object.assign(xsplit, req.body, { modified: Date.now() })
-    xsplit.save()
-    res.json(xsplit)
+    let scene = new Scene()
+    scene = Object.assign(scene, req.body, { modified: Date.now() })
+    scene.save()
+    res.json(scene)
   });
 
 module.exports = router;

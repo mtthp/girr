@@ -3,7 +3,7 @@ import Router from 'vue-router'
 import Programs from '@/components/Program/Programs'
 import Program from '@/components/Program/Program'
 import Episode from '@/components/Episode/Episode'
-import Xsplit from '@/components/Xsplit'
+import Scene from '@/components/Scene'
 import Settings from '@/components/Settings'
 
 Vue.use(Router)
@@ -36,9 +36,9 @@ export default new Router({
       component: Settings
     },
     {
-      name: 'Xsplit',
-      path: '/xsplit',
-      component: Xsplit
+      name: 'Scene',
+      path: '/scene',
+      component: Scene
     }
   ]
 })
