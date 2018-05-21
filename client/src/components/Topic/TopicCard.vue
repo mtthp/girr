@@ -2,7 +2,7 @@
   <div class="topic" v-bind:class="{ playing : topic.started !== null && topic.ended === null }">
     <li role="separator" class="mdc-list-divider"></li>
     <li class="mdc-list-item" data-mdc-auto-init="MDCRipple" v-on:click="toggle(!topic.expanded)">
-      <img v-if="medias.length > 0" class="mdc-list-item__graphic unselectable" :src="medias[0].uri ? medias[0].uri + '?height=56' : null" width="56" height="56" :alt="medias[0].label">
+      <img v-if="thumbnail" class="mdc-list-item__graphic unselectable" :src="thumbnail" width="56" height="56" :alt="medias[0].label">
       <span v-else class="mdc-list-item__graphic" role="presentation">
         <i class="material-icons" aria-hidden="true">comment</i>
       </span>
@@ -31,7 +31,7 @@
         </draggable>
       </div>
     </div>
-  </div> 
+  </div>
 </template>
 
 <script>
@@ -53,6 +53,9 @@ export default {
     draggable
   },
   computed: {
+    thumbnail () {
+      return this.medias.length > 0 ? this.medias[0].thumbnail : null
+    },
     dragOptions () {
       return {
         animation: 0,
@@ -267,7 +270,6 @@ export default {
 
 .topic .content {
   max-height: 0px;
-  margin: 10px 0;
   overflow: hidden;
   padding: 0 16px;
   transition: all 0.2s, max-height 0.2s; /* close rapidly */

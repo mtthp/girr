@@ -2,7 +2,8 @@
   <main class="scene" :style="{ 'background-image': background }">
     <div class="title">{{ animatedTitle }}</div>
     <div class="content">
-      <img v-if="scene.picture" :src="scene.picture" :class="{ loading: scene.picture }" v-on:load="loaded($event)" v-on:error="failed($event)">
+      <img v-if="!iframeContent" :src="scene.picture" :class="{ loading: scene.picture }" v-on:load="loaded($event)" v-on:error="failed($event)">
+      <iframe v-else :src="iframeContent" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
    	</div>
     <img class="logo" v-if="logo" :src="logo">
   </main>
@@ -27,7 +28,24 @@ export default {
     }
     document.title = 'Remote Regie'
   },
+  computed: {
+    iframeContent () {
+      return this.scene.media && this.scene.media.mimeType.includes('html') ? this.scene.media.uri : null
+    },
+    background () {
+      if (this.scene.picture) {
+        return 'url(' + (this.scene.background ? this.scene.background : require('../assets/img-background.jpg')) + ')'
+      }
+      return null
+    },
+    logo () {
+      return this.scene.logo ? this.scene.logo + '?height=72' : null
+    }
+  },
   watch: {
+    'scene' (newValue, oldValue) {
+      console.log(newValue)
+    },
     'scene.title' (newValue, oldValue) {
       function animate () {
         if (TWEEN.update()) {
@@ -67,17 +85,6 @@ export default {
         }
       }
       animate()
-    }
-  },
-  computed: {
-    background () {
-      if (this.scene.picture) {
-        return 'url(' + (this.scene.background ? this.scene.background : require('../assets/img-background.jpg')) + ')'
-      }
-      return null
-    },
-    logo () {
-      return this.scene.logo ? this.scene.logo + '?height=72' : null
     }
   },
   methods: {
@@ -190,6 +197,11 @@ export default {
 	max-width: 100%;
   max-height: 100%;
 	object-fit: contain;
+}
+
+.scene .content iframe {
+  width: 100%;
+  height: 100%;
 }
 
 .loading {
