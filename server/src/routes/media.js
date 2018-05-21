@@ -132,16 +132,17 @@ router.route('/')
       media.mimeType = req.file.mimetype
     } else if (media.uri) { // otherwise, tries to download the file and place it under the data directory
       let response = await request({uri: media.uri, encoding: 'binary', resolveWithFullResponse: true})
-      let mimeType = response.headers['content-type']
-      let uploadsPath = process.env.DATA_PATH + '/uploads'
-      if (!fs.existsSync(uploadsPath)) fs.mkdirSync(uploadsPath)
-      let filepath = uploadsPath + '/' + path.basename(media.uri.split('?')[0], path.extname(media.uri)).replace(/\s/g, "_") + '-' + uuidv4() + '.' + mime.getExtension(mimeType)
-      fs.writeFileSync(path.resolve(filepath), response.body, 'binary')
+      media.mimeType = response.headers['content-type'].split(";").shift()
+      if (!media.mimeType.includes('html')) {
+        let uploadsPath = process.env.DATA_PATH + '/uploads'
+        if (!fs.existsSync(uploadsPath)) fs.mkdirSync(uploadsPath)
+        let filepath = uploadsPath + '/' + path.basename(media.uri.split('?')[0], path.extname(media.uri)).replace(/\s/g, "_") + '-' + uuidv4() + '.' + mime.getExtension(media.mimeType)
+        fs.writeFileSync(path.resolve(filepath), response.body, 'binary')
 
-      if (typeof media.label === "undefined") media.label = path.basename(media.uri)
-      media.path = filepath
-      media.uri = media.path.replace(process.env.DATA_PATH, '/data').replace(/\\/g, path.posix.sep)
-      media.mimeType = mimeType
+        if (typeof media.label === "undefined") media.label = path.basename(media.uri)
+        media.path = filepath
+        media.uri = media.path.replace(process.env.DATA_PATH, '/data').replace(/\\/g, path.posix.sep)
+      }
     } else {
       next({message:"No media file or URI was provided", status: 417})
     }
