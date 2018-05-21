@@ -37,6 +37,7 @@ let mediaSchema = new mongoose.Schema({
   uri: { type: String, required: true},
   mimeType: { type: String, required: true},
   path: { type: String }, // in the case of a local file
+  // thumbnail: { type: String },
   position: { type: Number },
   started: { type: Date },
   ended: { type: Date },
@@ -58,7 +59,7 @@ mediaSchema.post('remove', function(media) {
   logger.debug("Removed Media " + media._id)
   websockets.sockets.emit('medias.' + media._id + '.delete', media)
 
-  if (fs.existsSync(path.join(__base, media.path))) {
+  if (media.path && fs.existsSync(path.join(__base, media.path))) {
     fs.unlinkSync(path.join(__base, media.path))
   }
 })
@@ -93,5 +94,25 @@ mediaSchema.post('save', function(media) {
   }
   websockets.sockets.emit('medias.' + media._id, media)
 })
+
+mediaSchema.virtual('thumbnail').get(function() {
+  if (this.mimeType.includes('html')) {
+    // https://stackoverflow.com/a/2068371
+    if (this.uri.startsWith('https://youtube') || this.uri.startsWith('https://www.youtube')) {
+      const [uri, queries] = this.uri.split('?')
+      if (/v=([^&]*)/.test(queries)) {
+        // https://www.youtube.com/watch?v=XXXXXXXXX
+        return `https://img.youtube.com/vi/${queries.match(/v=([^&]*)/).pop()}/default.jpg`
+      } else {
+        // https://www.youtube.com/embed/XXXXXXXXX?autoplay=true
+        return `https://img.youtube.com/vi/${uri.match(/([^/]*)\/*$/).pop()}/default.jpg`
+      }
+    }
+    return null
+  }
+  return `${this.uri}?height=256`
+})
+mediaSchema.set('toObject', { virtuals: true })
+mediaSchema.set('toJSON', { virtuals: true })
 
 module.exports = mediaModel
