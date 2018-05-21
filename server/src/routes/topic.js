@@ -120,7 +120,7 @@ router.route('/')
         })
   })
 
-// Middleware : we check if the topic exists in the specified program before going further
+// Middleware : we check if the topic exists in the specified episode before going further
 router.param('topicId', function (req, res, next, value, name) {
   delete req.body.started
   delete req.body.ended
@@ -313,7 +313,7 @@ router.get('/:topicId/start', function (req, res, next) {
       logger.debug("Started " + topicStarted.toString())
 
       res.json(topicStarted)
-      
+
       let scene = new Scene()
       scene.topic = topicStarted
       scene.title = topicStarted.title
