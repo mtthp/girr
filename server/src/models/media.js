@@ -5,30 +5,6 @@ const fs = require('fs')
 const path  = require('path')
 const websockets = require('../websockets')()
 
-/*
- * The purpose of this setter is to end all playing medias
- * because there can be only one to rule them all
- */
-function stopPlayingMedias (time_value) {
-  this.constructor // get the Model to execute queries
-    .find({ ended : null })
-    .where('_id').ne(this._id)
-    .where('started').ne(null)
-    .then(function(results) { // we end all medias that are playing
-      results.forEach(function (media) {
-        media.ended = Date.now()
-        media.save()
-      })
-    })
-    .catch(function(error) {
-      logger.error(error)
-    })
-
-  this.ended = null
-
-  return time_value // hmm, we can also return Date.now() instead ?
-}
-
 /**
  * @swagger
  * definitions:
@@ -62,12 +38,14 @@ let mediaSchema = new mongoose.Schema({
   mimeType: { type: String, required: true},
   path: { type: String }, // in the case of a local file
   position: { type: Number },
-  started: { type: Date, set: stopPlayingMedias },
+  started: { type: Date },
   ended: { type: Date },
   created: { type: Date, required: true },
   modified: { type: Date, required: true },
   topic: { type: mongoose.Schema.Types.ObjectId, ref:'Topic', required: true },
 })
+
+let mediaModel = mongoose.model('Media', mediaSchema)
 
 mediaSchema.methods.toJSON = function() {
  var obj = this.toObject()
@@ -87,7 +65,26 @@ mediaSchema.post('remove', function(media) {
 
 mediaSchema.pre('save', function(next) {
   this.wasNew = this.isNew
-  next()
+
+  // stop all others medias if this one starts playing
+  if (this.isModified('started') && this.started && !this.ended) {
+    mediaModel
+      .find({ ended : null })
+      .where('_id').ne(this._id)
+      .where('started').ne(null)
+      .then(function(results) {
+        results.forEach(function (media) {
+          media.ended = Date.now()
+          media.save()
+        })
+        next()
+      })
+      .catch(function(error) {
+        logger.error(error)
+      })
+  } else {
+    next()
+  }
 })
 
 mediaSchema.post('save', function(media) {
@@ -97,4 +94,4 @@ mediaSchema.post('save', function(media) {
   websockets.sockets.emit('medias.' + media._id, media)
 })
 
-module.exports = mongoose.model('Media', mediaSchema)
+module.exports = mediaModel

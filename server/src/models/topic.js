@@ -6,35 +6,6 @@ const websockets = require('../websockets')()
 const cache = require('memory-cache')
 const Scene = require('./scene')
 
-/*
- * The purpose of this setter is to end all playing topics
- * because there can be only one to rule them all
- */
-function stopPlayingTopics (time_value) {
-  this.constructor // get the Model to execute queries
-    .find({ ended : null })
-    .where('_id').ne(this._id)
-    .where('started').ne(null)
-    .populate('medias')
-    .then(function(results) { // we end all topics that are playing
-      results.forEach(function (topic) {
-        topic.ended = Date.now()
-        topic.medias.forEach(function (media) {
-          media.ended = Date.now()
-          media.save()
-        })
-        topic.save()
-      })
-    })
-    .catch(function(error) {
-      logger.error(error)
-    })
-
-  this.ended = null
-
-  return time_value // hmm, we can also return Date.now() instead ?
-}
-
 /**
  * Change the Scene title accordingly if the Topic is currently playing
  */
@@ -78,13 +49,15 @@ let topicSchema = new mongoose.Schema({
     title: { type: String, set: setTitle, required: true },
     description: String,
     position: { type: Number },
-    started: { type: Date, set: stopPlayingTopics },
+    started: { type: Date },
     ended: { type: Date },
     created: { type: Date, required: true },
     modified: { type: Date, required: true },
     episode: { type: mongoose.Schema.Types.ObjectId, ref:'Episode' },
     medias: [{ type: mongoose.Schema.Types.ObjectId, ref:'Media' }]
 })
+
+let topicModel = mongoose.model('Topic', topicSchema)
 
 // when a Topic is removed, delete all its Medias
 topicSchema.post('remove', function(topic) {
@@ -105,7 +78,31 @@ topicSchema.post('remove', function(topic) {
 
 topicSchema.pre('save', function(next) {
   this.wasNew = this.isNew
-  next()
+
+  // stop all others topics if this one starts playing
+  if (this.isModified('started') && this.started && !this.ended) {
+    topicModel
+      .find({ ended : null })
+      .where('_id').ne(this._id)
+      .where('started').ne(null)
+      .populate('medias')
+      .then(function(results) {
+        results.forEach(function (topic) {
+          topic.ended = Date.now()
+          topic.medias.forEach(function (media) { // stop all topic's medias also
+            media.ended = Date.now()
+            media.save()
+          })
+          topic.save()
+        })
+        next()
+      })
+      .catch(function(error) {
+        logger.error(error)
+      })
+  } else {
+    next()
+  }
 })
 
 topicSchema.post('save', function(topic) {
@@ -115,4 +112,4 @@ topicSchema.post('save', function(topic) {
   websockets.sockets.emit('topics.' + topic._id, topic)
 })
 
-module.exports = mongoose.model('Topic', topicSchema)
+module.exports = topicModel
