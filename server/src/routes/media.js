@@ -377,6 +377,7 @@ router.route('/:mediaId')
  */
 router.get('/:mediaId/start', function (req, res, next) {
   req.media.started = Date.now()
+  req.media.ended = null
   req.media
       .save()
       .then(function(media) {

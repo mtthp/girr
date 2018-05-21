@@ -62,12 +62,14 @@ let mediaSchema = new mongoose.Schema({
   mimeType: { type: String, required: true},
   path: { type: String }, // in the case of a local file
   position: { type: Number },
-  started: { type: Date, set: stopPlayingMedias },
+  started: { type: Date },
   ended: { type: Date },
   created: { type: Date, required: true },
   modified: { type: Date, required: true },
   topic: { type: mongoose.Schema.Types.ObjectId, ref:'Topic', required: true },
 })
+
+let mediaModel = mongoose.model('Media', mediaSchema)
 
 mediaSchema.methods.toJSON = function() {
  var obj = this.toObject()
@@ -87,7 +89,26 @@ mediaSchema.post('remove', function(media) {
 
 mediaSchema.pre('save', function(next) {
   this.wasNew = this.isNew
-  next()
+
+  // stop all others medias if this one starts playing
+  if (this.isModified('started') && this.started && !this.ended) {
+    mediaModel
+      .find({ ended : null })
+      .where('_id').ne(this._id)
+      .where('started').ne(null)
+      .then(function(results) {
+        results.forEach(function (media) {
+          media.ended = Date.now()
+          media.save()
+        })
+        next()
+      })
+      .catch(function(error) {
+        logger.error(error)
+      })
+  } else {
+    next()
+  }
 })
 
 mediaSchema.post('save', function(media) {
@@ -97,4 +118,4 @@ mediaSchema.post('save', function(media) {
   websockets.sockets.emit('medias.' + media._id, media)
 })
 
-module.exports = mongoose.model('Media', mediaSchema)
+module.exports = mediaModel
