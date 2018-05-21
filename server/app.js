@@ -60,7 +60,7 @@ Object.keys(config).forEach(function (index) {
 })
 
 mongoose.Promise = Promise;
-mongoose.connect(process.env.MONGO_ENDPOINT, { useMongoClient: true })
+mongoose.connect(process.env.MONGO_ENDPOINT)
   .then(() => {
     io.listen(
       app.listen(process.env.PORT, () => {
