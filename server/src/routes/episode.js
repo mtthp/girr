@@ -292,6 +292,7 @@ router.route('/:episodeId')
  */
 router.get('/:episodeId/start', function (req, res, next) {
   req.episode.started = Date.now()
+  req.episode.ended = null
   req.episode
       .save()
       .then(function(episode) {
