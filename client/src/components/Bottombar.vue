@@ -1,5 +1,5 @@
 <template>
-    <footer v-on:click="goToEpisode($event)">
+    <footer v-on:click="goToEpisode($event)" v-on:keyup.right="nextTopic">
       <img v-if="thumbnail" class="thumbnail" :src="thumbnail">
       <div class="metadata">
         <div class="mdc-typography--subheading2">{{ scene.title }}</div>
