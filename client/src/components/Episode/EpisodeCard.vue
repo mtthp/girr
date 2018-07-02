@@ -7,6 +7,7 @@
       <div class="mdc-simple-menu mdc-simple-menu--open-from-bottom-right" tabindex="-1">
         <ul class="mdc-simple-menu__items mdc-list" role="menu" aria-hidden="true">
           <li class="mdc-list-item" role="menuitem" tabindex="0" v-on:click="editEpisode($event)">Edit</li>
+          <li class="mdc-list-item" role="menuitem" tabindex="0" v-on:click="cloneEpisode(episode)">Clone</li>
         </ul>
       </div>
     </section>
@@ -40,6 +41,20 @@ export default {
       event.preventDefault()
       event.stopPropagation()
       Event.$emit('episodeDialog.show', this.episode)
+    },
+    cloneEpisode: function (episode) {
+      event.preventDefault()
+      Event.$emit('progressbar.toggle', true)
+      this.$http.get(`/api/programs/${this.$route.params.programId}/episodes/${episode._id}/clone`).then(
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          window.location = this.$router.resolve({ name: 'Episode', params: { programId: response.body.program, episodeId: response.body._id } }).href
+        },
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          Event.$emit('http.error', response)
+        }
+      )
     }
   }
 }

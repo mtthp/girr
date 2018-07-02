@@ -10,6 +10,7 @@
             <li class="mdc-list-item" role="menuitem" tabindex="0" v-on:click="editEpisode">Edit</li>
             <li class="mdc-list-item" role="menuitem" tabindex="0" v-on:click="stopEpisode(episode)" v-if="episode.started && !episode.ended">Stop</li>
             <li class="mdc-list-item" role="menuitem" tabindex="0" v-on:click="startEpisode(episode)" v-else>Start</li>
+            <li class="mdc-list-item" role="menuitem" tabindex="0" v-on:click="cloneEpisode(episode)">Clone</li>
           </ul>
         </div>
       </section>
@@ -196,6 +197,19 @@ export default {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('episode.updated', response.body)
           Event.$emit('snackbar.message', `Episode ${response.body.name} stopped`)
+        },
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          Event.$emit('http.error', response)
+        }
+      )
+    },
+    cloneEpisode: function (episode) {
+      Event.$emit('progressbar.toggle', true)
+      this.$http.get(`/api/programs/${this.$route.params.programId}/episodes/${this.$route.params.episodeId}/clone`).then(
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          window.location = this.$router.resolve({ name: 'Episode', params: { programId: response.body.program, episodeId: response.body._id } }).href
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
