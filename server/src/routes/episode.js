@@ -5,6 +5,8 @@ const Episode = require('../models/episode')
 const Topic = require('../models/topic')
 const Media = require('../models/media')
 const Scene = require('../models/scene')
+const fs = require('fs')
+const path = require('path')
 
 router.route('/')
   /**
@@ -464,6 +466,133 @@ router.get('/:episodeId/next', function (req, res, next) {
   } else {
     next({message:"Episode " + req.params.episodeId + " isn't playing", status: 417})
   }
+})
+
+/**
+ * @swagger
+ * /programs/{programId}/episodes/{episodeId}/clone:
+ *   get:
+ *     tags:
+ *       - Episodes
+ *     description: >
+ *       Clone the Episode into a new one.
+ *       All objects inside the new document have their time reset and aren't playing.
+ *     summary: Clone the Episode
+ *     produces: application/json
+ *     parameters:
+ *       - name: programId
+ *         description: Program's id
+ *         in: path
+ *         required: true
+ *         type: uuid
+ *       - name: episodeId
+ *         description: Episode's id
+ *         in: path
+ *         required: true
+ *         type: uuid
+ *     responses:
+ *       200:
+ *         description: Episode newly created
+ *         schema:
+ *           $ref: '#/definitions/Episode'
+ */
+router.get('/:episodeId/clone', async function (req, res, next) {
+  // get a new Episode number inside the Program
+  const programEpisodes = await Episode.find({ program: req.program._id }).exec()
+  const maxEpisodeNumber = programEpisodes.length > 0 ? Math.max.apply(
+      Math,
+      programEpisodes.map(function(e){
+          return e.number
+      })
+  ) : 0
+
+  let newEpisode = new Episode(Object.assign({}, req.episode.toObject(), {
+    _id: undefined,
+    __v: undefined,
+    name: "Copy of " + req.episode.name,
+    started: null,
+    ended: null,
+    number: 1 + maxEpisodeNumber,
+    topics: [],
+    created: Date.now(),
+    modified: Date.now()
+  }))
+  newEpisode.program = req.program._id
+
+  newEpisode
+    .save()
+    .then(async (newEpisodeSaved) => {
+      logger.debug("Added a new Episode " + newEpisodeSaved.toString())
+
+      // get all Episode's Topics
+      const topics = await Topic
+        .find({ episode: req.episode._id })
+        .sort({ 'position': 1 })
+
+      topics.forEach((topic) => {
+        let newTopic = new Topic(Object.assign({}, topic.toObject(), {
+          _id: undefined,
+          __v: undefined,
+          started: null,
+          ended: null,
+          medias: [],
+          created: Date.now(),
+          modified: Date.now(),
+          episode: newEpisodeSaved._id
+        }))
+        newTopic
+          .save()
+          .then(async (newTopicSaved) => {
+            logger.debug("Added a new Topic " + newTopicSaved.toString())
+
+            // get all Topic's Medias
+            const medias = await Media
+              .find({ topic: topic._id })
+              .sort({ 'position': 1 })
+
+            medias.forEach((media) => {
+              let newMedia = new Media(Object.assign({}, media.toObject(), {
+                _id: undefined,
+                __v: undefined,
+                started: null,
+                ended: null,
+                created: Date.now(),
+                modified: Date.now(),
+                topic: newTopicSaved._id
+              }))
+
+              if (media.path) {
+                const pathObject = path.parse(media.path)
+                const newFilePath = `${path.join(pathObject.dir, pathObject.name)}-copy${pathObject.ext}` 
+                fs.copyFileSync(media.path, newFilePath)
+                newMedia.path = newFilePath
+                newMedia.uri = newFilePath.replace(process.env.DATA_PATH, '/data').replace(/\\/g, path.posix.sep)
+              }
+
+              newMedia
+                .save()
+                .then((newMediaSaved) => {
+                  logger.debug("Added a new Media " + newMediaSaved.toString())
+                })
+                .catch((error) => {
+                  logger.error(error)
+                })
+            })
+          })
+          .catch((error) => {
+            logger.error(error)
+          })
+      })
+
+      // add newly Episode to Program to retrieve them all by using 'populate'
+      req.program.episodes.push(newEpisodeSaved)
+      req.program.save()
+
+      res.json(newEpisodeSaved)
+    })
+    .catch((error) => {
+      next(error)
+    })
 })
 
 router.use('/:episodeId/topics', require('./topic'));
