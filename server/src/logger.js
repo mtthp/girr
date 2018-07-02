@@ -13,7 +13,7 @@ const logger = new winston.Logger({
             name: 'info-file',
             level: 'info',
             filename: path.resolve(process.env.LOGS_PATH + '/info.log'),
-            handleExceptions: true,
+            handleExceptions: false,
             json: false,
             maxsize: 5242880, //5MB
             maxFiles: 5,
@@ -30,7 +30,7 @@ const logger = new winston.Logger({
             level: 'error',
             filename: path.resolve(process.env.LOGS_PATH + '/error.log'),
             handleExceptions: true,
-            json: false,
+            json: true,
             colorize: false
         }),
     ],

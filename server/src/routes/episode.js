@@ -524,71 +524,85 @@ router.get('/:episodeId/clone', async function (req, res, next) {
     .then(async (newEpisodeSaved) => {
       logger.debug("Added a new Episode " + newEpisodeSaved.toString())
 
+      /*
+       * to make all save synchronous, we chain the 'save' Promises
+       */
+      function cloneMediasSync(mediaCollection, parentTopic) {
+        return mediaCollection.reduce((promise, media) => {
+          let newMedia = new Media(Object.assign({}, media.toObject(), {
+            _id: undefined,
+            __v: undefined,
+            started: null,
+            ended: null,
+            created: Date.now(),
+            modified: Date.now(),
+            topic: parentTopic._id
+          }))
+
+          if (media.path) {
+            const pathObject = path.parse(media.path)
+            const newFilePath = `${path.join(pathObject.dir, pathObject.name)}-copy${pathObject.ext}` 
+            fs.copyFileSync(media.path, newFilePath)
+            newMedia.path = newFilePath
+            newMedia.uri = newFilePath.replace(process.env.DATA_PATH, '/data').replace(/\\/g, path.posix.sep)
+          }
+
+          return promise
+            .then((result) => {
+              return newMedia.save().then((newMediaSaved) => {
+                logger.debug("Added a new Media " + newMediaSaved.toString())
+              });
+            })
+            .catch((error) => {
+              logger.error(error)
+            });
+        }, Promise.resolve());
+      }
+
+      function cloneTopicsSync(topicCollection, parentEpisode) {
+        return topicCollection.reduce(async (promise, topic) => {
+          let newTopic = new Topic(Object.assign({}, topic.toObject(), {
+            _id: undefined,
+            __v: undefined,
+            started: null,
+            ended: null,
+            medias: [],
+            created: Date.now(),
+            modified: Date.now(),
+            episode: parentEpisode._id
+          }))
+
+          // get all Topic's Medias
+          const medias = await Media
+            .find({ topic: topic._id })
+            .sort({ 'position': 1 })
+
+          return promise
+            .then((result) => {
+              return newTopic.save().then((savedTopic) => {
+                logger.debug("Added a new Topic " + savedTopic.toString())
+                return cloneMediasSync(medias, savedTopic.toObject())
+              });
+            })
+            .catch((error) => {
+              logger.error(error)
+            });
+        }, Promise.resolve());
+      }
+
       // get all Episode's Topics
       const topics = await Topic
         .find({ episode: req.episode._id })
         .sort({ 'position': 1 })
+        .exec()
 
-      topics.forEach((topic) => {
-        let newTopic = new Topic(Object.assign({}, topic.toObject(), {
-          _id: undefined,
-          __v: undefined,
-          started: null,
-          ended: null,
-          medias: [],
-          created: Date.now(),
-          modified: Date.now(),
-          episode: newEpisodeSaved._id
-        }))
-        newTopic
-          .save()
-          .then(async (newTopicSaved) => {
-            logger.debug("Added a new Topic " + newTopicSaved.toString())
+      cloneTopicsSync(topics, newEpisodeSaved.toObject()).then(() => {
+        // add newly Episode to Program to retrieve them all by using 'populate'
+        req.program.episodes.push(newEpisodeSaved)
+        req.program.save()
 
-            // get all Topic's Medias
-            const medias = await Media
-              .find({ topic: topic._id })
-              .sort({ 'position': 1 })
-
-            medias.forEach((media) => {
-              let newMedia = new Media(Object.assign({}, media.toObject(), {
-                _id: undefined,
-                __v: undefined,
-                started: null,
-                ended: null,
-                created: Date.now(),
-                modified: Date.now(),
-                topic: newTopicSaved._id
-              }))
-
-              if (media.path) {
-                const pathObject = path.parse(media.path)
-                const newFilePath = `${path.join(pathObject.dir, pathObject.name)}-copy${pathObject.ext}` 
-                fs.copyFileSync(media.path, newFilePath)
-                newMedia.path = newFilePath
-                newMedia.uri = newFilePath.replace(process.env.DATA_PATH, '/data').replace(/\\/g, path.posix.sep)
-              }
-
-              newMedia
-                .save()
-                .then((newMediaSaved) => {
-                  logger.debug("Added a new Media " + newMediaSaved.toString())
-                })
-                .catch((error) => {
-                  logger.error(error)
-                })
-            })
-          })
-          .catch((error) => {
-            logger.error(error)
-          })
+        res.json(newEpisodeSaved)
       })
-
-      // add newly Episode to Program to retrieve them all by using 'populate'
-      req.program.episodes.push(newEpisodeSaved)
-      req.program.save()
-
-      res.json(newEpisodeSaved)
     })
     .catch((error) => {
       next(error)
