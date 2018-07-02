@@ -34,15 +34,14 @@ router.route('/')
    */
   .get(function(req, res, next) {
     Episode
-        .find({ program: req.program._id })
-        // .populate({ path: 'program', select: 'name' })
-        .sort({ 'number': -1 })
-        .then(function(episodes) {
-            res.json(episodes)
-        })
-        .catch(function(error) {
-            next(error)
-        });
+      .find({ program: req.program._id })
+      .sort({ 'number': -1 })
+      .then(function(episodes) {
+          res.json(episodes)
+      })
+      .catch(function(error) {
+          next(error)
+      });
   })
   /**
    * @swagger
@@ -85,48 +84,35 @@ router.route('/')
 
       // Max episode number + 1 - inspired by https://stackoverflow.com/a/4020842
       var maxEpisodeNumber = programEpisodes.length > 0 ? Math.max.apply(
-          Math,
-          programEpisodes.map(function(e){
-              return e.number
-          })
+        Math,
+        programEpisodes.map(function(e){
+            return e.number
+        })
       ) : 0
       episode.number = 1 + maxEpisodeNumber
     }
 
     // provide a name if the user didn't specified one
     if (typeof episode.name === "undefined") {
-        episode.name = "Episode #" + episode.number;
+      episode.name = "Episode #" + episode.number;
     }
 
     episode
-        .save()
-        .then(function(episode) {
-            logger.debug("Added a new Episode " + episode.toString())
-            // add episode to program to retrieve them all by using 'populate'
-            req.program.episodes.push(episode)
-            req.program.save()
+      .save()
+      .then(function(episode) {
+          logger.debug("Added a new Episode " + episode.toString())
 
-            res.json(episode)
-        })
-        .catch(function(error) {
-            next(error)
-        })
+          res.json(episode)
+      })
+      .catch(function(error) {
+          next(error)
+      })
   })
 
 // Middleware : we check if the episode exists in the specified program before going further
 router.param('episodeId', function (req, res, next, value, name) {
   Episode
     .findOne({_id: value, program: req.program._id})
-    // .populate({ 
-    //   path: 'topics',
-    //   // options: {
-    //   //   sort: { position: 1 }
-    //   // },
-    //   populate: {
-    //     path: 'medias',
-    //     model: 'Media'
-    //   } 
-    // })
     .then(function(episode) {
       if (episode !== null) {
         req.episode = episode
@@ -205,7 +191,7 @@ router.route('/:episodeId')
   .put(function (req, res, next) {
     delete req.body.started
     delete req.body.ended
-    
+
     req.episode = Object.assign(req.episode, req.body, {modified: Date.now()})
     req.episode
       .save()
@@ -298,7 +284,7 @@ router.get('/:episodeId/start', function (req, res, next) {
   req.episode
       .save()
       .then(function(episode) {
-        logger.debug("Started " + episode.toString())
+        logger.debug("Started Episode " + episode.toString())
         res.json(episode)
 
         let scene = new Scene()
@@ -374,7 +360,7 @@ router.get('/:episodeId/stop', function (req, res, next) {
             .catch(function(error) {
               logger.error(error)
             })
-          logger.debug("Stopped " + episode.toString())
+          logger.debug("Stopped Episode " + episode.toString())
           res.json(episode)
 
           let scene = new Scene()
@@ -446,7 +432,7 @@ router.get('/:episodeId/next', function (req, res, next) {
           nextTopic
             .save()
             .then(function(topicStarted) {
-              logger.debug("Started " + topicStarted.toString())
+              logger.debug("Started Topic " + topicStarted.toString())
               res.json(topicStarted)
 
               let scene = new Scene()
@@ -597,10 +583,6 @@ router.get('/:episodeId/clone', async function (req, res, next) {
         .exec()
 
       cloneTopicsSync(topics, newEpisodeSaved.toObject()).then(() => {
-        // add newly Episode to Program to retrieve them all by using 'populate'
-        req.program.episodes.push(newEpisodeSaved)
-        req.program.save()
-
         res.json(newEpisodeSaved)
       })
     })

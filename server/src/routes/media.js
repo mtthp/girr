@@ -165,10 +165,6 @@ router.route('/')
       .save()
       .then(function(media) {
         logger.debug("Added a new Media " + media.toString())
-        // add media to topic to retrieve them all by using 'populate'
-        req.topic.medias.push(media)
-        req.topic.save()
-
         res.json(media)
       })
       .catch(function(error) {
@@ -382,7 +378,7 @@ router.get('/:mediaId/start', function (req, res, next) {
   req.media
       .save()
       .then(function(media) {
-        logger.debug("Started " + media.toString())
+        logger.debug("Started Media " + media.toString())
         res.json(media)
 
         let scene = new Scene()
@@ -457,7 +453,7 @@ router.get('/:mediaId/stop', function (req, res, next) {
   req.media
       .save()
       .then(function(media) {
-        logger.debug("Stopped " + media.toString())
+        logger.debug("Stopped Media " + media.toString())
         var scene = new Scene()
         scene.media = null
         scene.picture = null

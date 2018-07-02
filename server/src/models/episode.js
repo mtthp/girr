@@ -1,6 +1,7 @@
 "use strict";
 const mongoose = require('mongoose')
 const Topic = require('./topic')
+const Media = require('./media')
 const logger = require('../logger')
 const websockets = require('../websockets')()
 const Scene = require('./scene')
@@ -82,25 +83,28 @@ episodeSchema.pre('save', function(next) {
       .find({ ended : null })
       .where('_id').ne(this._id)
       .where('started').ne(null)
-      .populate({ 
-        path: 'topics',
-        populate: {
-          path: 'medias',
-          model: 'Media'
-        } 
-      })
-      .then(function(results) { // we end all other episodes that are playing
-        results.forEach(function (episode) {
+      .then((results) => {
+        results.forEach((episode) => {
           episode.ended = Date.now()
-          episode.topics.forEach(function (topic) {
-            topic.ended = Date.now()
-            topic.medias.forEach(function (media) {
-              media.ended = Date.now()
-              media.save()
-            })
-            topic.save()
-          })
           episode.save()
+          Topic
+            .find({ episode: episode._id })
+            .where('started').ne(null)
+            .then((topics) => {
+              topics.forEach((topic) => {
+                topic.ended = Date.now()
+                topic.save()
+                Media
+                  .find({ topic: topic._id })
+                  .where('started').ne(null)
+                  .then((medias) => {
+                    medias.forEach((media) => {
+                      media.ended = Date.now()
+                      media.save()
+                    })
+                  })
+              })
+            })
         })
         next()
       })

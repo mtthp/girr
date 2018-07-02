@@ -78,22 +78,26 @@ topicSchema.post('remove', function(topic) {
 
 topicSchema.pre('save', function(next) {
   this.wasNew = this.isNew
-
+  
   // stop all others topics if this one starts playing
   if (this.isModified('started') && this.started && !this.ended) {
     topicModel
       .find({ ended : null })
       .where('_id').ne(this._id)
       .where('started').ne(null)
-      .populate('medias')
-      .then(function(results) {
-        results.forEach(function (topic) {
+      .then(function(topics) {
+        topics.forEach(function (topic) {
           topic.ended = Date.now()
-          topic.medias.forEach(function (media) { // stop all topic's medias also
-            media.ended = Date.now()
-            media.save()
-          })
           topic.save()
+          Media
+            .find({ topic: topic._id })
+            .where('started').ne(null)
+            .then((medias) => {
+              medias.forEach((media) => {
+                media.ended = Date.now()
+                media.save()
+              })
+            })
         })
         next()
       })

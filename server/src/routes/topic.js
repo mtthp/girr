@@ -38,14 +38,14 @@ router.route('/')
    */
   .get(function(req, res, next) {
     Topic
-        .find({ episode: req.episode._id })
-        .sort({ 'position': 1 })
-        .then(function(topics) {
-            res.json(topics)
-        })
-        .catch(function(error) {
-            next(error)
-        });
+      .find({ episode: req.episode._id })
+      .sort({ 'position': 1 })
+      .then(function(topics) {
+        res.json(topics)
+      })
+      .catch(function(error) {
+        next(error)
+      });
   })
   /**
    * @swagger
@@ -88,36 +88,32 @@ router.route('/')
 
     // provide a title if the user didn't specified one
     if (typeof topic.title === "undefined") {
-        topic.title = "Untitled topic"
+      topic.title = "Untitled topic"
     }
 
     // provide a position if the user didn't specified one
     if (typeof topic.position === "undefined") {
-        var episodeTopics = await Topic.find({ episode: req.episode._id }).exec()
+      var episodeTopics = await Topic.find({ episode: req.episode._id }).exec()
 
-        // Max topic position + 1 - inspired by https://stackoverflow.com/a/4020842
-        var maxTopicNumber = episodeTopics.length > 0 ? Math.max.apply(
-            Math,
-            episodeTopics.map(function(t){
-                return t.position;
-            })
-        ) : 0;
-        topic.position = 1 + maxTopicNumber;
+      // Max topic position + 1 - inspired by https://stackoverflow.com/a/4020842
+      var maxTopicNumber = episodeTopics.length > 0 ? Math.max.apply(
+        Math,
+        episodeTopics.map(function(t){
+            return t.position;
+        })
+      ) : 0;
+      topic.position = 1 + maxTopicNumber;
     }
 
     topic
-        .save()
-        .then(function(topic) {
-            logger.debug("Added a new Episode " + topic.toString())
-            // add topic to episode to retrieve them all by using 'populate'
-            req.episode.topics.push(topic)
-            req.episode.save()
-
-            res.json(topic)
-        })
-        .catch(function(error) {
-            next(error)
-        })
+      .save()
+      .then(function(topic) {
+        logger.debug("Added a new Episode " + topic.toString())
+        res.json(topic)
+      })
+      .catch(function(error) {
+        next(error)
+      })
   })
 
 // Middleware : we check if the topic exists in the specified episode before going further
@@ -127,7 +123,6 @@ router.param('topicId', function (req, res, next, value, name) {
 
   Topic
     .findOne({_id: value, episode: req.episode._id})
-    // .populate('medias')
     .then(function(topic) {
       if (topic !== null) {
         req.topic = topic
@@ -310,7 +305,7 @@ router.get('/:topicId/start', function (req, res, next) {
   req.topic
     .save()
     .then(function(topicStarted) {
-      logger.debug("Started " + topicStarted.toString())
+      logger.debug("Started Topic " + topicStarted.toString())
 
       res.json(topicStarted)
 
@@ -393,7 +388,7 @@ router.get('/:topicId/stop', function (req, res, next) {
         scene.picture = null
         scene.save()
 
-        logger.debug("Started " + topic.toString())
+        logger.debug("Stopped Topic " + topic.toString())
         res.json(topic)
       })
       .catch(function(error) {
