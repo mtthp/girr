@@ -36,8 +36,7 @@ let mediaSchema = new mongoose.Schema({
   label: { type: String },
   uri: { type: String, required: true},
   mimeType: { type: String, required: true},
-  path: { type: String }, // in the case of a local file
-  // thumbnail: { type: String },
+  path: { type: String }, // this should always be the absolute path to the file
   position: { type: Number },
   started: { type: Date },
   ended: { type: Date },
@@ -54,14 +53,22 @@ mediaSchema.methods.toJSON = function() {
  return obj
 }
 
+// when a Media should be removed, delete its local file
+mediaSchema.pre('remove', function(next) {
+  if (this.path) {
+    const filepath = path.isAbsolute(this.path) ? this.path : path.join(__base, this.path)
+    if (fs.existsSync(filepath)) {
+      logger.debug(`Removing file at ${filepath}`)
+      fs.unlinkSync(filepath)
+    }
+  }
+  next()
+})
+
 // when a Media is removed, delete its file
 mediaSchema.post('remove', function(media) {
   logger.debug("Removed Media " + media._id)
   websockets.sockets.emit('medias.' + media._id + '.delete', media)
-
-  if (media.path && fs.existsSync(path.join(__base, media.path))) {
-    fs.unlinkSync(path.join(__base, media.path))
-  }
 })
 
 mediaSchema.pre('save', function(next) {
