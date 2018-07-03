@@ -25,7 +25,7 @@
         @change="itemMoved"
         class="topics mdc-list mdc-list--avatar-list mdc-list--two-line">
         <transition-group name="fade">
-          <TopicCard v-for="topic in topics" :key="topic._id" :topic="topic" v-bind:class="{ expanded : topic.expanded }"></TopicCard>
+          <TopicCard v-for="topic in topics" :key="topic._id" :topic="topic" v-bind:class="{ expanded : topic.expanded,  'mdc-elevation--z8' : topic.expanded }"></TopicCard>
         </transition-group>
       </draggable>
       <EmptyState v-else></EmptyState>
@@ -273,10 +273,12 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+
 .topics {
   max-width: 1024px;
   margin: 0 auto;
   border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 0;
 }
 
 @media (max-width: 1280px) {
@@ -292,7 +294,11 @@ export default {
 }
 
 @media(min-width: 1024px) {
-   .fab {
+  main {
+    padding-top: 8px;
+  }
+
+  .fab {
     bottom: 1.5rem;
     right: 1.5rem;
   }
