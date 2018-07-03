@@ -91,7 +91,7 @@ export default {
 <style scoped>
 .mdc-grid-tile {
   --mdc-grid-list-tile-width: 256px;
-  margin: 2px auto;
+  margin: 8px auto;
 }
 
 @media screen and (max-width: 991px) {

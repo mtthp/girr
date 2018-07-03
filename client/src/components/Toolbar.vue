@@ -100,4 +100,13 @@ export default {
 .mdc-toolbar--flexible .mdc-toolbar__row:first-child.flex .material-icons {
   color: var(--mdc-theme-text-secondary-on-light,rgba(0,0,0,.54));
 }
+
+.mdc-linear-progress {
+  max-height: 4px;
+  transition: max-height 300ms;
+}
+
+.mdc-linear-progress:not(.mdc-linear-progress--indeterminate){
+  max-height: 0;
+}
 </style>

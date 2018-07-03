@@ -18,7 +18,7 @@
       </span>
     </li>
     <div class="content">
-      <pre>{{ topic.description ? topic.description : 'Empty in here' }}</pre>
+      <pre v-if="topic.description">{{ topic.description }}</pre>
       <div class="mdc-grid-list">
         <draggable
           v-if="medias.length > 0"
