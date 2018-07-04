@@ -14,23 +14,23 @@
         <div class="mdc-text-field mdc-text-field--fullwidth mdc-text-field--with-trailing-icon" v-bind:class="{ 'mdc-text-field--upgraded' : episode.name }">
           <i class="material-icons mdc-text-field__icon" tabindex="0">label</i>
           <input type="text" id="name" class="mdc-text-field__input" v-model.lazy="episode.name">
-          <label for="name" class="mdc-text-field__label" v-bind:class="{ 'mdc-text-field__label--float-above' : episode.name }">Name</label>
+          <label for="name" class="mdc-text-field__label" v-bind:class="{ 'mdc-text-field__label--float-above' : episode.name }">{{ $t('episode.name_label') }}</label>
         </div>
         <div class="mdc-text-field mdc-text-field--fullwidth mdc-text-field--with-trailing-icon" v-bind:class="{ 'mdc-text-field--upgraded' : episode.number }">
           <i class="material-icons mdc-text-field__icon" tabindex="0">format_list_numbered</i>
           <input type="text" id="number" class="mdc-text-field__input" v-model.lazy="episode.number" pattern="[0-9]+">
-          <label for="number" class="mdc-text-field__label" v-bind:class="{ 'mdc-text-field__label--float-above' : episode.number }">Number</label>
+          <label for="number" class="mdc-text-field__label" v-bind:class="{ 'mdc-text-field__label--float-above' : episode.number }">{{ $t('episode.number_label') }}</label>
         </div>
       </section>
       <footer class="mdc-dialog__footer">
         <div style="margin-right: auto;">
           <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--delete" v-on:click="deleteEpisode(episode)">
             <i class="material-icons mdc-button__icon">delete</i>
-            <span>Delete</span>
+            <span>{{ $t('actions.delete') }}</span>
           </button>
         </div>
-        <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--cancel" v-on:click="close"><i class="material-icons mdc-button__icon">clear</i><span>Cancel</span></button>
-        <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--accept mdc-button--raised" v-on:click="updateEpisode(episode)"><i class="material-icons mdc-button__icon">check</i><span>Update</span></button>
+        <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--cancel" v-on:click="close"><i class="material-icons mdc-button__icon">clear</i><span>{{ $t('actions.cancel') }}</span></button>
+        <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--accept mdc-button--raised" v-on:click="updateEpisode(episode)"><i class="material-icons mdc-button__icon">check</i><span>{{ $t('actions.update') }}</span></button>
       </footer>
     </div>
     <div class="mdc-dialog__backdrop"></div>

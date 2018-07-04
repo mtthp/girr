@@ -1,0 +1,49 @@
+{
+	"actions": {
+		"add": "Add",
+		"delete": "Delete",
+		"update": "Update",
+		"edit": "Edit",
+		"cancel": "Cancel",
+		"play": "Play",
+		"stop": "Stop",
+		"pause": "Pause",
+		"expand": "Expand",
+		"clone": "Clone"
+	},
+	"program": {
+		"title": "{0} Programs",
+		"name_label": "Name",
+		"episodes_count": "{0} Episode{1}"
+	},
+	"episode": {
+		"name_label": "Name",
+		"number_label": "Position",
+		"subtitle": "Episode #{0} - {1}",
+		"not_yet_started": "Not yet started"
+	},
+	"topic": {
+		"title_label": "Title",
+		"description_label": "Description"
+	},
+	"drawer": {
+		"title": "Studio Renegade Remote Regie",
+	  "programs_label": "Programs",
+	  "scene_label": "Scene",
+	  "settings_label": "Settings",
+	  "api_label": "API"
+	},
+	"settings": {
+		"title_input_label": "Title",
+		"picture_input_label": "Picture",
+		"logo_input_label": "Logo",
+		"background_input_label": "Background"
+	},
+	"empty_state": {
+		"title": "Oops ! It looks like empty in here",
+		"message": "You can add something by clicking on the Add (+) button"
+	},
+	"bottom_bar": {
+		"go_to_episode": "Go to {0}"
+	}
+}

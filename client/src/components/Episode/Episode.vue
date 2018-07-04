@@ -7,10 +7,10 @@
         <button class="material-icons mdc-toolbar__icon mdc-ripple-surface toggle-menu" arial-label="Menu" data-mdc-auto-init="MDCRipple">more_vert</button>
         <div class="mdc-simple-menu mdc-simple-menu--open-from-top-right" tabindex="-1">
           <ul class="mdc-simple-menu__items mdc-list" role="menu" aria-hidden="true">
-            <li class="mdc-list-item" role="menuitem" tabindex="0" v-on:click="editEpisode">Edit</li>
-            <li class="mdc-list-item" role="menuitem" tabindex="0" v-on:click="stopEpisode(episode)" v-if="episode.started && !episode.ended">Stop</li>
-            <li class="mdc-list-item" role="menuitem" tabindex="0" v-on:click="startEpisode(episode)" v-else>Start</li>
-            <li class="mdc-list-item" role="menuitem" tabindex="0" v-on:click="cloneEpisode(episode)">Clone</li>
+            <li class="mdc-list-item" role="menuitem" tabindex="0" v-on:click="editEpisode">{{ $t('actions.edit') }}</li>
+            <li class="mdc-list-item" role="menuitem" tabindex="0" v-on:click="stopEpisode(episode)" v-if="episode.started && !episode.ended">{{ $t('actions.stop') }}</li>
+            <li class="mdc-list-item" role="menuitem" tabindex="0" v-on:click="startEpisode(episode)" v-else>{{ $t('actions.start') }}</li>
+            <li class="mdc-list-item" role="menuitem" tabindex="0" v-on:click="cloneEpisode(episode)">{{ $t('actions.clone') }}</li>
           </ul>
         </div>
       </section>

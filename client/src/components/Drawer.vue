@@ -4,23 +4,23 @@
       <header class="mdc-drawer__header">
         <div class="mdc-drawer__header-content">
           <div class="title">
-            Studio Renegade Remote Regie
+            {{ $t('drawer.title') }}
             <i class="material-icons mdc-badge mdc-badge--overlap" :data-badge="usersCount" v-if="usersCount > 1">people</i>
           </div>
         </div>
       </header>
       <nav id="icon-with-text-demo" class="mdc-drawer__content mdc-list">
         <router-link :to="{ name: 'Programs' }" @click.native="toggleDrawer(false)" class="mdc-list-item" active-class="mdc-list-item--activated" data-mdc-auto-init="MDCRipple">
-          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">event</i>Programs
+          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">event</i>{{ $t('drawer.programs_label') }}
         </router-link>
         <router-link :to="{ name: 'Scene' }" @click.native="toggleDrawer(false)" class="mdc-list-item" active-class="mdc-list-item--activated" data-mdc-auto-init="MDCRipple">
-          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">tv</i>Scene
+          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">tv</i>{{ $t('drawer.scene_label') }}
         </router-link>
         <router-link :to="{ name: 'Settings' }" @click.native="toggleDrawer(false)" class="mdc-list-item" active-class="mdc-list-item--activated" data-mdc-auto-init="MDCRipple">
-          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">settings</i>Settings
+          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">settings</i>{{ $t('drawer.settings_label') }}
         </router-link>
         <a class="mdc-list-item" href="/api/" target="_blank" data-mdc-auto-init="MDCRipple">
-          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">code</i>API
+          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">code</i>{{ $t('drawer.api_label') }}
         </a>
       </nav>
     </nav>

@@ -14,7 +14,7 @@
         <div class="mdc-text-field mdc-text-field--fullwidth mdc-text-field--with-trailing-icon" v-bind:class="{ 'mdc-text-field--upgraded' : program.name }">
           <i class="material-icons mdc-text-field__icon" tabindex="0">label</i>
           <input type="text" id="name" class="mdc-text-field__input" v-model.lazy="program.name">
-          <label for="name" class="mdc-text-field__label" v-bind:class="{ 'mdc-text-field__label--float-above' : program.name }">Name</label>
+          <label for="name" class="mdc-text-field__label" v-bind:class="{ 'mdc-text-field__label--float-above' : program.name }">{{ $t('program.name_label') }}</label>
         </div>
         <div class="picture thumbnail" v-on:click="$event.currentTarget.querySelector('input').click()">
           <i class="material-icons">edit</i>
@@ -36,11 +36,11 @@
         <div style="margin-right: auto;">
           <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--delete" v-on:click="deleteProgram(program)">
             <i class="material-icons mdc-button__icon">delete</i>
-            <span>Delete</span>
+            <span>{{ $t('actions.delete') }}</span>
           </button>
         </div>
-        <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--cancel" v-on:click="close"><i class="material-icons mdc-button__icon">clear</i><span>Cancel</span></button>
-        <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--accept mdc-button--raised" v-on:click="confirm"><i class="material-icons mdc-button__icon">check</i><span>Update</span></button>
+        <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--cancel" v-on:click="close"><i class="material-icons mdc-button__icon">clear</i><span>{{ $t('actions.cancel') }}</span></button>
+        <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--accept mdc-button--raised" v-on:click="confirm"><i class="material-icons mdc-button__icon">check</i><span>{{ $t('actions.update') }}</span></button>
       </footer>
     </div>
     <div class="mdc-dialog__backdrop"></div>

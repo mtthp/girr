@@ -1,8 +1,8 @@
 <template>
   <div class="empty-state">
-    <h3>Oops ! It looks like empty in here</h3>
+    <h3>{{ $t('empty_state.title') }}</h3>
     <i class="large material-icons">priority_high</i>
-    <p>You can add something by clicking on the Add (+) button</p>
+    <p>{{ $t('empty_state.message') }}</p>
   </div>
 </template>
 

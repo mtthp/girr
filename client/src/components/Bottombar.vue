@@ -19,10 +19,10 @@
           <button class="material-icons mdc-toolbar__icon mdc-ripple-surface toggle-menu" arial-label="Menu" data-mdc-auto-init="MDCRipple">more_vert</button>
           <div class="mdc-simple-menu mdc-simple-menu--open-from-bottom-right bottombar-menu" tabindex="-1">
             <ul class="mdc-simple-menu__items mdc-list" role="menu" aria-hidden="true">
-              <li class="mdc-list-item" role="menuitem" tabindex="0" :aria-disabled="isAtEpisode" v-if="scene.episode" v-on:click="goToEpisode($event)">Go to {{ scene.episode.name }}</li>
+              <li class="mdc-list-item" role="menuitem" tabindex="0" :aria-disabled="isAtEpisode" v-if="scene.episode" v-on:click="goToEpisode($event)">{{ $t('bottom_bar.go_to_episode', [scene.episode.name]) }}}</li>
               <li class="mdc-list-divider" role="separator"></li>
-              <li class="mdc-list-item" role="menuitem" tabindex="0" v-on:click="stopEpisode($event)">Stop</li>
-              <li class="mdc-list-item" role="menuitem" tabindex="0" :aria-disabled="isTopicPlaying" v-on:click="stopTopic($event)">Pause</li>
+              <li class="mdc-list-item" role="menuitem" tabindex="0" v-on:click="stopEpisode($event)">{{ $t('actions.stop') }}</li>
+              <li class="mdc-list-item" role="menuitem" tabindex="0" :aria-disabled="isTopicPlaying" v-on:click="stopTopic($event)">{{ $t('actions.pause') }}</li>
             </ul>
           </div>
         </div>

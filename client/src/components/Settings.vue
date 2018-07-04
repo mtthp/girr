@@ -5,22 +5,22 @@
       <div class="mdc-text-field mdc-text-field--fullwidth mdc-text-field--with-trailing-icon" v-bind:class="{ 'mdc-text-field--upgraded' : scene.title }">
         <i class="material-icons mdc-text-field__icon" tabindex="0">label</i>
         <input type="text" id="title" class="mdc-text-field__input" v-model.lazy="scene.title" v-on:change="updateScene({title: $event.target.value})">
-        <label for="title" class="mdc-text-field__label" v-bind:class="{ 'mdc-text-field__label--float-above' : scene.title }">Title</label>
+        <label for="title" class="mdc-text-field__label" v-bind:class="{ 'mdc-text-field__label--float-above' : scene.title }">{{ $t('settings.title_input_label') }}</label>
       </div>
       <div class="mdc-text-field mdc-text-field--fullwidth mdc-text-field--with-trailing-icon" v-bind:class="{ 'mdc-text-field--upgraded' : scene.picture }">
         <i class="material-icons mdc-text-field__icon" tabindex="0">photo</i>
         <input type="text" id="picture" class="mdc-text-field__input" v-model.lazy="scene.picture" v-on:change="updateScene({picture: $event.target.value})">
-        <label for="picture" class="mdc-text-field__label" v-bind:class="{ 'mdc-text-field__label--float-above' : scene.picture }">Picture</label>
+        <label for="picture" class="mdc-text-field__label" v-bind:class="{ 'mdc-text-field__label--float-above' : scene.picture }">{{ $t('settings.picture_input_label') }}</label>
       </div>
       <div class="mdc-text-field mdc-text-field--fullwidth mdc-text-field--with-trailing-icon" v-bind:class="{ 'mdc-text-field--upgraded' : scene.logo }">
         <i class="material-icons mdc-text-field__icon flip-vertically" tabindex="0">photo_album</i>
         <input type="text" id="logo" class="mdc-text-field__input" v-model.lazy="scene.logo" v-on:change="updateScene({logo: $event.target.value})">
-        <label for="logo" class="mdc-text-field__label" v-bind:class="{ 'mdc-text-field__label--float-above' : scene.logo }">Logo</label>
+        <label for="logo" class="mdc-text-field__label" v-bind:class="{ 'mdc-text-field__label--float-above' : scene.logo }">{{ $t('settings.logo_input_label') }}</label>
       </div>
       <div class="mdc-text-field mdc-text-field--fullwidth mdc-text-field--with-trailing-icon" v-bind:class="{ 'mdc-text-field--upgraded' : scene.background }">
         <i class="material-icons mdc-text-field__icon" tabindex="0">photo_size_select_large</i>
         <input type="text" id="background" class="mdc-text-field__input" v-model.lazy="scene.background" v-on:change="updateScene({background: $event.target.value})">
-        <label for="background" class="mdc-text-field__label" v-bind:class="{ 'mdc-text-field__label--float-above' : scene.background }">Background</label>
+        <label for="background" class="mdc-text-field__label" v-bind:class="{ 'mdc-text-field__label--float-above' : scene.background }">{{ $t('settings.background_input_label') }}</label>
       </div>
       <scenes :scenes="scene.scenes" v-if="scene.scenes"></scenes>
     </main>

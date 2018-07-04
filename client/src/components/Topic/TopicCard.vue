@@ -11,10 +11,10 @@
         <span class="mdc-list-item__secondary-text" v-if="topic.started">{{ timePlayed | formatTime }}</span>
       </span>
       <span class="mdc-list-item__meta">
-        <i class="mdc-icon-toggle material-icons edit-button" arial-label="Edit" v-on:click="editTopic">edit</i>
-        <i v-if="topic.started !== null && topic.ended === null" class="mdc-icon-toggle material-icons" arial-label="Stop" v-on:click="stopTopic">stop</i>
-        <i v-else class="mdc-icon-toggle material-icons" arial-label="Playing" v-on:click="startTopic">play_arrow</i>
-        <i class="material-icons chevron unselectable" arial-label="Chevron">keyboard_arrow_down</i>
+        <i class="mdc-icon-toggle material-icons edit-button" :arial-label="$t('actions.edit')" v-on:click="editTopic">edit</i>
+        <i v-if="topic.started !== null && topic.ended === null" class="mdc-icon-toggle material-icons" :arial-label="$t('actions.stop')" v-on:click="stopTopic">stop</i>
+        <i v-else class="mdc-icon-toggle material-icons" :arial-label="$t('actions.play')" v-on:click="startTopic">play_arrow</i>
+        <i class="material-icons chevron unselectable" :arial-label="$t('actions.expand')">keyboard_arrow_down</i>
       </span>
     </li>
     <div class="content">
