@@ -5,9 +5,29 @@ import App from './App'
 import router from './router'
 import VueResource from 'vue-resource'
 import VueSocketio from 'vue-socket.io'
+import VueI18n from 'vue-i18n'
 
 Vue.use(VueResource)
 Vue.use(VueSocketio, '/')
+Vue.use(VueI18n)
+
+const locales = {
+  en: require('./assets/locales/en.json'),
+  fr: require('./assets/locales/fr.json')
+}
+
+const messages = {
+  'en': locales.en,
+  'en-US': locales.en,
+  'fr': locales.fr,
+  'fr-FR': locales.fr
+}
+
+// Create VueI18n instance with options
+const i18n = new VueI18n({
+  locale: navigator.language,
+  messages
+})
 
 Vue.config.productionTip = false
 
@@ -37,6 +57,7 @@ Vue.filter('formatTime', function (millisecondsTimestamp) {
 
 /* eslint-disable no-new */
 new Vue({
+  i18n,
   el: '#app',
   router,
   template: '<App/>',
