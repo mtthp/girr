@@ -22,7 +22,7 @@ export default {
   props: ['episode'],
   computed: {
     startedDate () {
-      return !this.episode.started ? this.$t('episode.not_yet_started') : (this.episode.started | this.formatDate)
+      return !this.episode.started ? this.$t('episode.not_yet_started') : this.$options.filters.formatDate(this.episode.started)
     }
   },
   created () {
