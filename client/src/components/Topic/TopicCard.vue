@@ -12,8 +12,8 @@
       </span>
       <span class="mdc-list-item__meta">
         <i class="mdc-icon-toggle material-icons edit-button" :arial-label="$t('actions.edit')" v-on:click="editTopic">edit</i>
-        <i v-if="topic.started !== null && topic.ended === null" class="mdc-icon-toggle material-icons" :arial-label="$t('actions.stop')" v-on:click="stopTopic">stop</i>
-        <i v-else class="mdc-icon-toggle material-icons" :arial-label="$t('actions.play')" v-on:click="startTopic">play_arrow</i>
+        <i v-if="topic.started !== null && topic.ended === null" class="mdc-icon-toggle material-icons stop-button" :arial-label="$t('actions.stop')" v-on:click="stopTopic">stop</i>
+        <i v-else class="mdc-icon-toggle material-icons play-button" :arial-label="$t('actions.play')" v-on:click="startTopic">play_arrow</i>
         <i class="material-icons chevron unselectable" :arial-label="$t('actions.expand')">keyboard_arrow_down</i>
       </span>
     </li>
@@ -331,7 +331,9 @@ export default {
   display: inherit;
 }
 
-.topic:not(.expanded) .edit-button {
+.topic:not(.expanded) .edit-button,
+.topic:not(.expanded):not(:hover) .play-button,
+.topic:not(.expanded):not(:hover) .stop-button {
   display: none;
 }
 
