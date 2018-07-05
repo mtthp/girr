@@ -490,7 +490,7 @@ router.get('/:episodeId/clone', async function (req, res, next) {
   let newEpisode = new Episode(Object.assign({}, req.episode.toObject(), {
     _id: undefined,
     __v: undefined,
-    name: "Copy of " + req.episode.name,
+    name: req.episode.name ? `Copy of ${req.episode.name}` : req.episode.name,
     started: null,
     ended: null,
     number: 1 + maxEpisodeNumber,
