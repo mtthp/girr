@@ -32,10 +32,10 @@
 	},
 	"drawer": {
 		"title": "Studio Renegade Remote Regie",
-	  "programs_label": "Programs",
-	  "scene_label": "Scene",
-	  "settings_label": "Settings",
-	  "api_label": "API"
+		"programs_label": "Programs",
+		"scene_label": "Scene",
+		"settings_label": "Settings",
+		"api_label": "API"
 	},
 	"settings": {
 		"title_input_label": "Title",
