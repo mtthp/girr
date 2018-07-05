@@ -12,7 +12,7 @@
       </header>
       <section id="my-mdc-dialog-description" class="mdc-dialog__body mdc-dialog__body--scrollable">
         <div class="mdc-text-field mdc-text-field--fullwidth" v-bind:class="{ 'mdc-text-field--upgraded' : topic.title }">
-          <input type="text" id="title" class="mdc-text-field__input" v-model.lazy="topic.title">
+          <input type="text" id="title" class="mdc-text-field__input" v-model.lazy="topic.title" v-on:keyup.enter="updateTopic(topic)" >
           <label for="title" class="mdc-text-field__label" v-bind:class="{ 'mdc-text-field__label--float-above' : topic.title }">{{ $t('topic.title_label') }}</label>
         </div>
         <div class="mdc-text-field mdc-text-field--fullwidth mdc-text-field--textarea">
@@ -81,6 +81,9 @@ export default {
     this.addTileTextfield = new textField.MDCTextField(this.$el.querySelector('.add-tile .mdc-text-field'))
     Event.$off('topicDialog.show').$on('topicDialog.show', this.show)
     Event.$off('topicDialog.close').$on('topicDialog.close', this.close)
+    this.dialog.focusTrap_.activate = () => {
+      this.$el.querySelector('input#title').select()
+    }
   },
   methods: {
     show: function (topic, medias) {

@@ -13,7 +13,7 @@
       <section id="my-mdc-dialog-description" class="mdc-dialog__body mdc-dialog__body--scrollable">
         <div class="mdc-text-field mdc-text-field--fullwidth mdc-text-field--with-trailing-icon" v-bind:class="{ 'mdc-text-field--upgraded' : episode.name }">
           <i class="material-icons mdc-text-field__icon" tabindex="0">label</i>
-          <input type="text" id="name" class="mdc-text-field__input" v-model.lazy="episode.name">
+          <input type="text" id="name" class="mdc-text-field__input" v-model.lazy="episode.name" v-on:keyup.enter="updateEpisode(episode)">
           <label for="name" class="mdc-text-field__label" v-bind:class="{ 'mdc-text-field__label--float-above' : episode.name }">{{ $t('episode.name_label') }}</label>
         </div>
         <div class="mdc-text-field mdc-text-field--fullwidth mdc-text-field--with-trailing-icon" v-bind:class="{ 'mdc-text-field--upgraded' : episode.number }">
@@ -56,6 +56,9 @@ export default {
     textField.MDCTextField.attachTo(this.$el.querySelector('.mdc-text-field'))
     Event.$off('episodeDialog.show').$on('episodeDialog.show', this.show)
     Event.$off('episodeDialog.close').$on('episodeDialog.close', this.close)
+    this.dialog.focusTrap_.activate = () => {
+      this.$el.querySelector('input#name').select()
+    }
   },
   methods: {
     show: function (episode) {

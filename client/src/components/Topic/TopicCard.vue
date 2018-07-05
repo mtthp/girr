@@ -331,7 +331,7 @@ export default {
   display: inherit;
 }
 
-.topic:not(.expanded) .edit-button,
+.topic:not(.expanded):not(:hover) .edit-button,
 .topic:not(.expanded):not(:hover) .play-button,
 .topic:not(.expanded):not(:hover) .stop-button {
   display: none;

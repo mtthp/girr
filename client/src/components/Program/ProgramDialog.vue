@@ -13,7 +13,7 @@
       <section id="my-mdc-dialog-description" class="mdc-dialog__body mdc-dialog__body--scrollable">
         <div class="mdc-text-field mdc-text-field--fullwidth mdc-text-field--with-trailing-icon" v-bind:class="{ 'mdc-text-field--upgraded' : program.name }">
           <i class="material-icons mdc-text-field__icon" tabindex="0">label</i>
-          <input type="text" id="name" class="mdc-text-field__input" v-model.lazy="program.name">
+          <input type="text" id="name" class="mdc-text-field__input" v-model.lazy="program.name" v-on:keyup.enter="updateProgram(program)">
           <label for="name" class="mdc-text-field__label" v-bind:class="{ 'mdc-text-field__label--float-above' : program.name }">{{ $t('program.name_label') }}</label>
         </div>
         <div class="picture thumbnail" v-on:click="$event.currentTarget.querySelector('input').click()">
@@ -66,6 +66,9 @@ export default {
     textField.MDCTextField.attachTo(this.$el.querySelector('.mdc-text-field'))
     Event.$off('programDialog.show').$on('programDialog.show', this.show)
     Event.$off('programDialog.close').$on('programDialog.close', this.close)
+    this.dialog.focusTrap_.activate = () => {
+      this.$el.querySelector('input#name').select()
+    }
   },
   methods: {
     show: function (program) {
