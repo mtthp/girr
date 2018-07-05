@@ -26,7 +26,7 @@ const websockets = require('../websockets')()
  *         description: black and white logo uri
  */
 let programSchema = new mongoose.Schema({
-    name: { type: String, required: true},
+    name: { type: String},
     thumbnail: { type: String },
     logo: { type: String },
     logoBW: { type: String }, // logo in black and white

@@ -92,11 +92,6 @@ router.route('/')
       episode.number = 1 + maxEpisodeNumber
     }
 
-    // provide a name if the user didn't specified one
-    if (typeof episode.name === "undefined") {
-      episode.name = "Episode #" + episode.number;
-    }
-
     episode
       .save()
       .then(function(episode) {

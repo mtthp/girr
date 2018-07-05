@@ -1,7 +1,7 @@
 <template>
   <div class="episode mdc-card mdc-card--theme-dark " :style="episode.thumbnail ? 'background-image: url(\'' + episode.thumbnail + '\');' : null">
     <section class="mdc-card__primary mdc-menu-anchor" v-bind:class="{ 'mdc-theme--secondary-bg' : episode.started && !episode.ended }">
-      <h1 class="mdc-card__title mdc-card__title--large">{{ episode.name }}</h1>
+      <h1 class="mdc-card__title mdc-card__title--large">{{ episode.name ? episode.name : $t('episode.unnamed', [episode.number]) }}</h1>
       <h2 class="mdc-card__subtitle">{{ $t('episode.subtitle', [episode.number, startedDate]) }}</h2>
       <i class="mdc-icon-toggle material-icons toggle-menu" arial-label="Menu">more_vert</i>
       <div class="mdc-simple-menu mdc-simple-menu--open-from-bottom-right" tabindex="-1">

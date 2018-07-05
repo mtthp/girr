@@ -46,9 +46,9 @@ function setTitle (newTitle) {
  *         description: time and date when the Topic has ended
  */
 let topicSchema = new mongoose.Schema({
-    title: { type: String, set: setTitle, required: true },
+    title: { type: String, set: setTitle },
     description: String,
-    position: { type: Number },
+    position: { type: Number, required: true, index: true },
     started: { type: Date },
     ended: { type: Date },
     created: { type: Date, required: true },

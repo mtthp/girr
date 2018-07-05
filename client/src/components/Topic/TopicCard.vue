@@ -7,7 +7,7 @@
         <i class="material-icons" aria-hidden="true">comment</i>
       </span>
       <span class="mdc-list-item__text">
-        {{ topic.title }}
+        {{ topic.title ? topic.title : $t('topic.untitled') }}
         <span class="mdc-list-item__secondary-text" v-if="topic.started">{{ timePlayed | formatTime }}</span>
       </span>
       <span class="mdc-list-item__meta">

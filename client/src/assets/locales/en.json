@@ -15,17 +15,20 @@
 	"program": {
 		"title": "{0} Programs",
 		"name_label": "Name",
-		"episodes_count": "{0} Episode{1}"
+		"episodes_count": "{0} Episode{1}",
+		"unnamed": "Unnamed Program"
 	},
 	"episode": {
 		"name_label": "Name",
 		"number_label": "Position",
 		"subtitle": "Episode #{0} - {1}",
-		"not_yet_started": "Not yet started"
+		"not_yet_started": "Not yet started",
+		"unnamed": "Episode #{0}"
 	},
 	"topic": {
 		"title_label": "Title",
-		"description_label": "Description"
+		"description_label": "Description",
+		"untitled": "Untitled topic"
 	},
 	"drawer": {
 		"title": "Studio Renegade Remote Regie",

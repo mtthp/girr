@@ -1,7 +1,7 @@
 <template>
   <div class="program mdc-card mdc-card--theme-dark " :style="{ 'background-image': program.thumbnail ? 'url(' + program.thumbnail + ')' : null }">
     <section class="mdc-card__primary mdc-menu-anchor">
-      <h1 class="mdc-card__title mdc-card__title--large">{{ program.name }}</h1>
+      <h1 class="mdc-card__title mdc-card__title--large">{{ program.name ? program.name : $t('program.unnamed') }}</h1>
       <i class="mdc-icon-toggle material-icons toggle-menu" arial-label="Menu">more_vert</i>
       <div class="mdc-simple-menu mdc-simple-menu--open-from-bottom-right" tabindex="-1">
         <ul class="mdc-simple-menu__items mdc-list" role="menu" aria-hidden="true">

@@ -86,11 +86,6 @@ router.route('/')
     var topic = new Topic(Object.assign(req.body, {created: Date.now(), modified: Date.now()}))
     topic.episode = req.episode._id
 
-    // provide a title if the user didn't specified one
-    if (typeof topic.title === "undefined") {
-      topic.title = "Untitled topic"
-    }
-
     // provide a position if the user didn't specified one
     if (typeof topic.position === "undefined") {
       var episodeTopics = await Topic.find({ episode: req.episode._id }).exec()

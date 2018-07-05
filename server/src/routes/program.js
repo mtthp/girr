@@ -66,7 +66,7 @@ router.route('/')
    *           $ref: '#/definitions/Program'
    */
   .post(function(req, res, next) {
-    let program = new Program(Object.assign({name: "New Program at " + (new Date()).toLocaleTimeString()}, req.body, {created: Date.now(), modified: Date.now()}));
+    let program = new Program(Object.assign(req.body, { created: Date.now(), modified: Date.now() }));
     program.save()
       .then(function(program) {
         logger.debug("Add a new Program " + program.toString())
