@@ -31,7 +31,7 @@
             </li>
             <li class="mdc-grid-tile add-tile">
               <div class="mdc-grid-tile__primary">
-                <input type="file" name="file" accept="image/*" class="input-file" v-on:change="fileChange($event.target.name, $event.target.files);" style="display: none;">
+                <input type="file" name="file" accept="image/*" class="input-file" v-on:change="fileChange($event);" style="display: none;">
                 <img class="mdc-grid-tile__primary-content" v-on:click="$event.currentTarget.parentNode.querySelector('input').click()"/>
               </div>
               <span class="mdc-grid-tile__secondary">
@@ -100,19 +100,31 @@ export default {
       Event.$emit(`topics.${this.topic._id}.update`, this.topic, this.medias)
       this.updateTopic(this.topic)
     },
-    fileChange: function (name, files) {
+    fileChange: function (event) {
+      const files = event.target.files
       if (files.length > 0) {
         let FR = new FileReader()
         FR.addEventListener('load', (e) => {
-          this.medias.push({uri: e.target.result, label: files[0].name, file: files[0]})
+          const highestPosition = Math.max.apply(Math, this.medias.map(m => m.position))
+          this.medias.push({
+            uri: e.target.result,
+            label: files[0].name,
+            file: files[0],
+            position: (isFinite(highestPosition) ? highestPosition : 0) + 1
+          })
+          event.target.value = null
         })
         FR.readAsDataURL(files[0])
       }
     },
     uriChange: function (event) {
       if (validUrl.isUri(event.target.value)) {
-        this.medias.push({uri: event.target.value})
-        event.target.value = ''
+        const highestPosition = Math.max.apply(Math, this.medias.map(m => { return m.position }))
+        this.medias.push({
+          uri: event.target.value,
+          position: (isFinite(highestPosition) ? highestPosition : 0) + 1
+        })
+        event.target.value = null
         this.addTileTextfield.valid = true
       } else {
         this.addTileTextfield.valid = false
