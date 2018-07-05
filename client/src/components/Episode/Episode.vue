@@ -88,22 +88,22 @@ export default {
         Event.$emit('topic.added', topic)
       }
     }
-    Event.$on('episode.update', (episode) => {
+    Event.$off('episode.update').$on('episode.update', (episode) => {
       this.updateEpisode(episode)
     })
-    Event.$on('episode.delete', (episode) => {
+    Event.$off('episode.delete').$on('episode.delete', (episode) => {
       this.deleteEpisode(episode)
     })
-    Event.$on('episode.updated', (episode) => {
+    Event.$off('episode.updated').$on('episode.updated', (episode) => {
       this.episode = episode
     })
-    Event.$on('topic.added', (topic) => {
+    Event.$off('topic.added').$on('topic.added', (topic) => {
       const index = this.topics.indexOf(this.topics.find(function (episodeTopic) {
         return episodeTopic._id === topic._id
       }))
       if (index < 0) this.topics.push(topic)
     })
-    Event.$on('topic.updated', (topic) => {
+    Event.$off('topic.updated').$on('topic.updated', (topic) => {
       for (let i = 0; i < this.topics.length; i++) {
         if (this.topics[i]._id === topic._id) {
           topic.expanded = this.topics[i].expanded // to keep expanded topics, well... expanded
@@ -114,7 +114,7 @@ export default {
         }
       }
     })
-    Event.$on('topic.deleted', (topic) => {
+    Event.$off('topic.deleted').$on('topic.deleted', (topic) => {
       const index = this.topics.indexOf(this.topics.find(function (episodeTopic) {
         return episodeTopic._id === topic._id
       }))
@@ -231,9 +231,10 @@ export default {
     addTopic: function () {
       Event.$emit('progressbar.toggle', true)
       this.$http.post(`/api/programs/${this.$route.params.programId}/episodes/${this.$route.params.episodeId}/topics/`).then(
-        function (response) {
+        (response) => {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('topic.added', response.body)
+          window.scrollTo(0, this.$el.scrollHeight)
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)

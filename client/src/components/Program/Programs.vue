@@ -94,9 +94,10 @@ export default {
     addProgram: function () {
       Event.$emit('progressbar.toggle', true)
       this.$http.post('/api/programs').then(
-        function (response) {
+        (response) => {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('program.added', response.body)
+          window.scrollTo(0, this.$el.scrollHeight)
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
