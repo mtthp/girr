@@ -94,8 +94,7 @@ export default {
           this.scene = response.body
         },
         function (response) {
-          console.error(response)
-          Event.$emit('snackbar.message', `Error : ${response.statusText ? response.statusText : 'no connection'}`)
+          Event.$emit('http.error', response)
         }
       )
     },

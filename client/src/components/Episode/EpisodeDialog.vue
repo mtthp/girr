@@ -72,7 +72,6 @@ export default {
         function (response) {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('episode.updated', response.body)
-          Event.$emit('snackbar.message', `Episode ${response.body.name} updated`)
           this.close()
         },
         function (response) {
@@ -87,7 +86,6 @@ export default {
         function (response) {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('episode.deleted', episode)
-          Event.$emit('snackbar.message', `Episode ${episode.name} deleted`)
           this.close()
           window.location = this.$router.resolve({ name: 'Program', params: { programId: this.$route.params.programId } }).href
         },

@@ -97,7 +97,6 @@ export default {
         function (response) {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('program.added', response.body)
-          Event.$emit('snackbar.message', `Added ${response.body.name}`)
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)

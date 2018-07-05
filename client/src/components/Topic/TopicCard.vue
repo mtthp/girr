@@ -166,7 +166,6 @@ export default {
         function (response) {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('topic.updated', response.body)
-          Event.$emit('snackbar.message', `Topic ${response.body.title} started`)
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
@@ -181,7 +180,6 @@ export default {
         function (response) {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('topic.updated', response.body)
-          Event.$emit('snackbar.message', `Topic ${response.body.title} stopped`)
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
@@ -212,7 +210,6 @@ export default {
         (response) => {
           Event.$emit('progressbar.toggle', false)
           Event.$emit(`topic.${this.topic._id}.media.added`, response.body)
-          Event.$emit('snackbar.message', `Added ${response.body.label}`)
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
@@ -226,7 +223,6 @@ export default {
         (response) => {
           Event.$emit('progressbar.toggle', false)
           Event.$emit(`topic.${this.topic._id}.media.deleted`, media)
-          Event.$emit('snackbar.message', `Media ${media.label} deleted`)
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)

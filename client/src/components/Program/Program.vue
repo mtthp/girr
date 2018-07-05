@@ -137,7 +137,6 @@ export default {
         function (response) {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('episode.added', response.body)
-          Event.$emit('snackbar.message', 'Added a new episode')
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)

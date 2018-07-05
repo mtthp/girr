@@ -182,7 +182,6 @@ export default {
         function (response) {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('episode.updated', response.body)
-          Event.$emit('snackbar.message', `Episode ${response.body.name} started`)
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
@@ -196,7 +195,6 @@ export default {
         function (response) {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('episode.updated', response.body)
-          Event.$emit('snackbar.message', `Episode ${response.body.name} stopped`)
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
@@ -236,7 +234,6 @@ export default {
         function (response) {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('topic.added', response.body)
-          Event.$emit('snackbar.message', 'Added a new topic')
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)

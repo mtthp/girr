@@ -109,7 +109,6 @@ export default {
         function (response) {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('program.updated', response.body)
-          Event.$emit('snackbar.message', `Program ${response.body.name} updated`)
           this.close()
         },
         function (response) {
@@ -124,7 +123,6 @@ export default {
         function (response) {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('program.deleted', program)
-          Event.$emit('snackbar.message', 'Program ' + program.name + ' deleted')
           this.close()
           window.location = this.$router.resolve({name: 'Programs'}).href
         },

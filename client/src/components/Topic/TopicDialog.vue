@@ -127,7 +127,6 @@ export default {
         function (response) {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('topic.updated', response.body)
-          Event.$emit('snackbar.message', `Topic ${response.body.title} updated`)
           this.close()
         },
         function (response) {
@@ -142,7 +141,6 @@ export default {
         function (response) {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('topic.deleted', topic)
-          Event.$emit('snackbar.message', `Topic ${topic.title} deleted`)
           this.close()
         },
         function (response) {
