@@ -1,7 +1,7 @@
 <template>
   <div class="episode">
     <EpisodeDialog></EpisodeDialog>
-    <Toolbar :title="episode.name ? episode.name : $t('episode.unnamed', [episode.number])">
+    <Toolbar :title="episode.name || $t('episode.unnamed', [episode.number])">
       <section class="mdc-toolbar__section mdc-toolbar__section--align-end" slot="headerActions">
         <time v-if="episode.started" >{{ timePlayed | formatTime }}</time>
         <button class="material-icons mdc-toolbar__icon mdc-ripple-surface toggle-menu" arial-label="Menu" data-mdc-auto-init="MDCRipple">more_vert</button>

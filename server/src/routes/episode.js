@@ -80,10 +80,10 @@ router.route('/')
     
     // provide a number if the user didn't specified one
     if (typeof episode.number === "undefined") {
-      var programEpisodes = await Episode.find({ program: req.program._id }).exec()
+      const programEpisodes = await Episode.find({ program: req.program._id }).exec()
 
       // Max episode number + 1 - inspired by https://stackoverflow.com/a/4020842
-      var maxEpisodeNumber = programEpisodes.length > 0 ? Math.max.apply(
+      const maxEpisodeNumber = programEpisodes.length > 0 ? Math.max.apply(
         Math,
         programEpisodes.map(function(e){
             return e.number

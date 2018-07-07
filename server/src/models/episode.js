@@ -55,7 +55,7 @@ let episodeSchema = new mongoose.Schema({
 });
 episodeSchema.index({ number: 1, program: 1 }, { unique: true })
 
-let episodeModel = mongoose.model('Episode', episodeSchema)
+const episodeModel = mongoose.model('Episode', episodeSchema)
 
 // when an Episode is removed, delete all its Topics
 episodeSchema.post('remove', function(episode) {

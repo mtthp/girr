@@ -149,10 +149,10 @@ router.route('/')
 
     // provide a position if the user didn't specified one
     if (typeof media.position === "undefined") {
-      var topicMedias = await Media.find({ topic: req.topic._id }).exec()
+      const topicMedias = await Media.find({ topic: req.topic._id }).exec()
 
       // Max media position + 1 - inspired by https://stackoverflow.com/a/4020842
-      var maxMediaPosition = topicMedias.length > 0 ? Math.max.apply(
+      const maxMediaPosition = topicMedias.length > 0 ? Math.max.apply(
           Math,
           topicMedias.map(function(m){
               return m.position;
@@ -454,7 +454,7 @@ router.get('/:mediaId/stop', function (req, res, next) {
       .save()
       .then(function(media) {
         logger.debug("Stopped Media " + media.toString())
-        var scene = new Scene()
+        let scene = new Scene()
         scene.media = null
         scene.picture = null
         scene.save()
@@ -513,10 +513,10 @@ router.get('/:mediaId/move', async function (req, res, next) {
     next({message:"A new position is needed to perform a move", status: 417, example: '/move?position=10'})
   }
 
-  var newPosition = parseInt(req.query.position)
+  const newPosition = parseInt(req.query.position)
 
-  var topicMedias = await Media.find({ topic: req.topic._id }).sort({ 'position': 1 }).exec()
-  for (var i = 0; i < topicMedias.length; i++) {
+  let topicMedias = await Media.find({ topic: req.topic._id }).sort({ 'position': 1 }).exec()
+  for (let i = 0; i < topicMedias.length; i++) {
     if (topicMedias[i]._id.equals(req.media._id)) {
       var mediaToMove = topicMedias[i]
       topicMedias.splice(i, 1)
@@ -526,7 +526,7 @@ router.get('/:mediaId/move', async function (req, res, next) {
   }
 
   if (mediaToMove) {
-    for (var i = 0; i < topicMedias.length; i++) {
+    for (let i = 0; i < topicMedias.length; i++) {
       topicMedias[i].position = i
       topicMedias[i].save()
     }

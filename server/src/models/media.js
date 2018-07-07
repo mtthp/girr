@@ -45,10 +45,10 @@ let mediaSchema = new mongoose.Schema({
   topic: { type: mongoose.Schema.Types.ObjectId, ref:'Topic', required: true },
 })
 
-let mediaModel = mongoose.model('Media', mediaSchema)
+const mediaModel = mongoose.model('Media', mediaSchema)
 
 mediaSchema.methods.toJSON = function() {
- var obj = this.toObject()
+ let obj = this.toObject()
  delete obj.path // remove/hide the local path
  return obj
 }

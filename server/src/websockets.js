@@ -14,9 +14,9 @@ function WebSockets() {
 
     // to log every messages being transmitted => https://stackoverflow.com/a/9042249
     var originalEmit = this.instance.sockets.emit
-    this.instance.sockets.emit = function () {
-      var event = arguments[0]
-      var data  = arguments[1]
+    this.instance.sockets.emit = function() {
+      const event = arguments[0]
+      const data  = arguments[1]
       if (!event.includes('connect')) { // osef des connect et disconnect
         logger.debug('[WS] ' + event + ' : ' + CircularJSON.stringify(data))
       }

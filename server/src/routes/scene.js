@@ -20,7 +20,7 @@ router.route('/')
    *           $ref: '#/definitions/Xsplit'
    */
   .get(function (req, res, next) {
-    var scene = new Scene()
+    const scene = new Scene()
     res.json(scene)
   })
   /**

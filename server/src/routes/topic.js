@@ -83,15 +83,15 @@ router.route('/')
     delete req.body.started
     delete req.body.ended
 
-    var topic = new Topic(Object.assign(req.body, {created: Date.now(), modified: Date.now()}))
+    let topic = new Topic(Object.assign(req.body, {created: Date.now(), modified: Date.now()}))
     topic.episode = req.episode._id
 
     // provide a position if the user didn't specified one
     if (typeof topic.position === "undefined") {
-      var episodeTopics = await Topic.find({ episode: req.episode._id }).exec()
+      const episodeTopics = await Topic.find({ episode: req.episode._id }).exec()
 
       // Max topic position + 1 - inspired by https://stackoverflow.com/a/4020842
-      var maxTopicNumber = episodeTopics.length > 0 ? Math.max.apply(
+      const maxTopicNumber = episodeTopics.length > 0 ? Math.max.apply(
         Math,
         episodeTopics.map(function(t){
             return t.position;
@@ -376,7 +376,7 @@ router.get('/:topicId/stop', function (req, res, next) {
           .catch(function(error) {
             logger.error(error)
           })
-        var scene = new Scene()
+        let scene = new Scene()
         scene.topic = null
         scene.media = null
         scene.title = req.episode.name
@@ -436,10 +436,10 @@ router.get('/:topicId/move', async function (req, res, next) {
     next({message:"A new position is needed to perform a move", status: 417, example: '/move?position=10'})
   }
 
-  var newPosition = parseInt(req.query.position)
+  const newPosition = parseInt(req.query.position)
 
-  var episodeTopics = await Topic.find({ episode: req.episode._id }).sort({ 'position': 1 }).exec()
-  for (var i = 0; i < episodeTopics.length; i++) {
+  let episodeTopics = await Topic.find({ episode: req.episode._id }).sort({ 'position': 1 }).exec()
+  for (let i = 0; i < episodeTopics.length; i++) {
     if (episodeTopics[i]._id.equals(req.topic._id)) {
       var topicToMove = episodeTopics[i]
       episodeTopics.splice(i, 1)
@@ -449,7 +449,7 @@ router.get('/:topicId/move', async function (req, res, next) {
   }
 
   if (topicToMove) {
-    for (var i = 0; i < episodeTopics.length; i++) {
+    for (let i = 0; i < episodeTopics.length; i++) {
       episodeTopics[i].position = i
       episodeTopics[i].save()
     }

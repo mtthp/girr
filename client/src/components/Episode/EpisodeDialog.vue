@@ -7,7 +7,7 @@
     <div class="mdc-dialog__surface">
       <header class="mdc-dialog__header">
         <h2 id="my-mdc-dialog-label" class="mdc-dialog__header__title">
-          {{ title ? title : $t('episode.unnamed', [episode.number]) }}
+          {{ title || $t('episode.unnamed', [episode.number]) }}
         </h2>
       </header>
       <section id="my-mdc-dialog-description" class="mdc-dialog__body mdc-dialog__body--scrollable">
