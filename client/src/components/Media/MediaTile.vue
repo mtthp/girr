@@ -54,7 +54,6 @@ export default {
         (response) => {
           Event.$emit('progressbar.toggle', false)
           Event.$emit(`topics.${this.topicId}.media.updated`, response.body)
-          Event.$emit('snackbar.message', `Media ${response.body.label} started`)
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
@@ -68,7 +67,6 @@ export default {
         (response) => {
           Event.$emit('progressbar.toggle', false)
           Event.$emit(`topics.${this.topicId}.media.updated`, response.body)
-          Event.$emit('snackbar.message', `Media ${response.body.label} stopped`)
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)

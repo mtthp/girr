@@ -13,7 +13,7 @@
       <section id="my-mdc-dialog-description" class="mdc-dialog__body mdc-dialog__body--scrollable">
         <div class="mdc-text-field mdc-text-field--fullwidth mdc-text-field--with-trailing-icon" v-bind:class="{ 'mdc-text-field--upgraded' : program.name }">
           <i class="material-icons mdc-text-field__icon" tabindex="0">label</i>
-          <input type="text" id="name" class="mdc-text-field__input" v-model.lazy="program.name" v-on:keyup.enter="updateProgram(program)">
+          <input type="text" id="name" class="mdc-text-field__input" v-model.lazy="program.name" v-on:keyup.enter="confirm">
           <label for="name" class="mdc-text-field__label" v-bind:class="{ 'mdc-text-field__label--float-above' : program.name }">{{ $t('program.name_label') }}</label>
         </div>
         <div class="picture thumbnail" v-on:click="$event.currentTarget.querySelector('input').click()">
@@ -33,14 +33,18 @@
         </div>
       </section>
       <footer class="mdc-dialog__footer">
-        <div style="margin-right: auto;">
-          <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--delete" v-on:click="deleteProgram(program)">
-            <i class="material-icons mdc-button__icon">delete</i>
-            <span>{{ $t('actions.delete') }}</span>
-          </button>
-        </div>
-        <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--cancel" v-on:click="close"><i class="material-icons mdc-button__icon">clear</i><span>{{ $t('actions.cancel') }}</span></button>
-        <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--accept mdc-button--raised" v-on:click="confirm"><i class="material-icons mdc-button__icon">check</i><span>{{ $t('actions.update') }}</span></button>
+        <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--delete" v-on:click="deleteProgram(program)">
+          <i class="material-icons mdc-button__icon">delete</i>
+          <span>{{ $t('actions.delete') }}</span>
+        </button>
+        <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--cancel" v-on:click="close">
+          <i class="material-icons mdc-button__icon">clear</i>
+          <span>{{ $t('actions.cancel') }}</span>
+        </button>
+        <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--accept mdc-button--raised" v-on:click="confirm">
+          <i class="material-icons mdc-button__icon">check</i>
+          <span>{{ $t('actions.update') }}</span>
+        </button>
       </footer>
     </div>
     <div class="mdc-dialog__backdrop"></div>
@@ -81,7 +85,14 @@ export default {
       this.dialog.close()
     },
     confirm: function () {
+      this.$el.querySelector('.mdc-dialog__footer__button--accept').disabled = true
       this.updateProgram(this.program, this.$el.querySelectorAll('input[type=file]'))
+        .then((response) => {
+          this.close()
+        })
+        .finally(() => {
+          this.$el.querySelector('.mdc-dialog__footer__button--accept').disabled = false
+        })
     },
     fileChange: function (event) {
       if (event.target.files.length > 0) {
@@ -108,11 +119,10 @@ export default {
         }
       }
       Event.$emit('progressbar.toggle', true)
-      this.$http.put(`/api/programs/${program._id}`, data).then(
+      return this.$http.put(`/api/programs/${program._id}`, data).then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('program.updated', response.body)
-          this.close()
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
@@ -240,5 +250,6 @@ export default {
 
 .mdc-dialog__footer__button--delete {
   color: red;
+  margin-right: auto;
 }
 </style>

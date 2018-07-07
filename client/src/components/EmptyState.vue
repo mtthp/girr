@@ -16,7 +16,7 @@ export default {
 .empty-state {
   display: flex;
   flex-flow: column;
-  height: calc(100vh - 68px); /* 68px == header height. Alright this is far from perfect */
+  height: calc(100vh - 68px - 8px); /* 68px == header height and 8px == episode padding top. Alright this is far from perfect */
   max-width: 90vw;
   text-align: center;
   margin: auto;

@@ -12,7 +12,7 @@
       </header>
       <section id="my-mdc-dialog-description" class="mdc-dialog__body mdc-dialog__body--scrollable">
         <div class="mdc-text-field mdc-text-field--fullwidth" v-bind:class="{ 'mdc-text-field--upgraded' : topic.title }">
-          <input type="text" id="title" class="mdc-text-field__input" v-model.lazy="topic.title" v-on:keyup.enter="updateTopic(topic)" >
+          <input type="text" id="title" class="mdc-text-field__input" v-model.lazy="topic.title" v-on:keyup.enter="confirm" >
           <label for="title" class="mdc-text-field__label" v-bind:class="{ 'mdc-text-field__label--float-above' : topic.title }">{{ $t('topic.title_label') }}</label>
         </div>
         <div class="mdc-text-field mdc-text-field--fullwidth mdc-text-field--textarea">
@@ -45,14 +45,18 @@
         </div>
       </section>
       <footer class="mdc-dialog__footer">
-        <div style="margin-right: auto;">
-          <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--delete" v-on:click="deleteTopic(topic)">
-            <i class="material-icons mdc-button__icon">delete</i>
-            <span>{{ $t('actions.delete') }}</span>
-          </button>
-        </div>
-        <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--cancel" v-on:click="close"><i class="material-icons mdc-button__icon">clear</i><span>{{ $t('actions.cancel') }}</span></button>
-        <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--accept mdc-button--raised" v-on:click="confirm"><i class="material-icons mdc-button__icon">check</i><span>{{ $t('actions.update') }}</span></button>
+        <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--delete" v-on:click="deleteTopic(topic)">
+          <i class="material-icons mdc-button__icon">delete</i>
+          <span>{{ $t('actions.delete') }}</span>
+        </button>
+        <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--cancel" v-on:click="close">
+          <i class="material-icons mdc-button__icon">clear</i>
+          <span>{{ $t('actions.cancel') }}</span>
+        </button>
+        <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--accept mdc-button--raised" v-on:click="confirm">
+          <i class="material-icons mdc-button__icon">check</i>
+          <span>{{ $t('actions.update') }}</span>
+        </button>
       </footer>
     </div>
     <div class="mdc-dialog__backdrop"></div>
@@ -96,9 +100,17 @@ export default {
     close: function () {
       this.dialog.close()
     },
-    confirm: function () {
-      Event.$emit(`topics.${this.topic._id}.update`, this.topic, this.medias)
-      this.updateTopic(this.topic)
+    confirm: function (event) {
+      this.$el.querySelector('.mdc-dialog__footer__button--accept').disabled = true
+      this
+        .updateTopic(this.topic)
+        .then((response) => {
+          Event.$emit(`topics.${this.topic._id}.update`, this.topic, this.medias)
+          this.close()
+        })
+        .finally(() => {
+          this.$el.querySelector('.mdc-dialog__footer__button--accept').disabled = false
+        })
     },
     fileChange: function (event) {
       const files = event.target.files
@@ -138,11 +150,10 @@ export default {
     },
     updateTopic: function (topic) {
       Event.$emit('progressbar.toggle', true)
-      this.$http.put(`/api/programs/${this.$route.params.programId}/episodes/${this.$route.params.episodeId}/topics/${topic._id}`, topic).then(
+      return this.$http.put(`/api/programs/${this.$route.params.programId}/episodes/${this.$route.params.episodeId}/topics/${topic._id}`, topic).then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('topic.updated', response.body)
-          this.close()
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
@@ -267,5 +278,6 @@ export default {
 
 .mdc-dialog__footer__button--delete {
   color: red;
+  margin-right: auto;
 }
 </style>
