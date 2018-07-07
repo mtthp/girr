@@ -67,7 +67,7 @@ mediaSchema.pre('remove', function(next) {
 
 // when a Media is removed, delete its file
 mediaSchema.post('remove', function(media) {
-  logger.debug("Removed Media " + media._id)
+  logger.debug(`Removed Media ${media._id}`)
   websockets.sockets.emit('medias.' + media._id + '.delete', media)
 })
 
@@ -97,7 +97,10 @@ mediaSchema.pre('save', function(next) {
 
 mediaSchema.post('save', function(media) {
   if (this.wasNew) {
+    logger.debug(`Added a new Media\n${media.toString()}`)
     websockets.sockets.emit('medias.add', media)
+  } else {
+    logger.debug(`Updated Media\n${media.toString()}`)
   }
   websockets.sockets.emit('medias.' + media._id, media)
 })

@@ -124,7 +124,7 @@ router.route('/')
       logger.debug('Receive a file : ')
       logger.debug(req.file)
       // provide a label if the user didn't specified one
-      if (typeof media.label === "undefined") { // something is wrong, the label cannot be sent in the request body
+      if (typeof media.label === 'undefined') { // something is wrong, the label cannot be sent in the request body
         media.label = req.file.originalname
       }
       media.path = req.file.path
@@ -139,12 +139,12 @@ router.route('/')
         let filepath = uploadsPath + '/' + path.basename(media.uri.split('?')[0], path.extname(media.uri)).replace(/\s/g, "_") + '-' + uuidv4() + '.' + mime.getExtension(media.mimeType)
         fs.writeFileSync(path.resolve(filepath), response.body, 'binary')
 
-        if (typeof media.label === "undefined") media.label = path.basename(media.uri)
+        if (typeof media.label === 'undefined') media.label = path.basename(media.uri)
         media.path = filepath
         media.uri = media.path.replace(process.env.DATA_PATH, '/data').replace(/\\/g, path.posix.sep)
       }
     } else {
-      next({message:"No media file or URI was provided", status: 417})
+      next({message: 'No media file or URI was provided', status: 417})
     }
 
     // provide a position if the user didn't specified one
@@ -164,7 +164,6 @@ router.route('/')
     media
       .save()
       .then(function(media) {
-        logger.debug("Added a new Media " + media.toString())
         res.json(media)
       })
       .catch(function(error) {
@@ -181,7 +180,7 @@ router.param('mediaId', function (req, res, next, value, name) {
         req.media = media
         next()
       } else {
-        next({message:"Media " + value + " was not found", status: 404})
+        next({message: `Media ${value} was not found`, status: 404})
       }
     })
     .catch(function(error) {
@@ -279,7 +278,6 @@ router.route('/:mediaId')
     req.media
       .save()
       .then(function(media) {
-        logger.debug("Updated " + media.toString())
         res.json(media)
       })
       .catch(function(error) {
@@ -325,7 +323,6 @@ router.route('/:mediaId')
       .remove()
       .then(function(result) {
         if (result !== null) {
-          logger.debug("Removed Media " + req.params.mediaId)
           res.status(204).json(result.toString())
         } else {
           next({message:"Media " + req.params.mediaId + " wasn't deleted", status: 417})
@@ -378,7 +375,7 @@ router.get('/:mediaId/start', function (req, res, next) {
   req.media
       .save()
       .then(function(media) {
-        logger.debug("Started Media " + media.toString())
+        logger.debug(`Started Media\n${media.toString()}`)
         res.json(media)
 
         let scene = new Scene()
@@ -453,7 +450,7 @@ router.get('/:mediaId/stop', function (req, res, next) {
   req.media
       .save()
       .then(function(media) {
-        logger.debug("Stopped Media " + media.toString())
+        logger.debug(`Stopped Media\n${media.toString()}`)
         let scene = new Scene()
         scene.media = null
         scene.picture = null
@@ -510,7 +507,7 @@ router.get('/:mediaId/stop', function (req, res, next) {
  */
 router.get('/:mediaId/move', async function (req, res, next) {
   if (!req.query.position) {
-    next({message:"A new position is needed to perform a move", status: 417, example: '/move?position=10'})
+    next({message: 'A new position is needed to perform a move', status: 417, example: '/move?position=10'})
   }
 
   const newPosition = parseInt(req.query.position)
@@ -533,7 +530,7 @@ router.get('/:mediaId/move', async function (req, res, next) {
 
     res.json(topicMedias)
   } else {
-    next({message:"Couldn't move the Media at the new position " + newPosition, status: 500})
+    next({message: `Couldn't move the Media at the new position ${newPosition}`, status: 500})
   }
 })
 

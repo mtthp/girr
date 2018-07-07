@@ -44,14 +44,14 @@ function setName (newName) {
  *         description: time and date when the Episode has ended
  */
 let episodeSchema = new mongoose.Schema({
-    number: { type: Number, required: true, index: true },
-    name: { type: String, set: setName },
-    started: { type: Date },
-    ended: { type: Date },
-    created: { type: Date, required: true },
-    modified: { type: Date, required: true },
-    program: { type: mongoose.Schema.Types.ObjectId, ref:'Program', required: true, index: true },
-    topics: [{ type: mongoose.Schema.Types.ObjectId, ref:'Topic' }]
+  number: { type: Number, required: true, index: true },
+  name: { type: String, set: setName },
+  started: { type: Date },
+  ended: { type: Date },
+  created: { type: Date, required: true },
+  modified: { type: Date, required: true },
+  program: { type: mongoose.Schema.Types.ObjectId, ref:'Program', required: true, index: true },
+  topics: [{ type: mongoose.Schema.Types.ObjectId, ref:'Topic' }]
 });
 episodeSchema.index({ number: 1, program: 1 }, { unique: true })
 
@@ -59,8 +59,8 @@ const episodeModel = mongoose.model('Episode', episodeSchema)
 
 // when an Episode is removed, delete all its Topics
 episodeSchema.post('remove', function(episode) {
-  logger.debug("Removed Episode " + episode._id)
-  websockets.sockets.emit('episodes.' + episode._id + '.delete', episode)
+  logger.debug(`Removed Episode ${episode._id}`)
+  websockets.sockets.emit(`episodes.${episode._id}.delete`, episode)
 
   Topic
     .find({ episode: episode._id })
@@ -118,9 +118,12 @@ episodeSchema.pre('save', function(next) {
 
 episodeSchema.post('save', function(episode) {
   if (this.wasNew) {
+    logger.debug(`Added a new Episode\n${episode.toString()}`)
     websockets.sockets.emit('episodes.add', episode)
+  } else {
+    logger.debug(`Updated Episode\n${episode.toString()}`)
   }
-  websockets.sockets.emit('episodes.' + episode._id, episode)
+  websockets.sockets.emit(`episodes.${episode._id}`, episode)
 })
 
 module.exports = episodeModel

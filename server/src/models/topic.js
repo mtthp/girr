@@ -61,8 +61,8 @@ let topicModel = mongoose.model('Topic', topicSchema)
 
 // when a Topic is removed, delete all its Medias
 topicSchema.post('remove', function(topic) {
-  logger.debug("Removed Topic " + topic._id)
-  websockets.sockets.emit('topics.' + topic._id + '.delete', topic)
+  logger.debug(`Removed Topic ${topic._id}`)
+  websockets.sockets.emit(`topics.${topic._id}.delete`, topic)
 
   Media
     .find({ topic: topic._id })
@@ -111,7 +111,10 @@ topicSchema.pre('save', function(next) {
 
 topicSchema.post('save', function(topic) {
   if (this.wasNew) {
+    logger.debug(`Added a new Topic\n${topic.toString()}`)
     websockets.sockets.emit('topics.add', topic)
+  } else {
+    logger.debug(`Updated Topic\n${topic.toString()}`)
   }
   websockets.sockets.emit('topics.' + topic._id, topic)
 })

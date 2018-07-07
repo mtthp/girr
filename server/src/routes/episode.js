@@ -95,8 +95,6 @@ router.route('/')
     episode
       .save()
       .then(function(episode) {
-          logger.debug("Added a new Episode " + episode.toString())
-
           res.json(episode)
       })
       .catch(function(error) {
@@ -113,7 +111,7 @@ router.param('episodeId', function (req, res, next, value, name) {
         req.episode = episode
         next()
       } else {
-        next({message:"Episode " + value + " was not found", status: 404})
+        next({message: `Episode ${value} was not found`, status: 404})
       }
     })
     .catch(function(error) {
@@ -191,7 +189,6 @@ router.route('/:episodeId')
     req.episode
       .save()
       .then(function(episode) {
-        logger.debug("Updated " + episode.toString())
         res.json(episode)
       })
       .catch(function(error) {
@@ -227,7 +224,6 @@ router.route('/:episodeId')
       .remove()
       .then(function(result) {
         if (result !== null) {
-          logger.debug("Removed Episode " + req.params.episodeId)
           let scene = new Scene()
           scene.episode = null
           scene.topic = null
@@ -239,7 +235,7 @@ router.route('/:episodeId')
           
           res.status(204).json(result.toString())
         } else {
-          next({message:"Episode " + req.params.episodeId + " wasn't deleted", status: 417})
+          next({message: `Episode ${req.params.episodeId} wasn't deleted`, status: 417})
         }
       })
       .catch(function(error) {
@@ -279,7 +275,7 @@ router.get('/:episodeId/start', function (req, res, next) {
   req.episode
       .save()
       .then(function(episode) {
-        logger.debug("Started Episode " + episode.toString())
+        logger.debug(`Started Episode\n${episode.toString()}`)
         res.json(episode)
 
         let scene = new Scene()
@@ -355,7 +351,7 @@ router.get('/:episodeId/stop', function (req, res, next) {
             .catch(function(error) {
               logger.error(error)
             })
-          logger.debug("Stopped Episode " + episode.toString())
+          logger.debug(`Stopped Episode\n${episode.toString()}`)
           res.json(episode)
 
           let scene = new Scene()
@@ -371,7 +367,7 @@ router.get('/:episodeId/stop', function (req, res, next) {
           next(error)
         })
   } else {
-    next({message:"Episode " + req.params.episodeId + " cannot be stopped if it isn't playing", status: 417})
+    next({message:`Episode ${req.params.episodeId} cannot be stopped if it isn't playing`, status: 417})
   }
 })
 
@@ -417,7 +413,7 @@ router.get('/:episodeId/next', function (req, res, next) {
                 nextTopic = topics[i]
                 break
               } else {
-                next({message: "Episode " + req.params.episodeId + " is at its end", status: 400})
+                next({message: `Episode ${req.params.episodeId} is at its end`, status: 400})
                 return
               }
             }
@@ -427,7 +423,7 @@ router.get('/:episodeId/next', function (req, res, next) {
           nextTopic
             .save()
             .then(function(topicStarted) {
-              logger.debug("Started Topic " + topicStarted.toString())
+              logger.debug(`Started Topic\n${topicStarted.toString()}`)
               res.json(topicStarted)
 
               let scene = new Scene()
@@ -445,7 +441,7 @@ router.get('/:episodeId/next', function (req, res, next) {
           next(error)
         })
   } else {
-    next({message:"Episode " + req.params.episodeId + " isn't playing", status: 417})
+    next({message:`Episode ${req.params.episodeId} isn't playing`, status: 417})
   }
 })
 
@@ -503,8 +499,6 @@ router.get('/:episodeId/clone', async function (req, res, next) {
   newEpisode
     .save()
     .then(async (newEpisodeSaved) => {
-      logger.debug("Added a new Episode " + newEpisodeSaved.toString())
-
       /*
        * to make all save synchronous, we chain the 'save' Promises
        */
@@ -531,7 +525,6 @@ router.get('/:episodeId/clone', async function (req, res, next) {
           return promise
             .then((result) => {
               return newMedia.save().then((newMediaSaved) => {
-                logger.debug("Added a new Media " + newMediaSaved.toString())
               });
             })
             .catch((error) => {
@@ -561,7 +554,6 @@ router.get('/:episodeId/clone', async function (req, res, next) {
           return promise
             .then((result) => {
               return newTopic.save().then((savedTopic) => {
-                logger.debug("Added a new Topic " + savedTopic.toString())
                 return cloneMediasSync(medias, savedTopic.toObject())
               });
             })

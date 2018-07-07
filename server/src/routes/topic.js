@@ -103,7 +103,6 @@ router.route('/')
     topic
       .save()
       .then(function(topic) {
-        logger.debug("Added a new Episode " + topic.toString())
         res.json(topic)
       })
       .catch(function(error) {
@@ -123,7 +122,7 @@ router.param('topicId', function (req, res, next, value, name) {
         req.topic = topic
         next()
       } else {
-        next({message:"Topic " + value + " was not found", status: 404})
+        next({message: `Topic ${value} was not found`, status: 404})
       }
     })
     .catch(function(error) {
@@ -211,7 +210,7 @@ router.route('/:topicId')
     req.topic
       .save()
       .then(function(topic) {
-        logger.debug("Updated " + topic.toString())
+        logger.debug(`Updated Topic\n${topic.toString()}`)
         res.json(topic)
       })
       .catch(function(error) {
@@ -252,10 +251,9 @@ router.route('/:topicId')
       .remove()
       .then(function(result) {
         if (result !== null) {
-          logger.debug("Removed Topic " + req.params.topicId)
           res.status(204).json(result.toString())
         } else {
-          next({message:"Topic " + req.params.topicId + " wasn't deleted", status: 417})
+          next({message: `Topic ${req.params.topicId} wasn't deleted`, status: 417})
         }
       })
       .catch(function(error) {
@@ -300,7 +298,7 @@ router.get('/:topicId/start', function (req, res, next) {
   req.topic
     .save()
     .then(function(topicStarted) {
-      logger.debug("Started Topic " + topicStarted.toString())
+      logger.debug(`Started Topic\n${topicStarted.toString()}`)
 
       res.json(topicStarted)
 
@@ -383,7 +381,7 @@ router.get('/:topicId/stop', function (req, res, next) {
         scene.picture = null
         scene.save()
 
-        logger.debug("Stopped Topic " + topic.toString())
+        logger.debug(`Stopped Topic\n${topic.toString()}`)
         res.json(topic)
       })
       .catch(function(error) {
@@ -433,7 +431,7 @@ router.get('/:topicId/stop', function (req, res, next) {
  */
 router.get('/:topicId/move', async function (req, res, next) {
   if (!req.query.position) {
-    next({message:"A new position is needed to perform a move", status: 417, example: '/move?position=10'})
+    next({message: 'A new position is needed to perform a move', status: 417, example: '/move?position=10'})
   }
 
   const newPosition = parseInt(req.query.position)
@@ -456,7 +454,7 @@ router.get('/:topicId/move', async function (req, res, next) {
 
     res.json(episodeTopics)
   } else {
-    next({message:"Couldn't move the Topic at the new position " + newPosition, status: 500})
+    next({message: `Couldn't move the Topic at the new position ${newPosition}`, status: 500})
   }
 })
 
