@@ -1,8 +1,4 @@
-//During the test the env variable is set to test
-process.env.NODE_ENV = 'test'
-
 let server = require('../app')
-let mongoose = require('mongoose')
 let Program = require('../src/models/program')
 
 // Require the dev-dependencies
@@ -13,14 +9,12 @@ let expect = chai.expect
 
 chai.use(chaiHttp)
 
-// remove console logs from the server
-const winston = require('winston')
-let logger = require('../src/logger')
-logger.remove(winston.transports.Console)
-
 // Our parent block
 describe('Programs', () => {
-  before((done) => { // Before each test we empty the database
+  /*
+   * Before all tests we empty the database
+   */
+  before((done) => {
     Program.remove({}, (err) => { 
       done()
     })
@@ -60,8 +54,7 @@ describe('Programs', () => {
           res.body.should.have.property('name')
           res.body.should.have.property('created')
           res.body.should.have.property('modified')
-          res.body.should.have.property('episodes')
-          res.body.episodes.should.be.a('array')
+          res.body.should.have.property('episodes').to.be.a('array').to.be.empty
           program = res.body
           done()
         })
@@ -81,16 +74,15 @@ describe('Programs', () => {
       program.save((err, savedProgram) => {
         expect(err).to.not.be.ok
         chai.request(server)
-          .get('/api/programs/' + savedProgram.id)
-          .send(savedProgram)
+          .get(`/api/programs/${savedProgram.id}`)
           .end((err, res) => {
-              res.should.have.status(200)
-              res.body.should.be.a('object')
-              res.body.should.have.property('name')
-              res.body.should.have.property('created')
-              res.body.should.have.property('modified')
-              res.body.should.have.property('episodes')
-              res.body.should.have.property('_id').eql(savedProgram.id)
+            res.should.have.status(200)
+            res.body.should.be.a('object')
+            res.body.should.have.property('name')
+            res.body.should.have.property('created')
+            res.body.should.have.property('modified')
+            res.body.should.have.property('episodes').to.be.empty
+            res.body.should.have.property('_id').eql(savedProgram.id)
             done()
           })
       })
@@ -113,15 +105,15 @@ describe('Programs', () => {
           name: "A super cool program"
         }
         chai.request(server)
-          .put('/api/programs/' + savedProgram.id)
+          .put(`/api/programs/${savedProgram.id}`)
           .send(data)
           .end((err, res) => {
             res.should.have.status(200)
             res.body.should.be.a('object')
             res.body.should.have.property('name').eql(data.name)
             res.body.should.have.property('created')
-            res.body.should.have.property('modified').not.eql(res.body.should.have.property('created'))
-            res.body.should.have.property('episodes')
+            res.body.should.have.property('modified').not.eql(res.body.created)
+            res.body.should.have.property('episodes').to.be.empty
             res.body.should.have.property('_id').eql(savedProgram.id)
             done()
           })
@@ -142,7 +134,7 @@ describe('Programs', () => {
       program.save((err, savedProgram) => {
         expect(err).to.not.be.ok
         chai.request(server)
-          .delete('/api/programs/' + savedProgram.id)
+          .delete(`/api/programs/${savedProgram.id}`)
           .end((err, res) => {
             res.should.have.status(204)
             res.body.should.be.empty
