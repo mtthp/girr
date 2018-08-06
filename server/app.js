@@ -60,8 +60,7 @@ Object.keys(config).forEach(function (index) {
 })
 
 mongoose.Promise = Promise;
-mongoose.connect(process.env.MONGO_ENDPOINT)
-  .then(() => {
+mongoose.connect(process.env.MONGO_ENDPOINT, { useMongoClient: true })  .then(() => {
     io.listen(
       app.listen(process.env.PORT, () => {
         const interfaces = require('os').networkInterfaces()
