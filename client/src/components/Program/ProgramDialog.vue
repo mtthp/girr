@@ -7,14 +7,14 @@
     <div class="mdc-dialog__surface">
       <header class="mdc-dialog__header">
         <h2 id="my-mdc-dialog-label" class="mdc-dialog__header__title">
-          {{ title }}
+          {{ title || $t('program.unnamed') }}
         </h2>
       </header>
       <section id="my-mdc-dialog-description" class="mdc-dialog__body mdc-dialog__body--scrollable">
         <div class="mdc-text-field mdc-text-field--fullwidth mdc-text-field--with-trailing-icon" v-bind:class="{ 'mdc-text-field--upgraded' : program.name }">
           <i class="material-icons mdc-text-field__icon" tabindex="0">label</i>
-          <input type="text" id="name" class="mdc-text-field__input" v-model.lazy="program.name">
-          <label for="name" class="mdc-text-field__label" v-bind:class="{ 'mdc-text-field__label--float-above' : program.name }">Name</label>
+          <input type="text" id="name" class="mdc-text-field__input" v-model.lazy="program.name" v-on:keyup.enter="confirm">
+          <label for="name" class="mdc-text-field__label" v-bind:class="{ 'mdc-text-field__label--float-above' : program.name }">{{ $t('program.name_label') }}</label>
         </div>
         <div class="picture thumbnail" v-on:click="$event.currentTarget.querySelector('input').click()">
           <i class="material-icons">edit</i>
@@ -33,14 +33,18 @@
         </div>
       </section>
       <footer class="mdc-dialog__footer">
-        <div style="margin-right: auto;">
-          <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--delete" v-on:click="deleteProgram(program)">
-            <i class="material-icons mdc-button__icon">delete</i>
-            <span>Delete</span>
-          </button>
-        </div>
-        <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--cancel" v-on:click="close"><i class="material-icons mdc-button__icon">clear</i><span>Cancel</span></button>
-        <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--accept mdc-button--raised" v-on:click="confirm"><i class="material-icons mdc-button__icon">check</i><span>Update</span></button>
+        <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--delete" v-on:click="deleteProgram(program)">
+          <i class="material-icons mdc-button__icon">delete</i>
+          <span>{{ $t('actions.delete') }}</span>
+        </button>
+        <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--cancel" v-on:click="close">
+          <i class="material-icons mdc-button__icon">clear</i>
+          <span>{{ $t('actions.cancel') }}</span>
+        </button>
+        <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--accept mdc-button--raised" v-on:click="confirm">
+          <i class="material-icons mdc-button__icon">check</i>
+          <span>{{ $t('actions.update') }}</span>
+        </button>
       </footer>
     </div>
     <div class="mdc-dialog__backdrop"></div>
@@ -66,6 +70,9 @@ export default {
     textField.MDCTextField.attachTo(this.$el.querySelector('.mdc-text-field'))
     Event.$off('programDialog.show').$on('programDialog.show', this.show)
     Event.$off('programDialog.close').$on('programDialog.close', this.close)
+    this.dialog.focusTrap_.activate = () => {
+      this.$el.querySelector('input#name').select()
+    }
   },
   methods: {
     show: function (program) {
@@ -78,7 +85,14 @@ export default {
       this.dialog.close()
     },
     confirm: function () {
+      this.$el.querySelector('.mdc-dialog__footer__button--accept').disabled = true
       this.updateProgram(this.program, this.$el.querySelectorAll('input[type=file]'))
+        .then((response) => {
+          this.close()
+        })
+        .finally(() => {
+          this.$el.querySelector('.mdc-dialog__footer__button--accept').disabled = false
+        })
     },
     fileChange: function (event) {
       if (event.target.files.length > 0) {
@@ -105,12 +119,10 @@ export default {
         }
       }
       Event.$emit('progressbar.toggle', true)
-      this.$http.put(`/api/programs/${program._id}`, data).then(
+      return this.$http.put(`/api/programs/${program._id}`, data).then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('program.updated', response.body)
-          Event.$emit('snackbar.message', `Program ${response.body.name} updated`)
-          this.close()
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
@@ -124,7 +136,6 @@ export default {
         function (response) {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('program.deleted', program)
-          Event.$emit('snackbar.message', 'Program ' + program.name + ' deleted')
           this.close()
           window.location = this.$router.resolve({name: 'Programs'}).href
         },
@@ -239,5 +250,6 @@ export default {
 
 .mdc-dialog__footer__button--delete {
   color: red;
+  margin-right: auto;
 }
 </style>

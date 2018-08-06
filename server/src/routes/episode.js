@@ -4,7 +4,9 @@ const logger = require('../logger');
 const Episode = require('../models/episode')
 const Topic = require('../models/topic')
 const Media = require('../models/media')
-const XSplit = require('../models/xsplit')
+const Scene = require('../models/scene')
+const fs = require('fs')
+const path = require('path')
 
 router.route('/')
   /**
@@ -32,15 +34,14 @@ router.route('/')
    */
   .get(function(req, res, next) {
     Episode
-        .find({ program: req.program._id })
-        // .populate({ path: 'program', select: 'name' })
-        .sort({ 'number': -1 })
-        .then(function(episodes) {
-            res.json(episodes)
-        })
-        .catch(function(error) {
-            next(error)
-        });
+      .find({ program: req.program._id })
+      .sort({ 'number': -1 })
+      .then(function(episodes) {
+          res.json(episodes)
+      })
+      .catch(function(error) {
+          next(error)
+      });
   })
   /**
    * @swagger
@@ -79,58 +80,38 @@ router.route('/')
     
     // provide a number if the user didn't specified one
     if (typeof episode.number === "undefined") {
-      var programEpisodes = await Episode.find({ program: req.program._id }).exec()
+      const programEpisodes = await Episode.find({ program: req.program._id }).exec()
 
       // Max episode number + 1 - inspired by https://stackoverflow.com/a/4020842
-      var maxEpisodeNumber = programEpisodes.length > 0 ? Math.max.apply(
-          Math,
-          programEpisodes.map(function(e){
-              return e.number
-          })
+      const maxEpisodeNumber = programEpisodes.length > 0 ? Math.max.apply(
+        Math,
+        programEpisodes.map(function(e){
+            return e.number
+        })
       ) : 0
       episode.number = 1 + maxEpisodeNumber
     }
 
-    // provide a name if the user didn't specified one
-    if (typeof episode.name === "undefined") {
-        episode.name = "Episode #" + episode.number;
-    }
-
     episode
-        .save()
-        .then(function(episode) {
-            logger.debug("Added a new Episode " + episode.toString())
-            // add episode to program to retrieve them all by using 'populate'
-            req.program.episodes.push(episode)
-            req.program.save()
-
-            res.json(episode)
-        })
-        .catch(function(error) {
-            next(error)
-        })
+      .save()
+      .then(function(episode) {
+          res.json(episode)
+      })
+      .catch(function(error) {
+          next(error)
+      })
   })
 
 // Middleware : we check if the episode exists in the specified program before going further
 router.param('episodeId', function (req, res, next, value, name) {
   Episode
     .findOne({_id: value, program: req.program._id})
-    // .populate({ 
-    //   path: 'topics',
-    //   // options: {
-    //   //   sort: { position: 1 }
-    //   // },
-    //   populate: {
-    //     path: 'medias',
-    //     model: 'Media'
-    //   } 
-    // })
     .then(function(episode) {
       if (episode !== null) {
         req.episode = episode
         next()
       } else {
-        next({message:"Episode " + value + " was not found", status: 404})
+        next({message: `Episode ${value} was not found`, status: 404})
       }
     })
     .catch(function(error) {
@@ -203,12 +184,11 @@ router.route('/:episodeId')
   .put(function (req, res, next) {
     delete req.body.started
     delete req.body.ended
-    
+
     req.episode = Object.assign(req.episode, req.body, {modified: Date.now()})
     req.episode
       .save()
       .then(function(episode) {
-        logger.debug("Updated " + episode.toString())
         res.json(episode)
       })
       .catch(function(error) {
@@ -244,19 +224,18 @@ router.route('/:episodeId')
       .remove()
       .then(function(result) {
         if (result !== null) {
-          logger.debug("Removed Episode " + req.params.episodeId)
-          let xsplit = new XSplit()
-          xsplit.episode = null
-          xsplit.topic = null
-          xsplit.media = null
-          xsplit.title = null
-          xsplit.picture = null
-          xsplit.logo = null
-          xsplit.save()
+          let scene = new Scene()
+          scene.episode = null
+          scene.topic = null
+          scene.media = null
+          scene.title = null
+          scene.picture = null
+          scene.logo = null
+          scene.save()
           
           res.status(204).json(result.toString())
         } else {
-          next({message:"Episode " + req.params.episodeId + " wasn't deleted", status: 417})
+          next({message: `Episode ${req.params.episodeId} wasn't deleted`, status: 417})
         }
       })
       .catch(function(error) {
@@ -292,20 +271,21 @@ router.route('/:episodeId')
  */
 router.get('/:episodeId/start', function (req, res, next) {
   req.episode.started = Date.now()
+  req.episode.ended = null
   req.episode
       .save()
       .then(function(episode) {
-        logger.debug("Started " + episode.toString())
+        logger.debug(`Started Episode\n${episode.toString()}`)
         res.json(episode)
 
-        let xsplit = new XSplit()
-        xsplit.episode = req.episode
-        xsplit.title = episode.name
-        xsplit.topic = null
-        xsplit.media = null
-        xsplit.picture = null
-        xsplit.logo = req.program.logoBW
-        xsplit.save()
+        let scene = new Scene()
+        scene.episode = req.episode
+        scene.title = episode.name
+        scene.topic = null
+        scene.media = null
+        scene.picture = null
+        scene.logo = req.program.logoBW
+        scene.save()
       })
       .catch(function(error) {
         next(error)
@@ -371,23 +351,23 @@ router.get('/:episodeId/stop', function (req, res, next) {
             .catch(function(error) {
               logger.error(error)
             })
-          logger.debug("Stopped " + episode.toString())
+          logger.debug(`Stopped Episode\n${episode.toString()}`)
           res.json(episode)
 
-          let xsplit = new XSplit()
-          xsplit.episode = null
-          xsplit.topic = null
-          xsplit.media = null
-          xsplit.title = null
-          xsplit.picture = null
-          xsplit.logo = null
-          xsplit.save()
+          let scene = new Scene()
+          scene.episode = null
+          scene.topic = null
+          scene.media = null
+          scene.title = null
+          scene.picture = null
+          scene.logo = null
+          scene.save()
         })
         .catch(function(error) {
           next(error)
         })
   } else {
-    next({message:"Episode " + req.params.episodeId + " cannot be stopped if it isn't playing", status: 417})
+    next({message:`Episode ${req.params.episodeId} cannot be stopped if it isn't playing`, status: 417})
   }
 })
 
@@ -433,7 +413,7 @@ router.get('/:episodeId/next', function (req, res, next) {
                 nextTopic = topics[i]
                 break
               } else {
-                next({message: "Episode " + req.params.episodeId + " is at its end", status: 400})
+                next({message: `Episode ${req.params.episodeId} is at its end`, status: 400})
                 return
               }
             }
@@ -443,15 +423,15 @@ router.get('/:episodeId/next', function (req, res, next) {
           nextTopic
             .save()
             .then(function(topicStarted) {
-              logger.debug("Started " + topicStarted.toString())
+              logger.debug(`Started Topic\n${topicStarted.toString()}`)
               res.json(topicStarted)
 
-              let xsplit = new XSplit()
-              xsplit.topic = topicStarted
-              xsplit.media = null
-              xsplit.title = topicStarted.title
-              xsplit.picture = null
-              xsplit.save()
+              let scene = new Scene()
+              scene.topic = topicStarted
+              scene.media = null
+              scene.title = topicStarted.title
+              scene.picture = null
+              scene.save()
             })
             .catch(function(error) {
               next(error)
@@ -461,8 +441,141 @@ router.get('/:episodeId/next', function (req, res, next) {
           next(error)
         })
   } else {
-    next({message:"Episode " + req.params.episodeId + " isn't playing", status: 417})
+    next({message:`Episode ${req.params.episodeId} isn't playing`, status: 417})
   }
+})
+
+/**
+ * @swagger
+ * /programs/{programId}/episodes/{episodeId}/clone:
+ *   get:
+ *     tags:
+ *       - Episodes
+ *     description: >
+ *       Clone the Episode into a new one.
+ *       All objects inside the new document have their time reset and aren't playing.
+ *     summary: Clone the Episode
+ *     produces: application/json
+ *     parameters:
+ *       - name: programId
+ *         description: Program's id
+ *         in: path
+ *         required: true
+ *         type: uuid
+ *       - name: episodeId
+ *         description: Episode's id
+ *         in: path
+ *         required: true
+ *         type: uuid
+ *     responses:
+ *       200:
+ *         description: Episode newly created
+ *         schema:
+ *           $ref: '#/definitions/Episode'
+ */
+router.get('/:episodeId/clone', async function (req, res, next) {
+  // get a new Episode number inside the Program
+  const programEpisodes = await Episode.find({ program: req.program._id }).exec()
+  const maxEpisodeNumber = programEpisodes.length > 0 ? Math.max.apply(
+      Math,
+      programEpisodes.map(function(e){
+          return e.number
+      })
+  ) : 0
+
+  let newEpisode = new Episode(Object.assign({}, req.episode.toObject(), {
+    _id: undefined,
+    __v: undefined,
+    name: req.episode.name ? `Copy of ${req.episode.name}` : req.episode.name,
+    started: null,
+    ended: null,
+    number: 1 + maxEpisodeNumber,
+    topics: [],
+    created: Date.now(),
+    modified: Date.now()
+  }))
+  newEpisode.program = req.program._id
+
+  newEpisode
+    .save()
+    .then(async (newEpisodeSaved) => {
+      /*
+       * to make all save synchronous, we chain the 'save' Promises
+       */
+      function cloneMediasSync(mediaCollection, parentTopic) {
+        return mediaCollection.reduce((promise, media) => {
+          let newMedia = new Media(Object.assign({}, media.toObject(), {
+            _id: undefined,
+            __v: undefined,
+            started: null,
+            ended: null,
+            created: Date.now(),
+            modified: Date.now(),
+            topic: parentTopic._id
+          }))
+
+          if (media.path) {
+            const pathObject = path.parse(media.path)
+            const newFilePath = `${path.join(pathObject.dir, pathObject.name)}-copy${pathObject.ext}` 
+            fs.copyFileSync(media.path, newFilePath)
+            newMedia.path = newFilePath
+            newMedia.uri = newFilePath.replace(process.env.DATA_PATH, '/data').replace(/\\/g, path.posix.sep)
+          }
+
+          return promise
+            .then((result) => {
+              return newMedia.save().then((newMediaSaved) => {
+              });
+            })
+            .catch((error) => {
+              logger.error(error)
+            });
+        }, Promise.resolve());
+      }
+
+      function cloneTopicsSync(topicCollection, parentEpisode) {
+        return topicCollection.reduce(async (promise, topic) => {
+          let newTopic = new Topic(Object.assign({}, topic.toObject(), {
+            _id: undefined,
+            __v: undefined,
+            started: null,
+            ended: null,
+            medias: [],
+            created: Date.now(),
+            modified: Date.now(),
+            episode: parentEpisode._id
+          }))
+
+          // get all Topic's Medias
+          const medias = await Media
+            .find({ topic: topic._id })
+            .sort({ 'position': 1 })
+
+          return promise
+            .then((result) => {
+              return newTopic.save().then((savedTopic) => {
+                return cloneMediasSync(medias, savedTopic.toObject())
+              });
+            })
+            .catch((error) => {
+              logger.error(error)
+            });
+        }, Promise.resolve());
+      }
+
+      // get all Episode's Topics
+      const topics = await Topic
+        .find({ episode: req.episode._id })
+        .sort({ 'position': 1 })
+        .exec()
+
+      cloneTopicsSync(topics, newEpisodeSaved.toObject()).then(() => {
+        res.json(newEpisodeSaved)
+      })
+    })
+    .catch((error) => {
+      next(error)
+    })
 })
 
 router.use('/:episodeId/topics', require('./topic'));

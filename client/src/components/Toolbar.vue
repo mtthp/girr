@@ -48,11 +48,11 @@ export default {
         this.$el.querySelector('.mdc-toolbar__row:first-child').classList.remove('flex')
       }
     })
-    document.title = `${this.title} - GIRR`
+    document.title = `${this.title} - Studio Renegade`
   },
   watch: {
     title: function (newTitle) {
-      document.title = `${newTitle} - GIRR`
+      document.title = `${newTitle} - Studio Renegade`
     }
   },
   methods: {
@@ -99,5 +99,14 @@ export default {
 
 .mdc-toolbar--flexible .mdc-toolbar__row:first-child.flex .material-icons {
   color: var(--mdc-theme-text-secondary-on-light,rgba(0,0,0,.54));
+}
+
+.mdc-linear-progress {
+  max-height: 4px;
+  transition: max-height 300ms;
+}
+
+.mdc-linear-progress:not(.mdc-linear-progress--indeterminate){
+  max-height: 0;
 }
 </style>

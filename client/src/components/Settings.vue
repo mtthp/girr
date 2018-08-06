@@ -2,27 +2,27 @@
   <div>
     <Toolbar :title="'Settings'"></Toolbar>
     <main class="mdc-toolbar-fixed-adjust">
-      <div class="mdc-text-field mdc-text-field--fullwidth mdc-text-field--with-trailing-icon" v-bind:class="{ 'mdc-text-field--upgraded' : xsplit.title }">
+      <div class="mdc-text-field mdc-text-field--fullwidth mdc-text-field--with-trailing-icon" v-bind:class="{ 'mdc-text-field--upgraded' : scene.title }">
         <i class="material-icons mdc-text-field__icon" tabindex="0">label</i>
-        <input type="text" id="title" class="mdc-text-field__input" v-model.lazy="xsplit.title" v-on:change="updateXsplit({title: $event.target.value})">
-        <label for="title" class="mdc-text-field__label" v-bind:class="{ 'mdc-text-field__label--float-above' : xsplit.title }">Title</label>
+        <input type="text" id="title" class="mdc-text-field__input" v-model.lazy="scene.title" v-on:change="updateScene({title: $event.target.value})">
+        <label for="title" class="mdc-text-field__label" v-bind:class="{ 'mdc-text-field__label--float-above' : scene.title }">{{ $t('settings.title_input_label') }}</label>
       </div>
-      <div class="mdc-text-field mdc-text-field--fullwidth mdc-text-field--with-trailing-icon" v-bind:class="{ 'mdc-text-field--upgraded' : xsplit.picture }">
+      <div class="mdc-text-field mdc-text-field--fullwidth mdc-text-field--with-trailing-icon" v-bind:class="{ 'mdc-text-field--upgraded' : scene.picture }">
         <i class="material-icons mdc-text-field__icon" tabindex="0">photo</i>
-        <input type="text" id="picture" class="mdc-text-field__input" v-model.lazy="xsplit.picture" v-on:change="updateXsplit({picture: $event.target.value})">
-        <label for="picture" class="mdc-text-field__label" v-bind:class="{ 'mdc-text-field__label--float-above' : xsplit.picture }">Picture</label>
+        <input type="text" id="picture" class="mdc-text-field__input" v-model.lazy="scene.picture" v-on:change="updateScene({picture: $event.target.value})">
+        <label for="picture" class="mdc-text-field__label" v-bind:class="{ 'mdc-text-field__label--float-above' : scene.picture }">{{ $t('settings.picture_input_label') }}</label>
       </div>
-      <div class="mdc-text-field mdc-text-field--fullwidth mdc-text-field--with-trailing-icon" v-bind:class="{ 'mdc-text-field--upgraded' : xsplit.logo }">
+      <div class="mdc-text-field mdc-text-field--fullwidth mdc-text-field--with-trailing-icon" v-bind:class="{ 'mdc-text-field--upgraded' : scene.logo }">
         <i class="material-icons mdc-text-field__icon flip-vertically" tabindex="0">photo_album</i>
-        <input type="text" id="logo" class="mdc-text-field__input" v-model.lazy="xsplit.logo" v-on:change="updateXsplit({logo: $event.target.value})">
-        <label for="logo" class="mdc-text-field__label" v-bind:class="{ 'mdc-text-field__label--float-above' : xsplit.logo }">Logo</label>
+        <input type="text" id="logo" class="mdc-text-field__input" v-model.lazy="scene.logo" v-on:change="updateScene({logo: $event.target.value})">
+        <label for="logo" class="mdc-text-field__label" v-bind:class="{ 'mdc-text-field__label--float-above' : scene.logo }">{{ $t('settings.logo_input_label') }}</label>
       </div>
-      <div class="mdc-text-field mdc-text-field--fullwidth mdc-text-field--with-trailing-icon" v-bind:class="{ 'mdc-text-field--upgraded' : xsplit.background }">
+      <div class="mdc-text-field mdc-text-field--fullwidth mdc-text-field--with-trailing-icon" v-bind:class="{ 'mdc-text-field--upgraded' : scene.background }">
         <i class="material-icons mdc-text-field__icon" tabindex="0">photo_size_select_large</i>
-        <input type="text" id="background" class="mdc-text-field__input" v-model.lazy="xsplit.background" v-on:change="updateXsplit({background: $event.target.value})">
-        <label for="background" class="mdc-text-field__label" v-bind:class="{ 'mdc-text-field__label--float-above' : xsplit.background }">Background</label>
+        <input type="text" id="background" class="mdc-text-field__input" v-model.lazy="scene.background" v-on:change="updateScene({background: $event.target.value})">
+        <label for="background" class="mdc-text-field__label" v-bind:class="{ 'mdc-text-field__label--float-above' : scene.background }">{{ $t('settings.background_input_label') }}</label>
       </div>
-      <scenes :scenes="xsplit.scenes" v-if="xsplit.scenes"></scenes>
+      <scenes :scenes="scene.scenes" v-if="scene.scenes"></scenes>
     </main>
   </div>
 </template>
@@ -41,21 +41,21 @@ export default {
   },
   data () {
     return {
-      xsplit: {}
+      scene: {}
     }
   },
   computed: {
-    xsplitPath: function () {
-      return this.$router.resolve({name: 'Xsplit'}).href
+    scenePath: function () {
+      return this.$router.resolve({name: 'Scene'}).href
     }
   },
   watch: {// call again the method if the route changes
-    '$route': 'getXsplit'
+    '$route': 'getScene'
   },
   created () {
-    this.getXsplit()
-    this.$options.sockets['xsplit'] = (data) => {
-      this.xsplit = data
+    this.getScene()
+    this.$options.sockets['scene'] = (data) => {
+      this.scene = data
     }
   },
   mounted () {
@@ -64,12 +64,12 @@ export default {
     })
   },
   methods: {
-    getXsplit: function () {
+    getScene: function () {
       Event.$emit('progressbar.toggle', true)
-      this.$http.get('/api/xsplit/').then(
+      this.$http.get('/api/scene/').then(
         (response) => {
           Event.$emit('progressbar.toggle', false)
-          this.xsplit = response.body
+          this.scene = response.body
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
@@ -77,12 +77,12 @@ export default {
         }
       )
     },
-    updateXsplit: function (data) {
+    updateScene: function (data) {
       Event.$emit('progressbar.toggle', true)
-      this.$http.put('/api/xsplit/', data).then(
+      this.$http.put('/api/scene/', data).then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
-          this.xsplit = response.body
+          this.scene = response.body
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)

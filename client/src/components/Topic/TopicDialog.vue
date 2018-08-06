@@ -7,22 +7,22 @@
     <div class="mdc-dialog__surface">
       <header class="mdc-dialog__header">
         <h2 id="my-mdc-dialog-label" class="mdc-dialog__header__title">
-          {{ title }}
+          {{ title ? title : $t('topic.untitled') }}
         </h2>
       </header>
       <section id="my-mdc-dialog-description" class="mdc-dialog__body mdc-dialog__body--scrollable">
         <div class="mdc-text-field mdc-text-field--fullwidth" v-bind:class="{ 'mdc-text-field--upgraded' : topic.title }">
-          <input type="text" id="title" class="mdc-text-field__input" v-model.lazy="topic.title">
-          <label for="title" class="mdc-text-field__label" v-bind:class="{ 'mdc-text-field__label--float-above' : topic.title }">Title</label>
+          <input type="text" id="title" class="mdc-text-field__input" v-model.lazy="topic.title" v-on:keyup.enter="confirm" >
+          <label for="title" class="mdc-text-field__label" v-bind:class="{ 'mdc-text-field__label--float-above' : topic.title }">{{ $t('topic.title_label') }}</label>
         </div>
         <div class="mdc-text-field mdc-text-field--fullwidth mdc-text-field--textarea">
-          <textarea id="description" class="mdc-text-field__input" rows="8" placeholder="Description" v-model.lazy="topic.description">{{ topic.description }}</textarea>
+          <textarea id="description" class="mdc-text-field__input" rows="8" :placeholder="$t('topic.description_label')" v-model.lazy="topic.description">{{ topic.description }}</textarea>
         </div>
         <div class="mdc-grid-list">
           <ul class="mdc-grid-list__tiles">
             <li class="mdc-grid-tile" v-for="media in medias">
               <div class="mdc-grid-tile__primary">
-                <img class="mdc-grid-tile__primary-content" :src="media._id && media.uri ? media.uri + '?height=256' : media.uri" />
+                <img class="mdc-grid-tile__primary-content" :src="media._id && media.thumbnail ? media.thumbnail : media.uri" />
                 <i class="material-icons" v-on:click="deleteMedia(media)">cancel</i>
               </div>
               <span class="mdc-grid-tile__secondary" v-if="media.label">
@@ -31,7 +31,7 @@
             </li>
             <li class="mdc-grid-tile add-tile">
               <div class="mdc-grid-tile__primary">
-                <input type="file" name="file" accept="image/*" class="input-file" v-on:change="fileChange($event.target.name, $event.target.files);" style="display: none;">
+                <input type="file" name="file" accept="image/*" class="input-file" v-on:change="fileChange($event);" style="display: none;">
                 <img class="mdc-grid-tile__primary-content" v-on:click="$event.currentTarget.parentNode.querySelector('input').click()"/>
               </div>
               <span class="mdc-grid-tile__secondary">
@@ -45,14 +45,18 @@
         </div>
       </section>
       <footer class="mdc-dialog__footer">
-        <div style="margin-right: auto;">
-          <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--delete" v-on:click="deleteTopic(topic)">
-            <i class="material-icons mdc-button__icon">delete</i>
-            <span>Delete</span>
-          </button>
-        </div>
-        <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--cancel" v-on:click="close"><i class="material-icons mdc-button__icon">clear</i><span>Cancel</span></button>
-        <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--accept mdc-button--raised" v-on:click="confirm"><i class="material-icons mdc-button__icon">check</i><span>Update</span></button>
+        <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--delete" v-on:click="deleteTopic(topic)">
+          <i class="material-icons mdc-button__icon">delete</i>
+          <span>{{ $t('actions.delete') }}</span>
+        </button>
+        <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--cancel" v-on:click="close">
+          <i class="material-icons mdc-button__icon">clear</i>
+          <span>{{ $t('actions.cancel') }}</span>
+        </button>
+        <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--accept mdc-button--raised" v-on:click="confirm">
+          <i class="material-icons mdc-button__icon">check</i>
+          <span>{{ $t('actions.update') }}</span>
+        </button>
       </footer>
     </div>
     <div class="mdc-dialog__backdrop"></div>
@@ -81,6 +85,9 @@ export default {
     this.addTileTextfield = new textField.MDCTextField(this.$el.querySelector('.add-tile .mdc-text-field'))
     Event.$off('topicDialog.show').$on('topicDialog.show', this.show)
     Event.$off('topicDialog.close').$on('topicDialog.close', this.close)
+    this.dialog.focusTrap_.activate = () => {
+      this.$el.querySelector('input#title').select()
+    }
   },
   methods: {
     show: function (topic, medias) {
@@ -93,23 +100,43 @@ export default {
     close: function () {
       this.dialog.close()
     },
-    confirm: function () {
-      Event.$emit(`topics.${this.topic._id}.update`, this.topic, this.medias)
-      this.updateTopic(this.topic)
+    confirm: function (event) {
+      this.$el.querySelector('.mdc-dialog__footer__button--accept').disabled = true
+      this
+        .updateTopic(this.topic)
+        .then((response) => {
+          Event.$emit(`topics.${this.topic._id}.update`, this.topic, this.medias)
+          this.close()
+        })
+        .finally(() => {
+          this.$el.querySelector('.mdc-dialog__footer__button--accept').disabled = false
+        })
     },
-    fileChange: function (name, files) {
+    fileChange: function (event) {
+      const files = event.target.files
       if (files.length > 0) {
         let FR = new FileReader()
         FR.addEventListener('load', (e) => {
-          this.medias.push({uri: e.target.result, label: files[0].name, file: files[0]})
+          const highestPosition = Math.max.apply(Math, this.medias.map(m => m.position))
+          this.medias.push({
+            uri: e.target.result,
+            label: files[0].name,
+            file: files[0],
+            position: (isFinite(highestPosition) ? highestPosition : 0) + 1
+          })
+          event.target.value = null
         })
         FR.readAsDataURL(files[0])
       }
     },
     uriChange: function (event) {
       if (validUrl.isUri(event.target.value)) {
-        this.medias.push({uri: event.target.value})
-        event.target.value = ''
+        const highestPosition = Math.max.apply(Math, this.medias.map(m => { return m.position }))
+        this.medias.push({
+          uri: event.target.value,
+          position: (isFinite(highestPosition) ? highestPosition : 0) + 1
+        })
+        event.target.value = null
         this.addTileTextfield.valid = true
       } else {
         this.addTileTextfield.valid = false
@@ -123,12 +150,10 @@ export default {
     },
     updateTopic: function (topic) {
       Event.$emit('progressbar.toggle', true)
-      this.$http.put(`/api/programs/${this.$route.params.programId}/episodes/${this.$route.params.episodeId}/topics/${topic._id}`, topic).then(
+      return this.$http.put(`/api/programs/${this.$route.params.programId}/episodes/${this.$route.params.episodeId}/topics/${topic._id}`, topic).then(
         function (response) {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('topic.updated', response.body)
-          Event.$emit('snackbar.message', `Topic ${response.body.title} updated`)
-          this.close()
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
@@ -142,7 +167,6 @@ export default {
         function (response) {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('topic.deleted', topic)
-          Event.$emit('snackbar.message', `Topic ${topic.title} deleted`)
           this.close()
         },
         function (response) {
@@ -199,6 +223,10 @@ export default {
   cursor: pointer;
 }
 
+.mdc-grid-tile__primary i:hover {
+  color: var(--mdc-theme-secondary);
+}
+
 .add-tile img {
   cursor: pointer;
   background: transparent;
@@ -250,5 +278,6 @@ export default {
 
 .mdc-dialog__footer__button--delete {
   color: red;
+  margin-right: auto;
 }
 </style>

@@ -1,8 +1,8 @@
 <template>
   <div class="empty-state">
-    <h3>Oops ! It looks like empty in here</h3>
+    <h3>{{ $t('empty_state.title') }}</h3>
     <i class="large material-icons">priority_high</i>
-    <p>You can add something by clicking on the Add (+) button</p>
+    <p>{{ $t('empty_state.message') }}</p>
   </div>
 </template>
 
@@ -16,7 +16,7 @@ export default {
 .empty-state {
   display: flex;
   flex-flow: column;
-  height: calc(100vh - 68px); /* 68px == header height. Alright this is far from perfect */
+  height: calc(100vh - 68px - 8px); /* 68px == header height and 8px == episode padding top. Alright this is far from perfect */
   max-width: 90vw;
   text-align: center;
   margin: auto;

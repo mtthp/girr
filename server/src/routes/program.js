@@ -66,10 +66,9 @@ router.route('/')
    *           $ref: '#/definitions/Program'
    */
   .post(function(req, res, next) {
-    let program = new Program(Object.assign({name: "New Program at " + (new Date()).toLocaleTimeString()}, req.body, {created: Date.now(), modified: Date.now()}));
+    let program = new Program(Object.assign(req.body, { created: Date.now(), modified: Date.now() }));
     program.save()
       .then(function(program) {
-        logger.debug("Add a new Program " + program.toString())
         res.json(program)
       })
       .catch(function(error) {
@@ -81,13 +80,12 @@ router.route('/')
 router.param('programId', function (req, res, next, value, name) {
   Program
     .findOne({_id: value})
-    // .populate('episodes')
     .then(function(program) {
       if (program !== null) {
         req.program = program
         next()
       } else {
-        next({message:"Program " + value + " was not found", status: 404})
+        next({message: `Program ${value} was not found`, status: 404})
       }
     })
     .catch(function(error) {
@@ -165,7 +163,6 @@ router.route('/:programId')
     req.program
       .save()
       .then(function(program) {
-        logger.debug("Updated " + program.toString())
         res.json(program)
       })
       .catch(function(error) {
@@ -197,10 +194,9 @@ router.route('/:programId')
       .remove()
       .then(function(result) {
         if (result !== null) {
-          logger.debug("Removed Program " + req.params.programId)
           res.status(204).json(result.toString())
         } else {
-          next({message:"Program " + req.params.programId + " wasn't deleted", status: 417})
+          next({message: `Program ${req.params.programId} wasn't deleted`, status: 417})
         }
       })
       .catch(function(error) {

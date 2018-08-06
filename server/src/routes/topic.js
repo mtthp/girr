@@ -5,7 +5,7 @@ const logger = require('../logger')
 const Topic = require('../models/topic')
 const Media = require('../models/media')
 const Episode = require('../models/episode')
-const XSplit = require('../models/xsplit')
+const Scene = require('../models/scene')
 
 router.route('/')
   /**
@@ -38,14 +38,14 @@ router.route('/')
    */
   .get(function(req, res, next) {
     Topic
-        .find({ episode: req.episode._id })
-        .sort({ 'position': 1 })
-        .then(function(topics) {
-            res.json(topics)
-        })
-        .catch(function(error) {
-            next(error)
-        });
+      .find({ episode: req.episode._id })
+      .sort({ 'position': 1 })
+      .then(function(topics) {
+        res.json(topics)
+      })
+      .catch(function(error) {
+        next(error)
+      });
   })
   /**
    * @swagger
@@ -83,57 +83,46 @@ router.route('/')
     delete req.body.started
     delete req.body.ended
 
-    var topic = new Topic(Object.assign(req.body, {created: Date.now(), modified: Date.now()}))
+    let topic = new Topic(Object.assign(req.body, {created: Date.now(), modified: Date.now()}))
     topic.episode = req.episode._id
-
-    // provide a title if the user didn't specified one
-    if (typeof topic.title === "undefined") {
-        topic.title = "Untitled topic"
-    }
 
     // provide a position if the user didn't specified one
     if (typeof topic.position === "undefined") {
-        var episodeTopics = await Topic.find({ episode: req.episode._id }).exec()
+      const episodeTopics = await Topic.find({ episode: req.episode._id }).exec()
 
-        // Max topic position + 1 - inspired by https://stackoverflow.com/a/4020842
-        var maxTopicNumber = episodeTopics.length > 0 ? Math.max.apply(
-            Math,
-            episodeTopics.map(function(t){
-                return t.position;
-            })
-        ) : 0;
-        topic.position = 1 + maxTopicNumber;
+      // Max topic position + 1 - inspired by https://stackoverflow.com/a/4020842
+      const maxTopicNumber = episodeTopics.length > 0 ? Math.max.apply(
+        Math,
+        episodeTopics.map(function(t){
+            return t.position;
+        })
+      ) : 0;
+      topic.position = 1 + maxTopicNumber;
     }
 
     topic
-        .save()
-        .then(function(topic) {
-            logger.debug("Added a new Episode " + topic.toString())
-            // add topic to episode to retrieve them all by using 'populate'
-            req.episode.topics.push(topic)
-            req.episode.save()
-
-            res.json(topic)
-        })
-        .catch(function(error) {
-            next(error)
-        })
+      .save()
+      .then(function(topic) {
+        res.json(topic)
+      })
+      .catch(function(error) {
+        next(error)
+      })
   })
 
-// Middleware : we check if the topic exists in the specified program before going further
+// Middleware : we check if the topic exists in the specified episode before going further
 router.param('topicId', function (req, res, next, value, name) {
   delete req.body.started
   delete req.body.ended
 
   Topic
     .findOne({_id: value, episode: req.episode._id})
-    // .populate('medias')
     .then(function(topic) {
       if (topic !== null) {
         req.topic = topic
         next()
       } else {
-        next({message:"Topic " + value + " was not found", status: 404})
+        next({message: `Topic ${value} was not found`, status: 404})
       }
     })
     .catch(function(error) {
@@ -221,7 +210,7 @@ router.route('/:topicId')
     req.topic
       .save()
       .then(function(topic) {
-        logger.debug("Updated " + topic.toString())
+        logger.debug(`Updated Topic\n${topic.toString()}`)
         res.json(topic)
       })
       .catch(function(error) {
@@ -262,10 +251,9 @@ router.route('/:topicId')
       .remove()
       .then(function(result) {
         if (result !== null) {
-          logger.debug("Removed Topic " + req.params.topicId)
           res.status(204).json(result.toString())
         } else {
-          next({message:"Topic " + req.params.topicId + " wasn't deleted", status: 417})
+          next({message: `Topic ${req.params.topicId} wasn't deleted`, status: 417})
         }
       })
       .catch(function(error) {
@@ -310,15 +298,15 @@ router.get('/:topicId/start', function (req, res, next) {
   req.topic
     .save()
     .then(function(topicStarted) {
-      logger.debug("Started " + topicStarted.toString())
+      logger.debug(`Started Topic\n${topicStarted.toString()}`)
 
       res.json(topicStarted)
-      
-      let xsplit = new XSplit()
-      xsplit.topic = topicStarted
-      xsplit.title = topicStarted.title
-      xsplit.media = null // no content should be displayed when cast start talking about a Topic
-      xsplit.picture = null
+
+      let scene = new Scene()
+      scene.topic = topicStarted
+      scene.title = topicStarted.title
+      scene.media = null // no content should be displayed when cast start talking about a Topic
+      scene.picture = null
 
       // we start the parent Episode if it isn't already
       if (!(req.episode.started && !req.episode.ended)) {
@@ -326,10 +314,10 @@ router.get('/:topicId/start', function (req, res, next) {
         req.episode.ended = null
         req.episode.save()
 
-        xsplit.logo = req.program.logoBW
-        xsplit.episode = req.episode
+        scene.logo = req.program.logoBW
+        scene.episode = req.episode
       }
-      xsplit.save()
+      scene.save()
     })
     .catch(function(error) {
       next(error)
@@ -386,14 +374,14 @@ router.get('/:topicId/stop', function (req, res, next) {
           .catch(function(error) {
             logger.error(error)
           })
-        var xsplit = new XSplit()
-        xsplit.topic = null
-        xsplit.media = null
-        xsplit.title = req.episode.name
-        xsplit.picture = null
-        xsplit.save()
+        let scene = new Scene()
+        scene.topic = null
+        scene.media = null
+        scene.title = req.episode.name
+        scene.picture = null
+        scene.save()
 
-        logger.debug("Started " + topic.toString())
+        logger.debug(`Stopped Topic\n${topic.toString()}`)
         res.json(topic)
       })
       .catch(function(error) {
@@ -443,13 +431,13 @@ router.get('/:topicId/stop', function (req, res, next) {
  */
 router.get('/:topicId/move', async function (req, res, next) {
   if (!req.query.position) {
-    next({message:"A new position is needed to perform a move", status: 417, example: '/move?position=10'})
+    next({message: 'A new position is needed to perform a move', status: 417, example: '/move?position=10'})
   }
 
-  var newPosition = parseInt(req.query.position)
+  const newPosition = parseInt(req.query.position)
 
-  var episodeTopics = await Topic.find({ episode: req.episode._id }).sort({ 'position': 1 }).exec()
-  for (var i = 0; i < episodeTopics.length; i++) {
+  let episodeTopics = await Topic.find({ episode: req.episode._id }).sort({ 'position': 1 }).exec()
+  for (let i = 0; i < episodeTopics.length; i++) {
     if (episodeTopics[i]._id.equals(req.topic._id)) {
       var topicToMove = episodeTopics[i]
       episodeTopics.splice(i, 1)
@@ -459,14 +447,14 @@ router.get('/:topicId/move', async function (req, res, next) {
   }
 
   if (topicToMove) {
-    for (var i = 0; i < episodeTopics.length; i++) {
+    for (let i = 0; i < episodeTopics.length; i++) {
       episodeTopics[i].position = i
       episodeTopics[i].save()
     }
 
     res.json(episodeTopics)
   } else {
-    next({message:"Couldn't move the Topic at the new position " + newPosition, status: 500})
+    next({message: `Couldn't move the Topic at the new position ${newPosition}`, status: 500})
   }
 })
 

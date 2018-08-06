@@ -37,7 +37,7 @@ npm start --prefix server
 ## Install all dependencies (including dev ones)
 ```bash
 npm install --prefix client
-npm install --prefix <section></section>rver
+npm install --prefix server
 ```
 
 ## Start the application

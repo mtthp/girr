@@ -14,21 +14,21 @@ function WebSockets() {
 
     // to log every messages being transmitted => https://stackoverflow.com/a/9042249
     var originalEmit = this.instance.sockets.emit
-    this.instance.sockets.emit = function () {
-      var event = arguments[0]
-      var data  = arguments[1]
+    this.instance.sockets.emit = function() {
+      const event = arguments[0]
+      const data  = arguments[1]
       if (!event.includes('connect')) { // osef des connect et disconnect
-        logger.debug('[WS] ' + event + ' : ' + CircularJSON.stringify(data))
+        logger.debug(`[WS] >> ${event} :\n${CircularJSON.stringify(data)}`)
       }
       originalEmit.apply(this, Array.prototype.slice.call(arguments));
     }
 
     // log connect and disconnect
     this.instance.on('connection', function(socket) {
-      logger.info('[WS] New connection from ' + socket.request.connection.remoteAddress)
+      logger.info(`[WS] ${socket.request.connection.remoteAddress} connected`)
       this.instance.emit('users.count', Object.keys(this.instance.sockets.connected).length)
       socket.on('disconnect', function(reason) {
-        logger.info('[WS] ' + socket.request.connection.remoteAddress + ' just disconnected')
+        logger.info(`[WS] ${socket.request.connection.remoteAddress} disconnected`)
         this.instance.emit('users.count', Object.keys(this.instance.sockets.connected).length)
       }.bind(this))
     }.bind(this))

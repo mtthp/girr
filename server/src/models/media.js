@@ -5,30 +5,6 @@ const fs = require('fs')
 const path  = require('path')
 const websockets = require('../websockets')()
 
-/*
- * The purpose of this setter is to end all playing medias
- * because there can be only one to rule them all
- */
-function stopPlayingMedias (time_value) {
-  this.constructor // get the Model to execute queries
-    .find({ ended : null })
-    .where('_id').ne(this._id)
-    .where('started').ne(null)
-    .then(function(results) { // we end all medias that are playing
-      results.forEach(function (media) {
-        media.ended = Date.now()
-        media.save()
-      })
-    })
-    .catch(function(error) {
-      logger.error(error)
-    })
-
-  this.ended = null
-
-  return time_value // hmm, we can also return Date.now() instead ?
-}
-
 /**
  * @swagger
  * definitions:
@@ -60,41 +36,93 @@ let mediaSchema = new mongoose.Schema({
   label: { type: String },
   uri: { type: String, required: true},
   mimeType: { type: String, required: true},
-  path: { type: String }, // in the case of a local file
+  path: { type: String }, // this should always be the absolute path to the file
   position: { type: Number },
-  started: { type: Date, set: stopPlayingMedias },
+  started: { type: Date },
   ended: { type: Date },
   created: { type: Date, required: true },
   modified: { type: Date, required: true },
   topic: { type: mongoose.Schema.Types.ObjectId, ref:'Topic', required: true },
 })
 
+const mediaModel = mongoose.model('Media', mediaSchema)
+
 mediaSchema.methods.toJSON = function() {
- var obj = this.toObject()
+ let obj = this.toObject()
  delete obj.path // remove/hide the local path
  return obj
 }
 
+// when a Media should be removed, delete its local file
+mediaSchema.pre('remove', function(next) {
+  if (this.path) {
+    const filepath = path.isAbsolute(this.path) ? this.path : path.join(__base, this.path)
+    if (fs.existsSync(filepath)) {
+      logger.debug(`Removing file at ${filepath}`)
+      fs.unlinkSync(filepath)
+    }
+  }
+  next()
+})
+
 // when a Media is removed, delete its file
 mediaSchema.post('remove', function(media) {
-  logger.debug("Removed Media " + media._id)
+  logger.debug(`Removed Media ${media._id}`)
   websockets.sockets.emit('medias.' + media._id + '.delete', media)
-
-  if (fs.existsSync(path.join(__base, media.path))) {
-    fs.unlinkSync(path.join(__base, media.path))
-  }
 })
 
 mediaSchema.pre('save', function(next) {
   this.wasNew = this.isNew
-  next()
+
+  // stop all others medias if this one starts playing
+  if (this.isModified('started') && this.started && !this.ended) {
+    mediaModel
+      .find({ ended : null })
+      .where('_id').ne(this._id)
+      .where('started').ne(null)
+      .then(function(results) {
+        results.forEach(function (media) {
+          media.ended = Date.now()
+          media.save()
+        })
+        next()
+      })
+      .catch(function(error) {
+        logger.error(error)
+      })
+  } else {
+    next()
+  }
 })
 
 mediaSchema.post('save', function(media) {
   if (this.wasNew) {
+    logger.debug(`Added a new Media\n${media.toString()}`)
     websockets.sockets.emit('medias.add', media)
+  } else {
+    logger.debug(`Updated Media\n${media.toString()}`)
   }
   websockets.sockets.emit('medias.' + media._id, media)
 })
 
-module.exports = mongoose.model('Media', mediaSchema)
+mediaSchema.virtual('thumbnail').get(function() {
+  if (this.mimeType.includes('html')) {
+    // https://stackoverflow.com/a/2068371
+    if (this.uri.startsWith('https://youtube') || this.uri.startsWith('https://www.youtube')) {
+      const [uri, queries] = this.uri.split('?')
+      if (/v=([^&]*)/.test(queries)) {
+        // https://www.youtube.com/watch?v=XXXXXXXXX
+        return `https://img.youtube.com/vi/${queries.match(/v=([^&]*)/).pop()}/default.jpg`
+      } else {
+        // https://www.youtube.com/embed/XXXXXXXXX?autoplay=true
+        return `https://img.youtube.com/vi/${uri.match(/([^/]*)\/*$/).pop()}/default.jpg`
+      }
+    }
+    return null
+  }
+  return `${this.uri}?height=256`
+})
+mediaSchema.set('toObject', { virtuals: true })
+mediaSchema.set('toJSON', { virtuals: true })
+
+module.exports = mediaModel

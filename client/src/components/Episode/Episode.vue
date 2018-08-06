@@ -1,15 +1,16 @@
 <template>
   <div class="episode">
     <EpisodeDialog></EpisodeDialog>
-    <Toolbar :title="episode.name">
+    <Toolbar :title="episode.name || $t('episode.unnamed', [episode.number])">
       <section class="mdc-toolbar__section mdc-toolbar__section--align-end" slot="headerActions">
         <time v-if="episode.started" >{{ timePlayed | formatTime }}</time>
         <button class="material-icons mdc-toolbar__icon mdc-ripple-surface toggle-menu" arial-label="Menu" data-mdc-auto-init="MDCRipple">more_vert</button>
         <div class="mdc-simple-menu mdc-simple-menu--open-from-top-right" tabindex="-1">
           <ul class="mdc-simple-menu__items mdc-list" role="menu" aria-hidden="true">
-            <li class="mdc-list-item" role="menuitem" tabindex="0" v-on:click="editEpisode">Edit</li>
-            <li class="mdc-list-item" role="menuitem" tabindex="0" v-on:click="stopEpisode(episode)" v-if="episode.started && !episode.ended">Stop</li>
-            <li class="mdc-list-item" role="menuitem" tabindex="0" v-on:click="startEpisode(episode)" v-else>Start</li>
+            <li class="mdc-list-item" role="menuitem" tabindex="0" v-on:click="editEpisode">{{ $t('actions.edit') }}</li>
+            <li class="mdc-list-item" role="menuitem" tabindex="0" v-on:click="stopEpisode(episode)" v-if="episode.started && !episode.ended">{{ $t('actions.stop') }}</li>
+            <li class="mdc-list-item" role="menuitem" tabindex="0" v-on:click="startEpisode(episode)" v-else>{{ $t('actions.start') }}</li>
+            <li class="mdc-list-item" role="menuitem" tabindex="0" v-on:click="cloneEpisode(episode)">{{ $t('actions.clone') }}</li>
           </ul>
         </div>
       </section>
@@ -24,7 +25,7 @@
         @change="itemMoved"
         class="topics mdc-list mdc-list--avatar-list mdc-list--two-line">
         <transition-group name="fade">
-          <TopicCard v-for="topic in topics" :key="topic._id" :topic="topic" v-bind:class="{ expanded : topic.expanded }"></TopicCard>
+          <TopicCard v-for="topic in topics" :key="topic._id" :topic="topic" v-bind:class="{ expanded : topic.expanded,  'mdc-elevation--z8' : topic.expanded }"></TopicCard>
         </transition-group>
       </draggable>
       <EmptyState v-else></EmptyState>
@@ -87,22 +88,22 @@ export default {
         Event.$emit('topic.added', topic)
       }
     }
-    Event.$on('episode.update', (episode) => {
+    Event.$off('episode.update').$on('episode.update', (episode) => {
       this.updateEpisode(episode)
     })
-    Event.$on('episode.delete', (episode) => {
+    Event.$off('episode.delete').$on('episode.delete', (episode) => {
       this.deleteEpisode(episode)
     })
-    Event.$on('episode.updated', (episode) => {
+    Event.$off('episode.updated').$on('episode.updated', (episode) => {
       this.episode = episode
     })
-    Event.$on('topic.added', (topic) => {
+    Event.$off('topic.added').$on('topic.added', (topic) => {
       const index = this.topics.indexOf(this.topics.find(function (episodeTopic) {
         return episodeTopic._id === topic._id
       }))
       if (index < 0) this.topics.push(topic)
     })
-    Event.$on('topic.updated', (topic) => {
+    Event.$off('topic.updated').$on('topic.updated', (topic) => {
       for (let i = 0; i < this.topics.length; i++) {
         if (this.topics[i]._id === topic._id) {
           topic.expanded = this.topics[i].expanded // to keep expanded topics, well... expanded
@@ -113,7 +114,7 @@ export default {
         }
       }
     })
-    Event.$on('topic.deleted', (topic) => {
+    Event.$off('topic.deleted').$on('topic.deleted', (topic) => {
       const index = this.topics.indexOf(this.topics.find(function (episodeTopic) {
         return episodeTopic._id === topic._id
       }))
@@ -181,7 +182,6 @@ export default {
         function (response) {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('episode.updated', response.body)
-          Event.$emit('snackbar.message', `Episode ${response.body.name} started`)
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
@@ -195,7 +195,19 @@ export default {
         function (response) {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('episode.updated', response.body)
-          Event.$emit('snackbar.message', `Episode ${response.body.name} stopped`)
+        },
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          Event.$emit('http.error', response)
+        }
+      )
+    },
+    cloneEpisode: function (episode) {
+      Event.$emit('progressbar.toggle', true)
+      this.$http.get(`/api/programs/${this.$route.params.programId}/episodes/${this.$route.params.episodeId}/clone`).then(
+        function (response) {
+          Event.$emit('progressbar.toggle', false)
+          window.location = this.$router.resolve({ name: 'Episode', params: { programId: response.body.program, episodeId: response.body._id } }).href
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
@@ -219,10 +231,10 @@ export default {
     addTopic: function () {
       Event.$emit('progressbar.toggle', true)
       this.$http.post(`/api/programs/${this.$route.params.programId}/episodes/${this.$route.params.episodeId}/topics/`).then(
-        function (response) {
+        (response) => {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('topic.added', response.body)
-          Event.$emit('snackbar.message', 'Added a new topic')
+          window.scrollTo(0, this.$el.scrollHeight)
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
@@ -259,10 +271,12 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+
 .topics {
   max-width: 1024px;
   margin: 0 auto;
   border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 0;
 }
 
 @media (max-width: 1280px) {
@@ -278,7 +292,11 @@ export default {
 }
 
 @media(min-width: 1024px) {
-   .fab {
+  main {
+    padding-top: 8px;
+  }
+
+  .fab {
     bottom: 1.5rem;
     right: 1.5rem;
   }

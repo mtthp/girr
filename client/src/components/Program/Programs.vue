@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Toolbar :title="programs.length + ' Programs'"></Toolbar>
+    <Toolbar :title="$t('program.title', [programs.length])"></Toolbar>
     <main class="mdc-toolbar-fixed-adjust" :class="{ empty: programs.length == 0 }">
       <div v-if="programs.length > 0" class="programs">
         <ProgramDialog></ProgramDialog>
@@ -13,7 +13,7 @@
         </router-link>
       </div>
       <EmptyState v-else></EmptyState>
-      <button class="mdc-fab material-icons fab" aria-label="add" data-mdc-auto-init="MDCRipple" v-on:click="addProgram">
+      <button class="mdc-fab material-icons fab" :aria-label="$t('actions.add')" data-mdc-auto-init="MDCRipple" v-on:click="addProgram">
         <span class="mdc-fab__icon">
           add
         </span>
@@ -94,10 +94,10 @@ export default {
     addProgram: function () {
       Event.$emit('progressbar.toggle', true)
       this.$http.post('/api/programs').then(
-        function (response) {
+        (response) => {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('program.added', response.body)
-          Event.$emit('snackbar.message', `Added ${response.body.name}`)
+          window.scrollTo(0, this.$el.scrollHeight)
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)

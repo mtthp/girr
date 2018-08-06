@@ -2,9 +2,9 @@ const cache = require('memory-cache')
 const websockets = require('../websockets')()
 
 /**
- * Class representing the displayed data for XSplit
+ * Class representing the displayed data for Scene
  */
-class XSplit {
+class Scene {
 
   /**
    * @swagger
@@ -13,7 +13,7 @@ class XSplit {
    *     properties:
    *       title:
    *         type: string
-   *         description: displayed title on the xsplit scene
+   *         description: displayed title on the scene scene
    *       picture:
    *         type: string
    *         description: picture uri
@@ -31,7 +31,7 @@ class XSplit {
    *         $ref: '#/definitions/Media'
    *       scenes:
    *         type: array
-   *         description: XSplit scenes
+   *         description: Scene scenes
    *         items:
    *           type: object
    *           properties:
@@ -47,7 +47,7 @@ class XSplit {
    */
   constructor () {
     "use strict";
-    let data = cache.get('xsplit')
+    let data = cache.get('scene')
     if (data !== null) {
       this.title = data.title
       this.picture = data.picture
@@ -79,9 +79,9 @@ class XSplit {
   }
 
   save() {
-    cache.put('xsplit', this)
-    websockets.sockets.emit('xsplit', this)
+    cache.put('scene', this)
+    websockets.sockets.emit('scene', this)
   }
 }
 
-module.exports = XSplit;
+module.exports = Scene;

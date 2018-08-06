@@ -2,23 +2,23 @@
   <div class="topic" v-bind:class="{ playing : topic.started !== null && topic.ended === null }">
     <li role="separator" class="mdc-list-divider"></li>
     <li class="mdc-list-item" data-mdc-auto-init="MDCRipple" v-on:click="toggle(!topic.expanded)">
-      <img v-if="medias.length > 0" class="mdc-list-item__graphic unselectable" :src="medias[0].uri ? medias[0].uri + '?height=56' : null" width="56" height="56" :alt="medias[0].label">
+      <img v-if="thumbnail" class="mdc-list-item__graphic unselectable" :src="thumbnail" width="56" height="56" :alt="medias[0].label">
       <span v-else class="mdc-list-item__graphic" role="presentation">
         <i class="material-icons" aria-hidden="true">comment</i>
       </span>
       <span class="mdc-list-item__text">
-        {{ topic.title }}
+        {{ topic.title ? topic.title : $t('topic.untitled') }}
         <span class="mdc-list-item__secondary-text" v-if="topic.started">{{ timePlayed | formatTime }}</span>
       </span>
       <span class="mdc-list-item__meta">
-        <i class="mdc-icon-toggle material-icons edit-button" arial-label="Edit" v-on:click="editTopic">edit</i>
-        <i v-if="topic.started !== null && topic.ended === null" class="mdc-icon-toggle material-icons" arial-label="Stop" v-on:click="stopTopic">stop</i>
-        <i v-else class="mdc-icon-toggle material-icons" arial-label="Playing" v-on:click="startTopic">play_arrow</i>
-        <i class="material-icons chevron unselectable" arial-label="Chevron">keyboard_arrow_down</i>
+        <i class="mdc-icon-toggle material-icons edit-button" :arial-label="$t('actions.edit')" v-on:click="editTopic">edit</i>
+        <i v-if="topic.started !== null && topic.ended === null" class="mdc-icon-toggle material-icons stop-button" :arial-label="$t('actions.stop')" v-on:click="stopTopic">stop</i>
+        <i v-else class="mdc-icon-toggle material-icons play-button" :arial-label="$t('actions.play')" v-on:click="startTopic">play_arrow</i>
+        <i class="material-icons chevron unselectable" :arial-label="$t('actions.expand')">keyboard_arrow_down</i>
       </span>
     </li>
     <div class="content">
-      <pre>{{ topic.description ? topic.description : 'Empty in here' }}</pre>
+      <pre v-if="topic.description">{{ topic.description }}</pre>
       <div class="mdc-grid-list">
         <draggable
           v-if="medias.length > 0"
@@ -31,7 +31,7 @@
         </draggable>
       </div>
     </div>
-  </div> 
+  </div>
 </template>
 
 <script>
@@ -53,6 +53,9 @@ export default {
     draggable
   },
   computed: {
+    thumbnail () {
+      return this.medias.length > 0 ? this.medias[0].thumbnail : null
+    },
     dragOptions () {
       return {
         animation: 0,
@@ -163,7 +166,6 @@ export default {
         function (response) {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('topic.updated', response.body)
-          Event.$emit('snackbar.message', `Topic ${response.body.title} started`)
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
@@ -178,7 +180,6 @@ export default {
         function (response) {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('topic.updated', response.body)
-          Event.$emit('snackbar.message', `Topic ${response.body.title} stopped`)
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
@@ -209,7 +210,6 @@ export default {
         (response) => {
           Event.$emit('progressbar.toggle', false)
           Event.$emit(`topic.${this.topic._id}.media.added`, response.body)
-          Event.$emit('snackbar.message', `Added ${response.body.label}`)
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
@@ -223,7 +223,6 @@ export default {
         (response) => {
           Event.$emit('progressbar.toggle', false)
           Event.$emit(`topic.${this.topic._id}.media.deleted`, media)
-          Event.$emit('snackbar.message', `Media ${media.label} deleted`)
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
@@ -267,7 +266,6 @@ export default {
 
 .topic .content {
   max-height: 0px;
-  margin: 10px 0;
   overflow: hidden;
   padding: 0 16px;
   transition: all 0.2s, max-height 0.2s; /* close rapidly */
@@ -281,6 +279,10 @@ export default {
 
 .topic.expanded .content pre {
   font-family: inherit;
+  white-space: -moz-pre-wrap;
+  white-space: -o-pre-wrap;
+  white-space: pre-wrap;
+  word-wrap: break-word;
 }
 
 .topic .chevron {
@@ -329,7 +331,9 @@ export default {
   display: inherit;
 }
 
-.topic:not(.expanded) .edit-button {
+.topic:not(.expanded):not(:hover) .edit-button,
+.topic:not(.expanded):not(:hover) .play-button,
+.topic:not(.expanded):not(:hover) .stop-button {
   display: none;
 }
 

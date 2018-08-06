@@ -4,7 +4,7 @@ const router = express.Router()
 const logger = require('../logger')
 const Media = require('../models/media')
 const Topic = require('../models/topic')
-const XSplit = require('../models/xsplit')
+const Scene = require('../models/scene')
 const path = require('path')
 const multer = require('multer')
 const uuidv4 = require('uuid/v4')
@@ -124,7 +124,7 @@ router.route('/')
       logger.debug('Receive a file : ')
       logger.debug(req.file)
       // provide a label if the user didn't specified one
-      if (typeof media.label === "undefined") { // something is wrong, the label cannot be sent in the request body
+      if (typeof media.label === 'undefined') { // something is wrong, the label cannot be sent in the request body
         media.label = req.file.originalname
       }
       media.path = req.file.path
@@ -132,26 +132,27 @@ router.route('/')
       media.mimeType = req.file.mimetype
     } else if (media.uri) { // otherwise, tries to download the file and place it under the data directory
       let response = await request({uri: media.uri, encoding: 'binary', resolveWithFullResponse: true})
-      let mimeType = response.headers['content-type']
-      let uploadsPath = process.env.DATA_PATH + '/uploads'
-      if (!fs.existsSync(uploadsPath)) fs.mkdirSync(uploadsPath)
-      let filepath = uploadsPath + '/' + path.basename(media.uri.split('?')[0], path.extname(media.uri)).replace(/\s/g, "_") + '-' + uuidv4() + '.' + mime.getExtension(mimeType)
-      fs.writeFileSync(path.resolve(filepath), response.body, 'binary')
+      media.mimeType = response.headers['content-type'].split(";").shift()
+      if (!media.mimeType.includes('html')) {
+        let uploadsPath = process.env.DATA_PATH + '/uploads'
+        if (!fs.existsSync(uploadsPath)) fs.mkdirSync(uploadsPath)
+        let filepath = uploadsPath + '/' + path.basename(media.uri.split('?')[0], path.extname(media.uri)).replace(/\s/g, "_") + '-' + uuidv4() + '.' + mime.getExtension(media.mimeType)
+        fs.writeFileSync(path.resolve(filepath), response.body, 'binary')
 
-      if (typeof media.label === "undefined") media.label = path.basename(media.uri)
-      media.path = filepath
-      media.uri = media.path.replace(process.env.DATA_PATH, '/data').replace(/\\/g, path.posix.sep)
-      media.mimeType = mimeType
+        if (typeof media.label === 'undefined') media.label = path.basename(media.uri)
+        media.path = filepath
+        media.uri = media.path.replace(process.env.DATA_PATH, '/data').replace(/\\/g, path.posix.sep)
+      }
     } else {
-      next({message:"No media file or URI was provided", status: 417})
+      next({message: 'No media file or URI was provided', status: 417})
     }
 
     // provide a position if the user didn't specified one
     if (typeof media.position === "undefined") {
-      var topicMedias = await Media.find({ topic: req.topic._id }).exec()
+      const topicMedias = await Media.find({ topic: req.topic._id }).exec()
 
       // Max media position + 1 - inspired by https://stackoverflow.com/a/4020842
-      var maxMediaPosition = topicMedias.length > 0 ? Math.max.apply(
+      const maxMediaPosition = topicMedias.length > 0 ? Math.max.apply(
           Math,
           topicMedias.map(function(m){
               return m.position;
@@ -163,11 +164,6 @@ router.route('/')
     media
       .save()
       .then(function(media) {
-        logger.debug("Added a new Media " + media.toString())
-        // add media to topic to retrieve them all by using 'populate'
-        req.topic.medias.push(media)
-        req.topic.save()
-
         res.json(media)
       })
       .catch(function(error) {
@@ -184,7 +180,7 @@ router.param('mediaId', function (req, res, next, value, name) {
         req.media = media
         next()
       } else {
-        next({message:"Media " + value + " was not found", status: 404})
+        next({message: `Media ${value} was not found`, status: 404})
       }
     })
     .catch(function(error) {
@@ -282,7 +278,6 @@ router.route('/:mediaId')
     req.media
       .save()
       .then(function(media) {
-        logger.debug("Updated " + media.toString())
         res.json(media)
       })
       .catch(function(error) {
@@ -328,7 +323,6 @@ router.route('/:mediaId')
       .remove()
       .then(function(result) {
         if (result !== null) {
-          logger.debug("Removed Media " + req.params.mediaId)
           res.status(204).json(result.toString())
         } else {
           next({message:"Media " + req.params.mediaId + " wasn't deleted", status: 417})
@@ -377,15 +371,16 @@ router.route('/:mediaId')
  */
 router.get('/:mediaId/start', function (req, res, next) {
   req.media.started = Date.now()
+  req.media.ended = null
   req.media
       .save()
       .then(function(media) {
-        logger.debug("Started " + media.toString())
+        logger.debug(`Started Media\n${media.toString()}`)
         res.json(media)
 
-        let xsplit = new XSplit()
-        xsplit.media = media
-        xsplit.picture = media.uri
+        let scene = new Scene()
+        scene.media = media
+        scene.picture = media.uri
 
         // we start the parent Topic if it isn't already
         if (!(req.topic.started && !req.topic.ended)) {
@@ -393,8 +388,8 @@ router.get('/:mediaId/start', function (req, res, next) {
           req.topic.ended = null
           req.topic.save()
 
-          xsplit.topic = req.topic
-          xsplit.title = req.topic.title
+          scene.topic = req.topic
+          scene.title = req.topic.title
         }
 
         // we start the parent Episode if it isn't already
@@ -403,11 +398,11 @@ router.get('/:mediaId/start', function (req, res, next) {
           req.episode.ended = null
           req.episode.save()
 
-          xsplit.episode = req.episode
-          xsplit.logo = req.program.logoBW
+          scene.episode = req.episode
+          scene.logo = req.program.logoBW
         }
 
-        xsplit.save()
+        scene.save()
       })
       .catch(function(error) {
         next(error)
@@ -455,11 +450,11 @@ router.get('/:mediaId/stop', function (req, res, next) {
   req.media
       .save()
       .then(function(media) {
-        logger.debug("Stopped " + media.toString())
-        var xsplit = new XSplit()
-        xsplit.media = null
-        xsplit.picture = null
-        xsplit.save()
+        logger.debug(`Stopped Media\n${media.toString()}`)
+        let scene = new Scene()
+        scene.media = null
+        scene.picture = null
+        scene.save()
         res.json(media)
       })
       .catch(function(error) {
@@ -512,13 +507,13 @@ router.get('/:mediaId/stop', function (req, res, next) {
  */
 router.get('/:mediaId/move', async function (req, res, next) {
   if (!req.query.position) {
-    next({message:"A new position is needed to perform a move", status: 417, example: '/move?position=10'})
+    next({message: 'A new position is needed to perform a move', status: 417, example: '/move?position=10'})
   }
 
-  var newPosition = parseInt(req.query.position)
+  const newPosition = parseInt(req.query.position)
 
-  var topicMedias = await Media.find({ topic: req.topic._id }).sort({ 'position': 1 }).exec()
-  for (var i = 0; i < topicMedias.length; i++) {
+  let topicMedias = await Media.find({ topic: req.topic._id }).sort({ 'position': 1 }).exec()
+  for (let i = 0; i < topicMedias.length; i++) {
     if (topicMedias[i]._id.equals(req.media._id)) {
       var mediaToMove = topicMedias[i]
       topicMedias.splice(i, 1)
@@ -528,14 +523,14 @@ router.get('/:mediaId/move', async function (req, res, next) {
   }
 
   if (mediaToMove) {
-    for (var i = 0; i < topicMedias.length; i++) {
+    for (let i = 0; i < topicMedias.length; i++) {
       topicMedias[i].position = i
       topicMedias[i].save()
     }
 
     res.json(topicMedias)
   } else {
-    next({message:"Couldn't move the Media at the new position " + newPosition, status: 500})
+    next({message: `Couldn't move the Media at the new position ${newPosition}`, status: 500})
   }
 })
 

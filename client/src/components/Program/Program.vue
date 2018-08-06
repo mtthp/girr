@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Toolbar :title="program.name" class="mdc-toolbar--flexible mdc-toolbar--flexible-default-behavior">
+    <Toolbar :title="program.name || $t('program.unnamed')" class="mdc-toolbar--flexible mdc-toolbar--flexible-default-behavior">
       <section class="mdc-toolbar__section mdc-toolbar__section--align-end" slot="headerActions">
         <button class="material-icons mdc-toolbar__icon mdc-ripple-surface" arial-label="Edit" v-on:click="editProgram">edit</button>
       </section>
@@ -96,7 +96,7 @@ export default {
       // change the Toolbar's first row background image
       let tbFirstRow = this.$el.querySelector('.mdc-toolbar--flexible .mdc-toolbar__row:first-child')
       let styleElem = tbFirstRow.querySelector('style') ? tbFirstRow.querySelector('style') : tbFirstRow.appendChild(document.createElement('style'))
-      styleElem.innerHTML = '.mdc-toolbar--flexible .mdc-toolbar__row:first-child::after { background-image: url(' + (value.thumbnail ? value.thumbnail : require('../../assets/geekinc-logo_452.png')) + '); }'
+      styleElem.innerHTML = '.mdc-toolbar--flexible .mdc-toolbar__row:first-child::after { background-image: url(' + (value.thumbnail ? value.thumbnail : require('../../assets/studiorenegade-logo_157.png')) + '); }'
     }
   },
   methods: {
@@ -137,7 +137,6 @@ export default {
         function (response) {
           Event.$emit('progressbar.toggle', false)
           Event.$emit('episode.added', response.body)
-          Event.$emit('snackbar.message', 'Added a new episode')
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)

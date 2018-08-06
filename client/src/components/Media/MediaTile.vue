@@ -1,7 +1,7 @@
 <template>
   <li class="mdc-grid-tile" :class="{ playing : media.started && !media.ended }" v-on:click="toggleMedia(media)">
     <div class="mdc-grid-tile__primary">
-      <img class="mdc-grid-tile__primary-content" :src="this.media.uri ? this.media.uri + '?height=256' : null" />
+      <img class="mdc-grid-tile__primary-content" :src="media.thumbnail" />
     </div>
     <span v-if="media.started && !media.ended" class="mdc-grid-tile__secondary">
       <span class="mdc-grid-tile__title">{{ timePlayed | formatTime }}</span>
@@ -54,7 +54,6 @@ export default {
         (response) => {
           Event.$emit('progressbar.toggle', false)
           Event.$emit(`topics.${this.topicId}.media.updated`, response.body)
-          Event.$emit('snackbar.message', `Media ${response.body.label} started`)
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
@@ -68,7 +67,6 @@ export default {
         (response) => {
           Event.$emit('progressbar.toggle', false)
           Event.$emit(`topics.${this.topicId}.media.updated`, response.body)
-          Event.$emit('snackbar.message', `Media ${response.body.label} stopped`)
         },
         function (response) {
           Event.$emit('progressbar.toggle', false)
@@ -91,7 +89,7 @@ export default {
 <style scoped>
 .mdc-grid-tile {
   --mdc-grid-list-tile-width: 256px;
-  margin: 2px auto;
+  margin: 8px auto;
 }
 
 @media screen and (max-width: 991px) {

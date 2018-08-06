@@ -1,0 +1,53 @@
+{
+	"actions": {
+		"add": "Ajouter",
+		"delete": "Supprimer",
+		"update": "Mettre à jour",
+		"edit": "Éditer",
+		"cancel": "Annuler",
+		"start": "Démarrer",
+		"play": "Jouer",
+		"stop": "Arrêter",
+		"pause": "Mettre en pause",
+		"expand": "Étendre",
+		"clone": "Cloner"
+	},
+	"program": {
+		"title": "{0} Émissions",
+		"name_label": "Nom",
+		"episodes_count": "{0} Épisode{1}",
+		"unnamed": "Émission sans nom"
+	},
+	"episode": {
+		"name_label": "Nom",
+		"number_label": "Position",
+		"subtitle": "Épisode #{0} - {1}",
+		"not_yet_started": "Pas encore démarré",
+		"unnamed": "Épisode #{0}"
+	},
+	"topic": {
+		"title_label": "Titre",
+		"description_label": "Description",
+		"untitled": "Sujet sans titre"
+	},
+	"drawer": {
+		"title": "Studio Renegade Remote Regie",
+	  	"programs_label": "Émissions",
+	  	"scene_label": "Scène",
+	  	"settings_label": "Réglages",
+	  	"api_label": "API"
+	},
+	"settings": {
+		"title_input_label": "Titre",
+		"picture_input_label": "Image",
+		"logo_input_label": "Logo",
+		"background_input_label": "Fond"
+	},
+	"empty_state": {
+		"title": "Oups ! Il semble ne rien avoir ici",
+		"message": "Vous pouvez ajouter quelque chose en cliquant sur le bouton Ajouter (+)"
+	},
+	"bottom_bar": {
+		"go_to_episode": "Aller à {0}"
+	}
+}
