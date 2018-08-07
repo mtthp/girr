@@ -123,7 +123,7 @@ body {
 <!-- Google Material Icons -->
 <style>@import '../node_modules/material-design-icons/iconfont/material-icons.css'</style>
 
-<style>@import 'https://fonts.googleapis.com/css?family=Oswald'</style>
+<style>@import 'https://fonts.googleapis.com/css?family=Montserrat:500,600,700'</style>
 
 <!-- Styling MDC -->
 <style>
