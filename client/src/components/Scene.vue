@@ -135,9 +135,9 @@ export default {
   flex: 1 0 auto; /* grow to content */
   margin: 0.5em 30px;
   padding: 0 30px;
-  font-family:'Montserra', sans-serif;
-  font-weight: 400;
-  font-size: 48px;
+  font-family:'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 40px;
   color: black;
   background-color: white;
   text-transform: uppercase;
