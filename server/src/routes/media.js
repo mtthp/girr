@@ -142,6 +142,35 @@ router.route('/')
         if (typeof media.label === 'undefined') media.label = path.basename(media.uri)
         media.path = filepath
         media.uri = media.path.replace(process.env.DATA_PATH, '/data').replace(/\\/g, path.posix.sep)
+      } else {
+        if (media.uri.startsWith('https://youtube') || media.uri.startsWith('https://www.youtube') || media.uri.startsWith('https://youtu.be')) {
+          const [uri, queries] = media.uri.split('?')
+          if (/v=([^&]*)/.test(queries)) {
+            // https://www.youtube.com/watch?v=XXXXXXXXX
+            media.uri = `https://www.youtube.com/embed/${queries.match(/v=([^&]*)/).pop()}`
+          } else {
+            // https://www.youtube.com/embed/XXXXXXXXX?autoplay=true
+            media.uri = `https://www.youtube.com/embed/${uri.match(/([^/]*)\/*$/).pop()}`
+          }
+          // https://developers.google.com/youtube/player_parameters
+          const defaultQueries = {
+            autoplay: 1,
+            controls: 0,
+            showinfo: 0,
+            enablejsapi: 1,
+            rel: 0,
+            modestbranding: 1,
+            iv_load_policy: 0
+          }
+          const userQueries = queries.split('&').reduce((queriesObject, query) => {
+            const [key, value] = query.split('=')
+            queriesObject[key] = value
+            return queriesObject
+          }, {})
+          const httpQueries = Object.assign(defaultQueries, userQueries)
+
+          media.uri = media.uri.concat(`?${Object.keys(httpQueries).map(key => `${key}=${httpQueries[key]}`).join('&')}`)
+        }
       }
     } else {
       next({message: 'No media file or URI was provided', status: 417})
